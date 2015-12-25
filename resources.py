@@ -275,6 +275,8 @@ def generate_ocean(ocean, **kwargs):
         params_dict['ocean'] = 'constant,delta_SL'
         if 'ocean_delta_SL_file' not in kwargs:
             params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
+    elif ocean in ('const'):
+        params_dict['ocean'] = 'constant'
     else:
         print('ocean {} not recognized, exiting'.format(ocean))
         import sys
