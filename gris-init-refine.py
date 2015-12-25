@@ -43,7 +43,7 @@ parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=['ctrl', 'old_bed', 'ba01_bed', '970mW_hs', 'jak_1985', 'cresis'],
                     help="output size type", default='ctrl')
 parser.add_argument("--forcing_type", dest="forcing_type",
-                    choices=['ctrl', 'e_age', 'ftt', 'e_age_ftt'],
+                    choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
@@ -88,7 +88,6 @@ pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed
 # ########################################################
 
 hydro = 'null'
-pism_surface_bcfile = 'GR6b_ERAI_1989_2011_4800M_BIL_1989_baseline.nc'
 
 sia_e = (3.0)
 ppq = (0.6)
@@ -110,7 +109,6 @@ regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href,thk'
 ftt_starttime = -5000
 
 scripts = []
-posts = []
 
 start = grid_start_times[grid]
 end = 0
@@ -141,35 +139,43 @@ for n, combination in enumerate(combinations):
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
 
         
-    script = 'spinup_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+    script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
-    post = 'spinup_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, experiment)
-    posts.append(post)
     
-    for filename in (script, post):
+    for filename in (script):
         try:
             os.remove(filename)
         except OSError:
             pass
 
     pbs_header = make_pbs_header(system, nn, walltime, queue)
-        
-    
-    os.environ['PISM_EXPERIMENT'] = experiment
-    os.environ['PISM_TITLE'] = 'Greenland Paramter Study'
     
     with open(script, 'w') as f:
 
         f.write(pbs_header)
 
-
         outfile = '{domain}_g{grid}m_spinup_refine_{experiment}_0.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
-        
-        dura = 10
 
+        prefix = generate_prefix_str(pism_exec)
+        
         general_params_dict = OrderedDict()
+        general_params_dict['i'] = pism_dataname
+        if grid_mapping[grid] > 0:
+            previous_grid =  [k for k, v in grid_mapping.iteritems() if v == grid_mapping[grid] -1][0]
+            regridfile = 'save_{domain}_g{grid}m_spinup_{experiment}_{start}.000.nc'.format(domain=domain.lower(),grid=previous_grid, experiment=experiment, start=start)
+            general_params_dict['regrid_file'] = regridfile
+            general_params_dict['regrid_vars'] = regridvars
+        else:
+            general_params_dict['bootstrap'] = ''
+        general_params_dict['ys'] = start
+        general_params_dict['ye'] = end
+        general_params_dict['o'] = outfile
         general_params_dict['o_format'] = oformat
         general_params_dict['o_size'] = osize
+        general_params_dict['config_override'] = 'init_config.nc'
+        general_params_dict['age'] = ''
+        if forcing_type in ('e_age'):
+            general_params_dict['e_age_coupling'] = ''
         
         grid_params_dict = generate_grid_description(grid)
 
@@ -184,49 +190,19 @@ for n, combination in enumerate(combinations):
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate)
         ocean_params_dict = generate_ocean(climate)
+        hydro_params_dict = generate_hydrology(hydro)
+        calving_params_dict = generate_calving(calving, ocean_kill_file=pism_dataname)
+        
         exvars = "climatic_mass_balance_cumulative,tempsurf,diffusivity,temppabase,bmeltvelsurf_mag,mask,thk,topg,usurf,taud_mag,velsurf_mag,climatic_mass_balance,climatic_mass_balance_original,velbase_mag,tauc,taub_mag"
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end)
+        snap_shot_dict = generate_snap_shots(outfile, save_times[grid_mapping[grid]+1::])
 
-        all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, spatial_ts_dict, scalar_ts_dict)
+        
+        all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
         
-        params_dict = OrderedDict()
-        if system in ('debug'):
-            params_dict['PISM_DO'] = 'echo'
-        else:
-            params_dict['PISM_DO'] = ''
-            
-        params_dict['PISM_EXEC'] = pism_exec
-        params_dict['PISM_PARAMS'] = '\'{}\''.format(all_params)
-        params_dict['PISM_SAVE'] = ','.join(str(e) for e in save_times[grid_mapping[grid]+1::])
-        params_dict['STARTEND'] = '{},{}'.format(start, end)
-
-        params_dict['PISM_DATANAME'] = pism_dataname
-        params_dict['PISM_SURFACE_BC_FILE'] = pism_surface_bcfile
-        params_dict['PISM_CONFIG'] = 'init_config.nc'
-        params_dict['TSSTEP'] = tsstep
-        params_dict['EXSTEP'] = exstep
-        if grid_mapping[grid] > 0:
-            previous_grid =  [k for k, v in grid_mapping.iteritems() if v == grid_mapping[grid] -1][0]
-            regridfile = 'save_{domain}_g{grid}m_spinup_{experiment}_{start}.000.nc'.format(domain=domain.lower(),grid=previous_grid, experiment=experiment, start=start)
-            params_dict['REGRIDVARS'] = regridvars
-            params_dict['REGRIDFILE'] = regridfile
-        params_dict['PARAM_NOAGE'] = ''
-        params_dict['PARAM_CALVING'] = calving
-        if calving in ('eigen_calving'):
-            params_dict['PARAM_CALVING_THK'] = calving_thk_threshold
-            params_dict['PARAM_CALVING_K'] = calving_k
-        if forcing_type in ('e_age', 'e_age_ftt'):
-            params_dict['PARAM_E_AGE_COUPLING'] = 'yes'
-        if forcing_type in ('ftt', 'e_age_ftt'):
-            params_dict['PARAM_FTT'] = 'yes'
-            params_dict['PARAM_FTT_STARTTIME'] = ftt_starttime
-            
-        
-        params = ' '.join(['='.join([k, str(v)]) for k, v in params_dict.items()])
-        
-        cmd = ' '.join([params, './run_main.sh', str(nn), str(dura), hydro, outfile, infile, '2>&1 | tee job.${PBS_JOBID}'])
+        cmd = ' '.join([prefix, all_params, '2>&1 | tee job.${PBS_JOBID}'])
 
         f.write(cmd)
         f.write('\n')

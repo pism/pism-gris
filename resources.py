@@ -1,4 +1,17 @@
 from collections import OrderedDict
+import os
+
+def generate_prefix_str(pism_exec):
+    '''
+    Generate prefix string
+    '''
+
+    try:
+        p = os.environ['PISM_PREFIX'] + '/' + pism_exec
+    except:
+        p  = pism_exec
+    
+    return p
 
 
 def generate_domain(domain):
@@ -63,6 +76,20 @@ def generate_scalar_ts(outfile, step, start=None, end=None):
     else:
         times = step
     params_dict['ts_times'] = times
+
+    return params_dict
+
+
+def generate_snap_shots(outfile, times):
+    '''
+    Return dict to generate snap shots
+    '''
+    
+    params_dict = OrderedDict()
+    params_dict['save_file'] = 'save_' + outfile
+    params_dict['save_times'] = ','.join(str(e) for e in times)
+    params_dict['save_split'] = ''
+    params_dict['save_force_output_times'] = ''
 
     return params_dict
 
@@ -183,6 +210,38 @@ def generate_stress_balance(stress_balance, additional_params_dict):
         return merge_dicts(additional_params_dict, params_dict)
 
 
+def generate_hydrology(hydro, **kwargs):
+    '''
+    Generate hydrology params
+    '''
+    
+    params_dict = OrderedDict()
+    if hydro in ('null'):
+        params_dict['hydrology'] = 'null'
+    else:
+        print('hydrology {} not recognized, exiting'.format(hydro))
+        import sys
+        sys.exit(0)
+
+    return merge_dicts(params_dict, kwargs)
+
+
+def generate_calving(calving, **kwargs):
+    '''
+    Generate calving params
+    '''
+    
+    params_dict = OrderedDict()
+    if calving in ('eigen_calving', 'float_kill', 'ocean_kill'):
+        params_dict['calving'] = calving
+    else:
+        print('calving {} not recognized, exiting'.format(calving))
+        import sys
+        sys.exit(0)
+
+    return merge_dicts(params_dict, kwargs)
+
+
 def generate_climate(climate, **kwargs):
     '''
     Generate climate params
@@ -223,61 +282,35 @@ def generate_ocean(ocean, **kwargs):
 
     return merge_dicts(params_dict, kwargs)
 
-    
-#     # set coupler from argument 2
-# if [ "$2" = "const" ]; then
-#   climname="constant-climate"
-#   INLIST=""
-#   # use this if you want constant-climate with force-to-thickness
-#   COUPLER="-surface given$FTT -surface_given_file $PISM_SURFACE_BCFILE $OCEAN"
-#   # COUPLER="-surface given -surface_given_file $PISM_DATANAME"
-# elif [ "$2" = "paleo" ]; then
-#   climname="paleo-climate"
-#   INLIST="$PISM_TEMPSERIES $PISM_SLSERIES"
-#   COUPLER=" -atmosphere searise_greenland,delta_T,paleo_precip -surface pdd$FTT -atmosphere_paleo_precip_file $PISM_TEMPSERIES -atmosphere_delta_T_file $PISM_TEMPSERIES -ocean constant,delta_SL -ocean_delta_SL_file $PISM_SLSERIES"
-# elif [ "$2" = "pdd" ]; then
-#   climname="pdd-climate"
-#   COUPLER=" -atmosphere searise_greenland -surface pdd$FTT $OCEAN"
-# elif [ "$2" = "climate" ]; then
-#   climname="rcm-forcing with constant ocean"
-#   INLIST=""
-#   COUPLER="-surface given -surface_given_file $PISM_SURFACE_BCFILE $OCEAN"
-# elif [ "$2" = "ocean" ]; then
-#   climname="ocean-forcing"
-#   INLIST=""
-#   COUPLER="-surface given -surface_given_file $PISM_SURFACE_BCFILE -ocean given -ocean_given_file $PISM_OCEAN_BCFILE"
-# elif [ "$2" = "climateocean" ]; then
-#   climname="rcm-forcing with ocean-forcing"
-#   INLIST=""
-#   COUPLER="-surface given -surface_given_file $PISM_SURFACE_BCFILE -ocean given -ocean_given_file $PISM_OCEAN_BCFILE"
-# else
-#   echo "invalid second argument; must be in $CLIMLIST"
-#   exit
-# fi
-
 
 def make_pbs_header(system, cores, walltime, queue):
     systems = {}
-    systems['debug'] = {}
-    systems['fish'] = {'gpu' : 16,
+    systems['debug'] = {'mpido' : 'mpiexec -n'}
+    systems['fish'] = {'mpido': 'aprun -n',
+                       'queue' : {
+                       'gpu' : 16,
                        'gpu_long' : 16,
-                       'standard' : 12}
-    systems['pacman'] = {'standard_4' : 4,
-                        'standard_16' : 16}
-    systems['pleiades'] = {'long' : 20,
-                           'normal': 20}
+                           'standard' : 12 }}
+    systems['pacman'] = {'mpido' : 'mpirun -np',
+                         'queue' : {
+                         'standard_4' : 4,
+                             'standard_16' : 16 }}
+    systems['pleiades'] = {'mpido' : 'mpiexec.hydra -n',
+                           'queue' : {
+                           'long' : 20,
+                           'normal': 20}}
 
     assert system in systems.keys()
     if system not in 'debug':
-        assert queue in systems[system].keys()
+        assert queue in systems[system]['queue'].keys()
         assert cores > 0
 
-        ppn = systems[system][queue]
+        ppn = systems[system]['queue'][queue]
         nodes = cores / ppn
 
     if system in ('debug'):
 
-        header = ''
+        header = '{mpido} {cores} '.format(mpido=systems[system]['mpido'], cores=cores)
         
     elif system in ('pleiades'):
         
@@ -292,7 +325,7 @@ def make_pbs_header(system, cores, walltime, queue):
 
 cd $PBS_O_WORKDIR
 
-""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn)
+{mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
     else:
         header = """
 #!/bin/bash
@@ -303,6 +336,6 @@ cd $PBS_O_WORKDIR
 
 cd $PBS_O_WORKDIR
 
-""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn)
+{mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
 
     return header
