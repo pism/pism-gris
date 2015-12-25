@@ -7,7 +7,7 @@ import os
 from argparse import ArgumentParser
 from resources import *
 
-grid_choices = [9000, 4500, 3600, 1800, 1500, 1200, 900, 600, 450, 300, 150]
+grid_choices = [9000, 4500, 3600, 1800, 1500, 1200, 900, 600]
 
 # set up the option parser
 parser = ArgumentParser()
@@ -78,7 +78,7 @@ grid_nos = range(0, no_grid_choices)
 grid_mapping = OrderedDict(zip(grid_choices, grid_nos))
 save_times = [-125000, -25000, -5000, -1500, -1000, -500, -200, -100]
 grid_start_times = OrderedDict(zip(grid_choices, save_times))
-
+print grid_mapping[grid]
 infile = ''
 pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
@@ -104,7 +104,10 @@ topg_max_values = [700]
 combinations = list(itertools.product(calving_thk_threshold_values, calving_k_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
-exstep = 100
+if grid_mapping[grid] < 6:
+    exstep = 100
+else:
+    exstep = 10
 regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href,thk'
 ftt_starttime = -5000
 

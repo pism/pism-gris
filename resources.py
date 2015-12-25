@@ -7,7 +7,7 @@ def generate_prefix_str(pism_exec):
     '''
 
     try:
-        p = os.environ['PISM_PREFIX'] + '/' + pism_exec
+        p = os.environ['PISM_PREFIX']  + pism_exec
     except:
         p  = pism_exec
     
