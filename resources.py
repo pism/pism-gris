@@ -86,7 +86,7 @@ def generate_snap_shots(outfile, times):
     '''
     
     params_dict = OrderedDict()
-    params_dict['save_file'] = 'save_' + outfile.split('.nc')
+    params_dict['save_file'] = 'save_' + outfile.split('.nc')[0]
     params_dict['save_times'] = ','.join(str(e) for e in times)
     params_dict['save_split'] = ''
     params_dict['save_force_output_times'] = ''
