@@ -163,13 +163,12 @@ for n, combination in enumerate(combinations):
         
         general_params_dict = OrderedDict()
         general_params_dict['i'] = pism_dataname
+        general_params_dict['bootstrap'] = ''
         if grid_mapping[grid] > 0:
             previous_grid =  [k for k, v in grid_mapping.iteritems() if v == grid_mapping[grid] -1][0]
             regridfile = 'save_{domain}_g{grid}m_spinup_{experiment}_{start}.000.nc'.format(domain=domain.lower(),grid=previous_grid, experiment=experiment, start=start)
             general_params_dict['regrid_file'] = regridfile
             general_params_dict['regrid_vars'] = regridvars
-        else:
-            general_params_dict['bootstrap'] = ''
         general_params_dict['ys'] = start
         general_params_dict['ye'] = end
         general_params_dict['o'] = outfile
