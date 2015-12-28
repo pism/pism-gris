@@ -255,8 +255,10 @@ def generate_climate(climate, **kwargs):
         if 'atmosphere_delta_T_file' not in kwargs:
             params_dict['atmosphere_delta_T_file'] = 'pism_dT.nc'
         params_dict['surface'] = 'pdd'
-    elif climate in ('const'):
+    elif climate in ('const', 'relax'):
         params_dict['surface'] = 'given'
+    elif climate in ('flux'):
+        params_dict['surface'] = 'given,forcing'
     else:
         print('climate {} not recognized, exiting'.format(climate))
         import sys
