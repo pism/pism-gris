@@ -166,7 +166,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['bootstrap'] = ''
         if grid_mapping[grid] > 0:
             previous_grid =  [k for k, v in grid_mapping.iteritems() if v == grid_mapping[grid] -1][0]
-            regridfile = 'save_{domain}_g{grid}m_refine_{experiment}_{start}.000.nc'.format(domain=domain.lower(),grid=previous_grid, experiment=experiment, start=start)
+            regridfile = 'save_{domain}_g{grid}m_refine_{experiment}_0_{start}.000.nc'.format(domain=domain.lower(),grid=previous_grid, experiment=experiment, start=start)
             general_params_dict['regrid_file'] = regridfile
             general_params_dict['regrid_vars'] = regridvars
         general_params_dict['ys'] = start
