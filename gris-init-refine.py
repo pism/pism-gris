@@ -78,7 +78,6 @@ grid_nos = range(0, no_grid_choices)
 grid_mapping = OrderedDict(zip(grid_choices, grid_nos))
 save_times = [-125000, -25000, -5000, -1500, -1000, -500, -200, -100]
 grid_start_times = OrderedDict(zip(grid_choices, save_times))
-print grid_mapping[grid]
 infile = ''
 pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
@@ -90,8 +89,8 @@ pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed
 hydro = 'null'
 
 sia_e = (3.0)
-ppq = (0.6)
-tefo = (0.02)
+ppq = (0.25, 0.33, 0.60)
+tefo = (0.020, 0.025, 0.030)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
@@ -109,7 +108,6 @@ if grid_mapping[grid] < 6:
 else:
     exstep = 10
 regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href,thk'
-ftt_starttime = -5000
 
 scripts = []
 
