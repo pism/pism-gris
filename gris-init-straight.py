@@ -109,7 +109,7 @@ end = 0
 
 for n, combination in enumerate(combinations):
 
-    calving_thk_threshold, calving_k , phi_min, phi_max, topg_min, topg_max = combination
+    phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 

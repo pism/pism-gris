@@ -100,7 +100,7 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(calving_thk_threshold_values, calving_k_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+combinations = list(itertools.product(ppq, tefo, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
 if grid_mapping[grid] < 6:
@@ -116,7 +116,7 @@ end = 0
 
 for n, combination in enumerate(combinations):
 
-    calving_thk_threshold, calving_k , phi_min, phi_max, topg_min, topg_max = combination
+    ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
