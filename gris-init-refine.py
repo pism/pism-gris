@@ -89,18 +89,16 @@ pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed
 hydro = 'null'
 
 sia_e = (3.0)
-ppq = (0.25, 0.33, 0.60)
-tefo = (0.020, 0.025, 0.030)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
-calving_thk_threshold_values = [300]
-calving_k_values = [1e18]
+ppq_values = [0.25, 0.33, 0.60]
+tefo_values = [0.020, 0.025, 0.030]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(ppq, tefo, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+combinations = list(itertools.product(ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
 if grid_mapping[grid] < 6:
@@ -207,7 +205,7 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         f.write('\n')
 
-    
+
 scripts = uniquify_list(scripts)
 
 submit = 'submit_{domain}_g{grid}m_{climate}_{bed_type}.sh'.format(domain=domain.lower(), grid=grid, climate=climate, bed_type=bed_type)

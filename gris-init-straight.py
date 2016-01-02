@@ -42,6 +42,9 @@ parser.add_argument("-s", "--system", dest="system",
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=['ctrl', 'old_bed', 'ba01_bed', '970mW_hs', 'jak_1985', 'cresis'],
                     help="output size type", default='ctrl')
+parser.add_argument("--bed_deformation", dest="bed_deformation",
+                    choices=[None, 'lc', 'iso'],
+                    help="Bed deformation model.", default=None)
 parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
@@ -66,6 +69,7 @@ calving = options.calving
 climate = options.climate
 forcing_type = options.forcing_type
 grid = options.grid
+bed_deformation = options.bed_deformation
 bed_type = options.bed_type
 version = options.version
 stress_balance = options.stress_balance
@@ -86,18 +90,16 @@ pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed
 hydro = 'null'
 
 sia_e = (3.0)
-ppq = (0.6)
-tefo = (0.02)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
-calving_thk_threshold_values = [300]
-calving_k_values = [1e18]
+ppq_values = [0.25, 0.33, 0.60]
+tefo_values = [0.020, 0.025, 0.030]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(calving_thk_threshold_values, calving_k_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+combinations = list(itertools.product(ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
 exstep = '100'
@@ -109,7 +111,7 @@ end = 0
 
 for n, combination in enumerate(combinations):
 
-    phi_min, phi_max, topg_min, topg_max = combination
+    ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -162,6 +164,8 @@ for n, combination in enumerate(combinations):
         general_params_dict['o_size'] = osize
         general_params_dict['config_override'] = 'init_config.nc'
         general_params_dict['age'] = ''
+        if bed_deformation is not None:
+            general_params_dict['bed_def'] = bed_deformation
         if forcing_type in ('e_age'):
             general_params_dict['e_age_coupling'] = ''
         
