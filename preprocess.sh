@@ -11,7 +11,7 @@ set -e -x  # exit on error
 # username to download MCBs from beauregard
 user=aaschwanden  # default number of processors
 if [ $# -gt 0 ] ; then
-  NN="$1"
+  user="$1"
 fi
 
 # generate config file
