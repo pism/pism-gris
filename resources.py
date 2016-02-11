@@ -1,9 +1,22 @@
+"""
+resources
+=========
+
+Provides:
+  - general resources such as grid constructors, calving, hydrology, etc.
+    for the Greenland Ice Sheet (and sub-regions thereof
+
+"""
+
 from collections import OrderedDict
 import os
 
+
 def generate_prefix_str(pism_exec):
     '''
-    Generate prefix string
+    Generate prefix string.
+
+    Returns: string
     '''
 
     try:
@@ -17,6 +30,8 @@ def generate_prefix_str(pism_exec):
 def generate_domain(domain):
     '''
     Generate domain specific options
+
+    Returns: string
     '''
     
     if domain.lower() in ('greenland', 'gris'):
@@ -38,6 +53,8 @@ def generate_domain(domain):
 def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None):
     '''
     Return dict to generate spatial time series
+
+    Returns: OrderedDict
     '''
 
     params_dict = OrderedDict()
@@ -63,6 +80,8 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None)
 def generate_scalar_ts(outfile, step, start=None, end=None):
     '''
     Return dict to create scalar time series
+
+    Returns: OrderedDict
     '''
 
     params_dict = OrderedDict()
@@ -83,6 +102,8 @@ def generate_scalar_ts(outfile, step, start=None, end=None):
 def generate_snap_shots(outfile, times):
     '''
     Return dict to generate snap shots
+
+    Returns: OrderedDict
     '''
     
     params_dict = OrderedDict()
@@ -97,6 +118,8 @@ def generate_snap_shots(outfile, times):
 def generate_grid_description(grid_resolution):
     '''
     Generate grid description dict
+
+    Returns: OrderedDict
     '''
     
     mx_max = 10560
@@ -157,6 +180,8 @@ def merge_dicts(*dict_args):
     '''
     Given any number of dicts, shallow copy and merge into a new dict,
     precedence goes to key value pairs in latter dicts.
+
+    Returns: OrderedDict
     '''
     result = OrderedDict()
     for dictionary in dict_args:
@@ -186,6 +211,8 @@ def uniquify_list(seq, idfun=None):
 def generate_stress_balance(stress_balance, additional_params_dict):
     '''
     Generate stress balance params
+
+    Returns: OrderedDict
     '''
 
     accepted_stress_balances = ('sia', 'ssa+sia')
@@ -213,6 +240,8 @@ def generate_stress_balance(stress_balance, additional_params_dict):
 def generate_hydrology(hydro, **kwargs):
     '''
     Generate hydrology params
+
+    Returns: OrderedDict
     '''
     
     params_dict = OrderedDict()
@@ -229,6 +258,8 @@ def generate_hydrology(hydro, **kwargs):
 def generate_calving(calving, **kwargs):
     '''
     Generate calving params
+
+    Returns: OrderedDict
     '''
     
     params_dict = OrderedDict()
@@ -245,6 +276,8 @@ def generate_calving(calving, **kwargs):
 def generate_climate(climate, **kwargs):
     '''
     Generate climate params
+
+    Returns: OrderedDict
     '''
     
     params_dict = OrderedDict()
@@ -270,6 +303,8 @@ def generate_climate(climate, **kwargs):
 def generate_ocean(ocean, **kwargs):
     '''
     Generate ocean params
+
+    Returns: OrderedDict
     '''
 
     params_dict = OrderedDict()
@@ -288,6 +323,12 @@ def generate_ocean(ocean, **kwargs):
 
 
 def make_pbs_header(system, cores, walltime, queue):
+    '''
+    Generate header file for different HPC system.
+
+    Returns: String
+    '''
+    
     systems = {}
     systems['debug'] = {'mpido' : 'mpiexec -n'}
     systems['fish'] = {'mpido': 'aprun -n',

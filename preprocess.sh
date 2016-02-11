@@ -22,7 +22,7 @@ fi
 
 # generate config file
 echo "  Generating config files..."
-for CONFIG in "init_config; do
+for CONFIG in "init_config"; do
 ncgen -o ${CONFIG}.nc ${CONFIG}.cdl
 done
 echo "  Done generating config file."
