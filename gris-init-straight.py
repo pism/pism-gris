@@ -97,7 +97,7 @@ ssa_n = (3.25)
 ssa_e = (1.0)
 
 calving_k = 1e18
-calving_thk = 100
+calving_thickness_threshold = 100
 
 ppq_values = [0.25, 0.33, 0.60]
 tefo_values = [0.020, 0.025, 0.030]
