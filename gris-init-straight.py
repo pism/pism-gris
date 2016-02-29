@@ -97,7 +97,7 @@ ssa_n = (3.25)
 ssa_e = (1.0)
 
 calving_k = 1e18
-calving_thickness_threshold = 100
+calving_thk_threshold = 100
 
 ppq_values = [0.25, 0.33, 0.60]
 tefo_values = [0.020, 0.025, 0.030]
@@ -134,7 +134,7 @@ for n, combination in enumerate(combinations):
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
         name_options['calving_k'] = calving_k
-        name_options['calving_thk_threshold'] = calving_thickness_threshold
+        name_options['calving_thk_threshold'] = calving_thk_threshold
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
