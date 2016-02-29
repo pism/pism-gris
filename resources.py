@@ -115,15 +115,21 @@ def generate_snap_shots(outfile, times):
     return params_dict
 
 
-def generate_grid_description(grid_resolution):
+def generate_grid_description(grid_resolution, domain):
     '''
     Generate grid description dict
 
     Returns: OrderedDict
     '''
-    
-    mx_max = 10560
-    my_max = 18240
+
+    if domain.lower() in ('greenland_ext', 'gris_ext'):
+        mx_max = 10560
+        my_max = 18240
+    else:
+        mx_max = 10560
+        my_max = 18240
+
+
     resolution_max = 150
     
     accepted_resolutions = (150, 300, 450, 600, 900, 1200, 1500, 1800, 2400, 3000, 3600, 4500, 9000, 18000, 36000)

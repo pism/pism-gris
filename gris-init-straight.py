@@ -25,8 +25,8 @@ parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving'],
                     help="claving", default='ocean_kill')
 parser.add_argument("-d", "--domain", dest="domain",
-                    choices=['gris'],
-                    help="sets the modeling domain", default='gris')
+                    choices=['gris', 'gris_ext'],
+                    help="sets the modeling domain", default='gris_ext')
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
