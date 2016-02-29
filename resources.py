@@ -123,8 +123,8 @@ def generate_grid_description(grid_resolution, domain):
     '''
 
     if domain.lower() in ('greenland_ext', 'gris_ext'):
-        mx_max = 10560
-        my_max = 18240
+        mx_max = 12000
+        my_max = 19680
     else:
         mx_max = 10560
         my_max = 18240

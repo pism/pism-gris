@@ -169,7 +169,7 @@ for n, combination in enumerate(combinations):
         if forcing_type in ('e_age'):
             general_params_dict['e_age_coupling'] = ''
         
-        grid_params_dict = generate_grid_description(grid)
+        grid_params_dict = generate_grid_description(grid, domain)
 
         sb_params_dict = OrderedDict()
         sb_params_dict['sia_e'] = sia_e
