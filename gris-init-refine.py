@@ -7,7 +7,7 @@ import os
 from argparse import ArgumentParser
 from resources import *
 
-grid_choices = [9000, 4500, 3600, 1800, 1500, 1200, 900, 600]
+grid_choices = [9000, 6000, 4500, 3600, 1800, 1500, 1200, 900, 600]
 
 # set up the option parser
 parser = ArgumentParser()
@@ -79,7 +79,10 @@ grid_mapping = OrderedDict(zip(grid_choices, grid_nos))
 save_times = [-125000, -25000, -5000, -1500, -1000, -500, -200, -100]
 grid_start_times = OrderedDict(zip(grid_choices, save_times))
 infile = ''
-pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
+if domain.lower() in ('greenland_ext', 'gris_ext'):
+    pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
+else:
+    pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
 
 # ########################################################
