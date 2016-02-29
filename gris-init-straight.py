@@ -96,6 +96,9 @@ sia_e = (3.0)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
+calving_k = 1e18
+calving_thk = 100
+
 ppq_values = [0.25, 0.33, 0.60]
 tefo_values = [0.020, 0.025, 0.030]
 phi_min_values = [5.0]
@@ -130,8 +133,8 @@ for n, combination in enumerate(combinations):
     name_options['topg_max'] = topg_max
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
-        name_options['calving_k'] = calving
-        name_options['calving_thk_threshold'] = calving
+        name_options['calving_k'] = calving_k
+        name_options['calving_thk_threshold'] = calving_thickness_threshold
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
@@ -186,7 +189,7 @@ for n, combination in enumerate(combinations):
         climate_params_dict = generate_climate(climate)
         ocean_params_dict = generate_ocean(climate)
         hydro_params_dict = generate_hydrology(hydro)
-        calving_params_dict = generate_calving(calving, ocean_kill_file=pism_dataname)
+        calving_params_dict = generate_calving(calving, calving_thk_threshold=calving_thk_threshold, calving_k=calving_k, ocean_kill_file=pism_dataname)
 
         exvars = "climatic_mass_balance_cumulative,tempsurf,diffusivity,temppabase,bmeltvelsurf_mag,mask,thk,topg,usurf,taud_mag,velsurf_mag,climatic_mass_balance,climatic_mass_balance_original,velbase_mag,tauc,taub_mag"
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
