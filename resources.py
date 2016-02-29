@@ -34,7 +34,7 @@ def generate_domain(domain):
     Returns: string
     '''
     
-    if domain.lower() in ('greenland', 'gris'):
+    if domain.lower() in ('greenland', 'gris', 'gris_ext'):
         pism_exec = 'pismr'
     elif domain.lower() in ('jakobshavn'):
         x_min = -280000
