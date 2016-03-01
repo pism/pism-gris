@@ -315,10 +315,6 @@ def generate_ocean(ocean, **kwargs):
     Returns: OrderedDict
     '''
 
-    if kwargs is not None:
-        for key, value in kwargs.iteritems():
-            print "%s == %s" %(key,value)
-
     params_dict = OrderedDict()
     if ocean in ('paleo'):
         params_dict['ocean'] = 'given,delta_SL'
