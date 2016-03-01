@@ -407,6 +407,11 @@ def make_batch_header(system, cores, walltime, queue):
 
 cd $SLURM_SUBMIT_DIR
 
+# Generate a list of compute node hostnames reserved for this job,
+# this ./nodes file is necessary for slurm to spawn mpi processes
+# across multiple compute nodes
+srun -l /bin/hostname | sort -n | awk '{print $2}' > ./nodes
+
 {mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
     elif system in ('pleiades'):
         
