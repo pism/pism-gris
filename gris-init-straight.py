@@ -128,7 +128,7 @@ for n, combination in enumerate(combinations):
     name_options['bed_deformation'] = bed_deformation
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
-        name_options['eigen_calving_k'] = calving_k
+        name_options['eigen_calving_k'] = eigen_calving_k
         name_options['thickness_calving_threshold'] = thickness_calving_threshold
     name_options['forcing_type'] = forcing_type
     
