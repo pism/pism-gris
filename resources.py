@@ -405,7 +405,7 @@ def make_batch_header(system, cores, walltime, queue):
 #SBATCH --mail-type=FAIL
 #SBATCH --output=pism.%j
 
-cd $SLURM_SUBMITDIR
+cd $SLURM_SUBMIT_DIR
 
 {mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
     elif system in ('pleiades'):
