@@ -412,7 +412,7 @@ cd $SLURM_SUBMIT_DIR
 # across multiple compute nodes
 srun -l /bin/hostname | sort -n | awk \'{{print $2}}\' > ./nodes
 
-{mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
+{mpido} {cores} -machinefile ./nodes """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
     elif system in ('pleiades'):
         
         header = """#PBS -S /bin/bash
