@@ -80,7 +80,6 @@ save_times = [-25000, -5000, -1500, -1000, -500, -200, -100]
 
     
 infile = ''
-print grid, version, bed_type
 if domain.lower() in ('greenland_ext', 'gris_ext'):
     pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 else:
