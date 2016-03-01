@@ -400,7 +400,7 @@ def make_batch_header(system, cores, walltime, queue):
 #SBATCH --partition=standard
 #SBATCH --ntasks={cores}
 #SBATCH --tasks-per-node={ppn}
-#SBATCH -t={walltime}
+#SBATCH --time={walltime}
 #SBATCH --mail-user=aaschwanden@alaska.edu
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
