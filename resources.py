@@ -394,9 +394,7 @@ def make_batch_header(system, cores, walltime, queue):
         
     elif system in ('chinook'):
         
-        header = """
-#!/bin/sh
- 
+        header = """#!/bin/sh
 #SBATCH --partition=standard
 #SBATCH --ntasks={cores}
 #SBATCH --tasks-per-node={ppn}
@@ -412,8 +410,7 @@ cd $SLURM_SUBMITDIR
 {mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
     elif system in ('pleiades'):
         
-        header = """
-#PBS -S /bin/bash
+        header = """#PBS -S /bin/bash
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
@@ -425,8 +422,7 @@ cd $PBS_O_WORKDIR
 
 {mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
     else:
-        header = """
-#!/bin/bash
+        header = """#!/bin/bash
 #PBS -q {queue}
 #PBS -l walltime={walltime}
 #PBS -l nodes={nodes}:ppn={ppn}
