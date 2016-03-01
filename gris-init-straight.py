@@ -37,7 +37,7 @@ parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', '2dbig'],
                     help="output size type", default='2dbig')
 parser.add_argument("-s", "--system", dest="system",
-                    choices=['pleiades', 'fish', 'pacman', 'debug'],
+                    choices=list_systems(),
                     help="computer system to use.", default='pacman')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=['ctrl', 'old_bed', 'ba01_bed', '970mW_hs', 'jak_1985', 'cresis'],
@@ -96,8 +96,8 @@ sia_e = (3.0)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
-calving_k = 1e18
-calving_thk_threshold = 100
+eigen_calving_k = 1e18
+thickness_calving_threshold = 150
 
 ppq_values = [0.25, 0.33, 0.60]
 tefo_values = [0.020, 0.025, 0.030]
@@ -125,16 +125,11 @@ for n, combination in enumerate(combinations):
     name_options['sia_e'] = sia_e
     name_options['ppq'] = ppq
     name_options['tefo'] = tefo
-    name_options['ssa_n'] = ssa_n
-    name_options['ssa_e'] = ssa_e
-    name_options['phi_min'] = phi_min
-    name_options['phi_max'] = phi_max
-    name_options['topg_min'] = topg_min
-    name_options['topg_max'] = topg_max
+    name_options['bed_deformation'] = bed_deformation
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
-        name_options['calving_k'] = calving_k
-        name_options['calving_thk_threshold'] = calving_thk_threshold
+        name_options['eigen_calving_k'] = calving_k
+        name_options['thickness_calving_threshold'] = thickness_calving_threshold
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
@@ -150,11 +145,11 @@ for n, combination in enumerate(combinations):
         except OSError:
             pass
 
-    pbs_header = make_pbs_header(system, nn, walltime, queue)
+    batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
             
     with open(script, 'w') as f:
 
-        f.write(pbs_header)
+        f.write(batch_header)
 
         outfile = '{domain}_g{grid}m_spinup_straight_{experiment}_0.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
@@ -187,9 +182,9 @@ for n, combination in enumerate(combinations):
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate)
-        ocean_params_dict = generate_ocean(climate)
+        ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal.nc')
         hydro_params_dict = generate_hydrology(hydro)
-        calving_params_dict = generate_calving(calving, calving_thk_threshold=calving_thk_threshold, calving_k=calving_k, ocean_kill_file=pism_dataname)
+        calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
         exvars = "climatic_mass_balance_cumulative,tempsurf,diffusivity,temppabase,bmeltvelsurf_mag,mask,thk,topg,usurf,taud_mag,velsurf_mag,climatic_mass_balance,climatic_mass_balance_original,velbase_mag,tauc,taub_mag"
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
@@ -201,6 +196,7 @@ for n, combination in enumerate(combinations):
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
         
         cmd = ' '.join([prefix, all_params, '2>&1 | tee job.${PBS_JOBID}'])
+        cmd = ' '.join([prefix, all_params, '2>&1 | tee job.${}'.format(batch_system['job_id'])])
 
         f.write(cmd)
         f.write('\n')
@@ -225,7 +221,7 @@ with open(submit, 'w') as f:
     f.write('#!/bin/bash\n')
 
     for k in range(len(scripts)):
-        f.write('JOBID=$(qsub {script})\n'.format(script=scripts[k]))
+        f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
 
 print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
 

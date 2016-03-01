@@ -42,7 +42,7 @@ parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', '2dbig'],
                     help="output size type", default='2dbig')
 parser.add_argument("-s", "--system", dest="system",
-                    choices=['pleiades', 'fish', 'pacman', 'debug'],
+                    choices=list_systems(),
                     help="computer system to use.", default='pacman')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=['ctrl', 'old_bed', 'ba01_bed', '970mW_hs', 'jak_1985', 'cresis'],
@@ -102,13 +102,14 @@ tefo = (0.02)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
-calving_thk_threshold_values = [300]
-calving_k_values = [1e18]
+eigen_calving_k = 1e18
+thickness_calving_threshold = 150
+
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(calving_thk_threshold_values, calving_k_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+combinations = list(itertools.product(phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href'
 if regrid_thickness:
@@ -140,8 +141,8 @@ for n, combination in enumerate(combinations):
     name_options['topg_max'] = topg_max
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
-        name_options['calving_k'] = calving
-        name_options['calving_thk_threshold'] = calving
+        name_options['eigen_calving_k'] = calving_k
+        name_options['thickness_calving_threshold'] = thickness_calving_threshold
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
@@ -157,11 +158,11 @@ for n, combination in enumerate(combinations):
         except OSError:
             pass
 
-    pbs_header = make_pbs_header(system, nn, walltime, queue)
+    batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
             
     with open(script, 'w') as f:
 
-        f.write(pbs_header)
+        f.write(batch_header)
 
         outfile = '{domain}_g{grid}m_{experiment}_{dura}a.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment, dura=dura)
 
@@ -230,7 +231,7 @@ with open(submit, 'w') as f:
     f.write('#!/bin/bash\n')
 
     for k in range(len(scripts)):
-        f.write('JOBID=$(qsub {script})\n'.format(script=scripts[k]))
+        f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
 
 print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
 

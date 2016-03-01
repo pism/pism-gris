@@ -315,11 +315,16 @@ def generate_ocean(ocean, **kwargs):
     Returns: OrderedDict
     '''
 
+    if kwargs is not None:
+        for key, value in kwargs.iteritems():
+            print "%s == %s" %(key,value)
+
     params_dict = OrderedDict()
     if ocean in ('paleo'):
-        params_dict['ocean'] = 'constant,delta_SL'
+        params_dict['ocean'] = 'given,delta_SL'
         if 'ocean_delta_SL_file' not in kwargs:
             params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
+            params_dict['ocean_given_file'] = kwargs['ocean_given_file']
     elif ocean in ('const'):
         params_dict['ocean'] = 'constant'
     else:
@@ -330,7 +335,18 @@ def generate_ocean(ocean, **kwargs):
     return merge_dicts(params_dict, kwargs)
 
 
-def make_pbs_header(system, cores, walltime, queue):
+def list_systems():
+
+    '''
+    Return a list of supported systems.
+    '''
+    
+    list = ['debug', 'chinook', 'fish', 'pacman', 'pleiades']
+    
+    return list
+
+
+def make_batch_header(system, cores, walltime, queue):
     '''
     Generate header file for different HPC system.
 
@@ -340,18 +356,33 @@ def make_pbs_header(system, cores, walltime, queue):
     systems = {}
     systems['debug'] = {'mpido' : 'mpiexec -n'}
     systems['fish'] = {'mpido': 'aprun -n',
+                       'submit' : 'qsub',
+                       'work_dir' : 'PBS_O_WORKDIR',
+                       'job_id' : 'PBS_JOBID',
                        'queue' : {
-                       'gpu' : 16,
-                       'gpu_long' : 16,
+                           'gpu' : 16,
+                           'gpu_long' : 16,
                            'standard' : 12 }}
     systems['pacman'] = {'mpido' : 'mpirun -np',
+                         'submit' : 'qsub',
+                         'work_dir' : 'PBS_O_WORKDIR',
+                         'job_id' : 'PBS_JOBID',
                          'queue' : {
-                         'standard_4' : 4,
+                             'standard_4' : 4,
                              'standard_16' : 16 }}
+    systems['chinook'] = {'mpido' : 'mpirun -np',
+                          'submit' : 'sbatch',
+                          'work_dir' : 'SLURM_SUBMIT_DIR',
+                          'job_id' : 'SLURM_JOBID',
+                          'queue' : {
+                              'standard' : 24 }}
     systems['pleiades'] = {'mpido' : 'mpiexec.hydra -n',
+                           'submit' : 'qsub',
+                           'work_dir' : 'PBS_O_WORKDIR',
+                           'job_id' : 'PBS_JOBID',
                            'queue' : {
-                           'long' : 20,
-                           'normal': 20}}
+                               'long' : 20,
+                               'normal': 20}}
 
     assert system in systems.keys()
     if system not in 'debug':
@@ -365,6 +396,24 @@ def make_pbs_header(system, cores, walltime, queue):
 
         header = '{mpido} {cores} '.format(mpido=systems[system]['mpido'], cores=cores)
         
+    elif system in ('chinook'):
+        
+        header = """
+#!/bin/sh
+ 
+#SBATCH --partition=standard
+#SBATCH --ntasks={cores}
+#SBATCH --tasks-per-node={ppn}
+#SBATCH -t={walltime}
+#SBATCH --mail-user=aaschwanden@alaska.edu
+#SBATCH --mail-type=BEGIN
+#SBATCH --mail-type=END
+#SBATCH --mail-type=FAIL
+#SBATCH --output=pism.%j
+
+cd $SLURM_SUBMITDIR
+
+{mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
     elif system in ('pleiades'):
         
         header = """
@@ -391,4 +440,4 @@ cd $PBS_O_WORKDIR
 
 {mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
 
-    return header
+    return header, systems[system]
