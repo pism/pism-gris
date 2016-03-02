@@ -405,6 +405,8 @@ def make_batch_header(system, cores, walltime, queue):
 #SBATCH --mail-type=FAIL
 #SBATCH --output=pism.%j
 
+module list
+
 cd $SLURM_SUBMIT_DIR
 
 # Generate a list of compute node hostnames reserved for this job,
@@ -423,6 +425,8 @@ srun -l /bin/hostname | sort -n | awk \'{{print $2}}\' > ./nodes
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=ivy
 #PBS -j oe
 
+module list
+
 cd $PBS_O_WORKDIR
 
 {mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
@@ -432,6 +436,8 @@ cd $PBS_O_WORKDIR
 #PBS -l walltime={walltime}
 #PBS -l nodes={nodes}:ppn={ppn}
 #PBS -j oe
+
+module list
 
 cd $PBS_O_WORKDIR
 
