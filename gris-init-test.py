@@ -29,7 +29,7 @@ parser.add_argument("-d", "--domain", dest="domain",
                     help="sets the modeling domain", default='gris_ext')
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
-                    help="output format", default='netcdf4_parallel')
+                    help="output format", default='netcdf3')
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
                     help="horizontal grid resolution", default=6000)
