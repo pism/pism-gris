@@ -22,8 +22,8 @@ parser.add_argument("--climate", dest="climate",
                     choices=['const', 'paleo'],
                     help="Climate", default='paleo')
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving'],
-                    help="claving", default='ocean_kill')
+                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving'],
+                    help="claving", default='thickness_calving')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris_ext')
@@ -122,13 +122,14 @@ for n, combination in enumerate(combinations):
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
-    name_options['sia_e'] = sia_e
     name_options['ppq'] = ppq
     name_options['tefo'] = tefo
     name_options['bed_deformation'] = bed_deformation
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
         name_options['k'] = eigen_calving_k
+        name_options['threshold'] = thickness_calving_threshold
+    if calving in ('thickness_calving'):
         name_options['threshold'] = thickness_calving_threshold
     name_options['forcing_type'] = forcing_type
     
