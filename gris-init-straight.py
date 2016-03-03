@@ -117,7 +117,7 @@ end = 0
 
 for n, combination in enumerate(combinations):
 
-    eigen_calving_k, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
