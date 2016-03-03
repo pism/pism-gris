@@ -97,15 +97,15 @@ ssa_n = (3.25)
 ssa_e = (1.0)
 
 eigen_calving_k = 1e18
-thickness_calving_threshold = 150
 
+thickness_calving_threshold_vales = [50, 100, 150]
 ppq_values = [0.25, 0.33, 0.60]
 tefo_values = [0.020, 0.025, 0.030]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+combinations = list(itertools.product(thickness_calving_threshold_vales, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
 exstep = '100'
@@ -117,7 +117,7 @@ end = 0
 
 for n, combination in enumerate(combinations):
 
-    ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    eigen_calving_k, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -128,8 +128,8 @@ for n, combination in enumerate(combinations):
     name_options['bed_deformation'] = bed_deformation
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
-        name_options['eigen_calving_k'] = eigen_calving_k
-        name_options['thickness_calving_threshold'] = thickness_calving_threshold
+        name_options['k'] = eigen_calving_k
+        name_options['threshold'] = thickness_calving_threshold
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
