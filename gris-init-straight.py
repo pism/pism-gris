@@ -76,7 +76,7 @@ stress_balance = options.stress_balance
 
 domain = options.domain
 pism_exec = generate_domain(domain)
-save_times = [-25000, -5000, -1500, -1000, -500, -200, -100]
+save_times = [-25000, -5000, -1500, -1000, -500, -200, -100, -5]
 
     
 infile = ''

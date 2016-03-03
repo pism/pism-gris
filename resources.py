@@ -412,7 +412,7 @@ cd $SLURM_SUBMIT_DIR
 # Generate a list of compute node hostnames reserved for this job,
 # this ./nodes file is necessary for slurm to spawn mpi processes
 # across multiple compute nodes
-srun -l /bin/hostname | sort -n | awk \'{{print $2}}\' > ./nodes
+srun -l /bin/hostname | sort -n | awk \'{{print $2}}\' > ./nodes_$SLURM_JOB_ID
 
 {mpido} {cores} -machinefile ./nodes """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
     elif system in ('pleiades'):
