@@ -353,7 +353,8 @@ def make_batch_header(system, cores, walltime, queue):
     '''
     
     systems = {}
-    systems['debug'] = {'mpido' : 'mpiexec -n'}
+    systems['debug'] = {'mpido' : 'mpiexec -n',
+                        'submit': 'echo'}
     systems['fish'] = {'mpido': 'aprun -n',
                        'submit' : 'qsub',
                        'work_dir' : 'PBS_O_WORKDIR',

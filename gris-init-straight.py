@@ -220,7 +220,6 @@ except OSError:
 with open(submit, 'w') as f:
 
     f.write('#!/bin/bash\n')
-
     for k in range(len(scripts)):
         f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
 
