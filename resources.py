@@ -123,7 +123,7 @@ def generate_grid_description(grid_resolution, domain):
     '''
 
     if domain.lower() in ('greenland_ext', 'gris_ext'):
-        mx_max = 14880
+        mx_max = 15120
         my_max = 19680
     else:
         mx_max = 10560
@@ -232,7 +232,10 @@ def generate_stress_balance(stress_balance, additional_params_dict):
     params_dict = OrderedDict()
     params_dict['stress_balance'] = stress_balance
     if stress_balance in ('ssa+sia'):
-        params_dict['pik'] = ''
+        params_dict['cfbc'] = ''
+        params_dict['kill_icebergs'] = ''
+        params_dict['part_grid'] = ''
+        params_dict['part_redist'] = ''
         params_dict['sia_flow_law'] = 'gpbld3'
         params_dict['pseudo_plastic'] = ''
         params_dict['pseudo_plastic_q'] = additional_params_dict['pseudo_plastic_q']
