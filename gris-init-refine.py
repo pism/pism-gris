@@ -80,7 +80,7 @@ pism_exec = generate_domain(domain)
 no_grid_choices = len(grid_choices)
 grid_nos = range(0, no_grid_choices)
 grid_mapping = OrderedDict(zip(grid_choices, grid_nos))
-save_times = [-125000, -15000]
+save_times = [-125000, -15000, -1000, -500, -200, -100, -5]
 grid_start_times = OrderedDict(zip(grid_choices, save_times))
 infile = ''
 if domain.lower() in ('greenland_ext', 'gris_ext'):
