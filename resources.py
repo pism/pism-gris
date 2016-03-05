@@ -299,7 +299,7 @@ def generate_climate(climate, **kwargs):
         if 'atmosphere_delta_T_file' not in kwargs:
             params_dict['atmosphere_delta_T_file'] = 'pism_dT.nc'
         params_dict['surface'] = 'pdd'
-    elif climate in ('const', 'relax'):
+    elif climate in ('const', 'relax', 'given'):
         params_dict['surface'] = 'given'
     elif climate in ('flux'):
         params_dict['surface'] = 'given,forcing'
@@ -324,6 +324,8 @@ def generate_ocean(ocean, **kwargs):
         if 'ocean_delta_SL_file' not in kwargs:
             params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
             params_dict['ocean_given_file'] = kwargs['ocean_given_file']
+    elif ocean in ('given'):
+        params_dict['ocean'] = 'given'
     elif ocean in ('const'):
         params_dict['ocean'] = 'constant'
     else:
@@ -353,9 +355,10 @@ def make_batch_header(system, cores, walltime, queue):
     '''
     
     systems = {}
-    systems['debug'] = {'mpido' : 'mpiexec -n',
-                        'submit': 'echo'}
-    systems['fish'] = {'mpido': 'aprun -n',
+    mpido = 'mpiexec -n {cores}'.format(cores=cores)
+    systems['debug'] = {'mpido' : mpido,
+                        'Submit': 'echo'}
+    systems['fish'] = {'mpido': 'aprun -n {cores}'.format(cores=cores),
                        'submit' : 'qsub',
                        'work_dir' : 'PBS_O_WORKDIR',
                        'job_id' : 'PBS_JOBID',
@@ -363,20 +366,23 @@ def make_batch_header(system, cores, walltime, queue):
                            'gpu' : 16,
                            'gpu_long' : 16,
                            'standard' : 12 }}
-    systems['pacman'] = {'mpido' : 'mpirun -np',
+    mpido = 'mpirun -np {cores}'.format(cores=cores)
+    systems['pacman'] = {'mpido' : mpido,
                          'submit' : 'qsub',
                          'work_dir' : 'PBS_O_WORKDIR',
                          'job_id' : 'PBS_JOBID',
                          'queue' : {
                              'standard_4' : 4,
                              'standard_16' : 16 }}
-    systems['chinook'] = {'mpido' : 'mpirun -np',
+    mpido = 'mpirun -np {cores} -machinefile ./nodes_$SLURM_JOBID'.format(cores=cores)                         
+    systems['chinook'] = {'mpido' : mpido,
                           'submit' : 'sbatch',
                           'work_dir' : 'SLURM_SUBMIT_DIR',
                           'job_id' : 'SLURM_JOBID',
                           'queue' : {
                               'standard' : 24 }}
-    systems['pleiades'] = {'mpido' : 'mpiexec.hydra -n',
+    mpido = 'mpiexec.hydra -n {cores}'.format(cores=cores)
+    systems['pleiades'] = {'mpido' : mpido,
                            'submit' : 'qsub',
                            'work_dir' : 'PBS_O_WORKDIR',
                            'job_id' : 'PBS_JOBID',
@@ -394,7 +400,7 @@ def make_batch_header(system, cores, walltime, queue):
 
     if system in ('debug'):
 
-        header = '{mpido} {cores} '.format(mpido=systems[system]['mpido'], cores=cores)
+        header = ''
         
     elif system in ('chinook'):
         
@@ -418,7 +424,7 @@ cd $SLURM_SUBMIT_DIR
 # across multiple compute nodes
 srun -l /bin/hostname | sort -n | awk \'{{print $2}}\' > ./nodes_$SLURM_JOBID
 
-{mpido} {cores} -machinefile ./nodes_$SLURM_JOBID """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
+""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
     elif system in ('pleiades'):
         
         header = """#PBS -S /bin/bash
@@ -433,7 +439,7 @@ module list
 
 cd $PBS_O_WORKDIR
 
-{mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
+""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
     else:
         header = """#!/bin/bash
 #PBS -q {queue}
@@ -445,6 +451,6 @@ module list
 
 cd $PBS_O_WORKDIR
 
-{mpido} {cores} """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores, mpido=systems[system]['mpido'])
+""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
 
     return header, systems[system]
