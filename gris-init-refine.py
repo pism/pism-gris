@@ -130,7 +130,6 @@ for n, combination in enumerate(combinations):
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
-    name_options['sia_e'] = sia_e
     name_options['ppq'] = ppq
     name_options['tefo'] = tefo
     name_options['bed_deformation'] = bed_deformation
