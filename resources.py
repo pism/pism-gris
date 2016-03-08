@@ -357,7 +357,8 @@ def make_batch_header(system, cores, walltime, queue):
     systems = {}
     mpido = 'mpiexec -n {cores}'.format(cores=cores)
     systems['debug'] = {'mpido' : mpido,
-                        'Submit': 'echo'}
+                        'submit': 'echo',
+                        'job_id' : 'PBS_JOBID'}
     mpido = 'mpiexec -n {cores}'.format(cores=cores)
     systems['fish'] = {'mpido': 'aprun -n {cores}'.format(cores=cores),
                        'submit' : 'qsub',
