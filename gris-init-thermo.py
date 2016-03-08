@@ -7,7 +7,7 @@ import os
 from argparse import ArgumentParser
 from resources import *
 
-grid_choices = [6000, 3000]
+grid_choices = [18000, 9000, 6000, 3000]
 
 # set up the option parser
 parser = ArgumentParser()
