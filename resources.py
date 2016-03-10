@@ -91,7 +91,7 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None)
 
     # check if list or comma-separated string is given.
     try:
-        ','.join(exvars)
+        exvars = ','.join(exvars)
     except:
         pass
     
