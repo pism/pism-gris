@@ -50,6 +50,39 @@ def generate_domain(domain):
     return pism_exec
 
 
+def default_spatial_ts_vars():
+    '''
+    Returns a list of commonly-used extra vars
+    '''
+    
+    exvars = ['beta',
+              'bmelt',
+              'bmeltvelsurf_mag',
+              'climatic_mass_balance',
+              'climatic_mass_balance_cumulative',
+              'climatic_mass_balance_original',
+              'dbdt',
+              'diffusivity',
+              'mask',
+              'nuH',
+              'taub_mag',
+              'tauc',
+              'taud_mag',
+              'tempicethk_basal',
+              'temppabase',
+              'tempsurf',
+              'thk',
+              'topg',
+              'usurf',
+              'velbase'
+              'velbase_mag',
+              'velsurf'
+              'velsurf_mag',
+              'wvelbase']
+    
+    return exvars
+
+
 def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None):
     '''
     Return dict to generate spatial time series
@@ -57,6 +90,12 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None)
     Returns: OrderedDict
     '''
 
+    # check if list or comma-separated string is given.
+    try:
+        ','.join(exvars)
+    except:
+        pass
+    
     params_dict = OrderedDict()
     params_dict['extra_file'] = 'ex_' + outfile
     params_dict['extra_vars'] = exvars

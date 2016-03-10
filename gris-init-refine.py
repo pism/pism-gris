@@ -101,10 +101,10 @@ ssa_e = (1.0)
 
 eigen_calving_k = 1e18
 
-thickness_calving_threshold_vales = [50, 100, 150]
+thickness_calving_threshold_vales = [50]
 
-ppq_values = [0.25, 0.33, 0.60]
-tefo_values = [0.020, 0.025, 0.030]
+ppq_values = [0.33]
+tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
@@ -201,7 +201,7 @@ for n, combination in enumerate(combinations):
         hydro_params_dict = generate_hydrology(hydro)
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
         
-        exvars = "climatic_mass_balance_cumulative,tempsurf,diffusivity,temppabase,bmeltvelsurf_mag,mask,thk,topg,usurf,taud_mag,velsurf_mag,climatic_mass_balance,climatic_mass_balance_original,velbase_mag,tauc,taub_mag"
+        exvars = default_spatial_ts_vars()
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end)
         snap_shot_dict = generate_snap_shots(outfile, save_times[grid_mapping[grid]+1::])
