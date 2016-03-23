@@ -294,6 +294,9 @@ def generate_hydrology(hydro, **kwargs):
     params_dict = OrderedDict()
     if hydro in ('null'):
         params_dict['hydrology'] = 'null'
+    elif hydro in ('diffuse'):
+        params_dict['hydrology'] = 'null'
+        params_dict['hydrology_null_diffuse_till_water'] = ''
     else:
         print('hydrology {} not recognized, exiting'.format(hydro))
         import sys

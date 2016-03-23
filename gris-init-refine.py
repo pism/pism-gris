@@ -45,6 +45,9 @@ parser.add_argument("-b", "--bed_type", dest="bed_type",
 parser.add_argument("--bed_deformation", dest="bed_deformation",
                     choices=[None, 'lc', 'iso'],
                     help="Bed deformation model.", default=None)
+parser.add_argument("--hydrology", dest="hydrology",
+                    choices=['null', 'diffuse'],
+                    help="Basal hydrology model.", default='null')
 parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
@@ -54,6 +57,9 @@ parser.add_argument("--stress_balance", dest="stress_balance",
 parser.add_argument("--dataset_version", dest="version",
                     choices=['2'],
                     help="input data set version", default='2')
+parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity_approximation",
+                    choices=['centered', 'upstream'],
+                    help="How to approximate vertical velocities", default='centered')
 
 
 options = parser.parse_args()
@@ -65,12 +71,13 @@ queue = options.queue
 walltime = options.walltime
 system = options.system
 
+bed_deformation = options.bed_deformation
+bed_type = options.bed_type
 calving = options.calving
 climate = options.climate
 forcing_type = options.forcing_type
 grid = options.grid
-bed_deformation = options.bed_deformation
-bed_type = options.bed_type
+hydrology = options.hydrology
 stress_balance = options.stress_balance
 version = options.version
 
@@ -93,7 +100,6 @@ else:
 # set up model initialization
 # ########################################################
 
-hydro = 'null'
 
 sia_e = (3.0)
 ssa_n = (3.25)
@@ -140,7 +146,8 @@ for n, combination in enumerate(combinations):
     if calving in ('thickness_calving'):
         name_options['threshold'] = thickness_calving_threshold
     name_options['forcing_type'] = forcing_type
-    
+    name_options['hydro'] = hydrology
+
     vversion = 'v' + str(version)
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
 
@@ -194,11 +201,12 @@ for n, combination in enumerate(combinations):
         sb_params_dict['pseudo_plastic_q'] = ppq
         sb_params_dict['till_effective_fraction_overburden'] = tefo
         sb_params_dict['topg_to_phi'] = ttphi
-
+        sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
+b
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate)
         ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal.nc')
-        hydro_params_dict = generate_hydrology(hydro)
+        hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
         
         exvars = default_spatial_ts_vars()

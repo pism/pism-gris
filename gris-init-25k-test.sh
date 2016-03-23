@@ -104,9 +104,9 @@ ssa_e = (1.0)
 
 eigen_calving_k = 1e18
 
-thickness_calving_threshold_vales = [50, 100, 150]
-ppq_values = [0.25, 0.33, 0.60]
-tefo_values = [0.020, 0.025, 0.030]
+thickness_calving_threshold_vales = [50]
+ppq_values = [0.33]
+tefo_values = [0.025]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
@@ -119,7 +119,7 @@ exstep = '100'
 scripts = []
 
 start = -125000
-end = 0
+end = -25000
 
 for n, combination in enumerate(combinations):
 
@@ -128,23 +128,14 @@ for n, combination in enumerate(combinations):
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
-    name_options['ppq'] = ppq
-    name_options['tefo'] = tefo
-    name_options['bed_deformation'] = bed_deformation
-    name_options['calving'] = calving
-    if calving in ('eigen_calving'):
-        name_options['k'] = eigen_calving_k
-        name_options['threshold'] = thickness_calving_threshold
-    if calving in ('thickness_calving'):
-        name_options['threshold'] = thickness_calving_threshold
-    name_options['forcing_type'] = forcing_type
     name_options['hydro'] = hydrology
+    name_options['wvel'] = vertical_velocity_approximation
     
     vversion = 'v' + str(version)
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
 
         
-    script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+    script = 'eemian_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
     
     for filename in (script):
@@ -159,7 +150,7 @@ for n, combination in enumerate(combinations):
 
         f.write(batch_header)
 
-        outfile = '{domain}_g{grid}m_straight_{experiment}_0.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+        outfile = '{domain}_g{grid}m_straight_{experiment}_eemian.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
         prefix = generate_prefix_str(pism_exec)
 
@@ -218,7 +209,7 @@ for n, combination in enumerate(combinations):
     
 scripts = uniquify_list(scripts)
 
-submit = 'submit_{domain}_g{grid}m_{climate}_{bed_type}.sh'.format(domain=domain.lower(), grid=grid, climate=climate, bed_type=bed_type)
+submit = 'submit_{domain}_g{grid}m_eemian.sh'.format(domain=domain.lower(), grid=grid)
 try:
     os.remove(submit)
 except OSError:
