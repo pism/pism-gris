@@ -73,7 +73,7 @@ def default_spatial_ts_vars():
               'thk',
               'topg',
               'usurf',
-              'velbase'
+              'velbase',
               'velbase_mag',
               'velsurf',
               'velsurf_mag',
