@@ -114,12 +114,12 @@ topg_max_values = [700]
 combinations = list(itertools.product(thickness_calving_threshold_vales, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
-exstep = '100'
+exstep = '10'
 
 scripts = []
 
 start = -125000
-end = -25000
+end = -100000
 
 for n, combination in enumerate(combinations):
 
@@ -150,7 +150,7 @@ for n, combination in enumerate(combinations):
 
         f.write(batch_header)
 
-        outfile = '{domain}_g{grid}m_straight_{experiment}_eemian.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+        outfile = '{domain}_g{grid}m_{experiment}_eemian.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
         prefix = generate_prefix_str(pism_exec)
 
