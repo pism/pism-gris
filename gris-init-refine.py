@@ -202,7 +202,7 @@ for n, combination in enumerate(combinations):
         sb_params_dict['till_effective_fraction_overburden'] = tefo
         sb_params_dict['topg_to_phi'] = ttphi
         sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
-b
+
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate)
         ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal.nc')
