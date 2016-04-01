@@ -47,7 +47,7 @@ parser.add_argument("--bed_deformation", dest="bed_deformation",
                     help="Bed deformation model.", default=None)
 parser.add_argument("--hydrology", dest="hydrology",
                     choices=['null', 'diffuse'],
-                    help="Basal hydrology model.", default='null')
+                    help="Basal hydrology model.", default='diffuse')
 parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
@@ -59,7 +59,7 @@ parser.add_argument("--dataset_version", dest="version",
                     help="input data set version", default='2')
 parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity_approximation",
                     choices=['centered', 'upstream'],
-                    help="How to approximate vertical velocities", default='centered')
+                    help="How to approximate vertical velocities", default='upstream')
 
 
 options = parser.parse_args()

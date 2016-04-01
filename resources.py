@@ -55,29 +55,43 @@ def default_spatial_ts_vars():
     Returns a list of commonly-used extra vars
     '''
     
-    exvars = ['beta',
+    exvars = ['basal_mass_balance_average',
+              'beta',
               'bmelt',
-              'climatic_mass_balance',
-              'climatic_mass_balance_cumulative',
-              'climatic_mass_balance_original',
+              'cell_area',
               'dbdt',
+              'dHdt',
               'diffusivity',
+              'discharge_flux',
+              'flux_divergence',
+              'hfgeoubed',
               'mask',
+              'lat',
+              'lat_bnds',
+              'lon',
+              'lon_bnds',
               'nuH',
+              'sftgrf',
+              'sftflf',
+              'sftgif',
+              'surface_mass_balance_average',
               'taub_mag',
               'tauc',
               'taud_mag',
               'tempicethk_basal',
+              'tempbase',
               'temppabase',
               'tempsurf',
               'thk',
               'topg',
               'usurf',
+              'velbar',
               'velbase',
               'velbase_mag',
               'velsurf',
               'velsurf_mag',
-              'wvelbase']
+              'wvelbase',
+              'wvelsurf']    
     
     return exvars
 
@@ -365,7 +379,7 @@ def generate_ocean(ocean, **kwargs):
         if 'ocean_delta_SL_file' not in kwargs:
             params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
             params_dict['ocean_given_file'] = kwargs['ocean_given_file']
-    elif ocean in ('given'):
+    elif ocean in ('given', 'relax'):
         params_dict['ocean'] = 'given'
     elif ocean in ('const'):
         params_dict['ocean'] = 'constant'
