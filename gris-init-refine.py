@@ -80,6 +80,7 @@ grid = options.grid
 hydrology = options.hydrology
 stress_balance = options.stress_balance
 version = options.version
+vertical_velocity_approximation = options.vertical_velocity_approximation
 
 domain = options.domain
 pism_exec = generate_domain(domain)
