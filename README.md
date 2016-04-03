@@ -23,7 +23,25 @@ Homepage
 [www.pism-docs.org](http://www.pism-docs.org/)
 
 
-gris-init
+pism-gris
 ================================
 
-This repo contains python scripts to generate PBS scripts that will run PISM to arrive at initial states for the Greenland Ice Sheet (GrIS).
+Repository which contains scripts and tools for simulations of the Greenland Ice Sheet (GrIS) with PISM.
+
+data_sets
+--------
+
+initMIP
+--------
+
+Scripts related to [initMIP](http://http://www.climate-cryosphere.org/wiki/index.php?title=InitMIP)
+
+initialization
+--------
+
+Scripts for paleo simulations / initial states
+
+prognostic
+--------
+
+Scripts for prognostic simulations

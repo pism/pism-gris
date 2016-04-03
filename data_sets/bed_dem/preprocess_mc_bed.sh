@@ -79,7 +79,10 @@ ymax=$((-657600 + $buffer_y))
 CUT="-cutline ../shape-files/gris-domain.shp"
 
 for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
-    outfile=pism_Greenland_ext_${GRID}m_mcb_jpl_v${ver}.nc
+    outfile_prefix=pism_Greenland_ext_${GRID}m_mcb_jpl_v${ver}
+    outfile=${outfile_prefix}.nc
+    outfile_ctrl=${outfile_prefix}_ctrl.nc
+    outfile_hot=${outfile_prefix}_970mW_hs.nc
     for var in "bed" "errbed"; do
         rm -f g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc
         gdalwarp $CUT -overwrite  -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff NETCDF:$infile:$var g${GRID}m_${var}_v${ver}.tif
@@ -149,5 +152,6 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     # surface to 0 where mask has ocean
     ncap2 -O -s "where(thickness<0) thickness=0; ftt_mask[\$y,\$x]=1b; where(mask==0) {thickness=0.; surface=0.;};" $outfile $outfile
 
-    
+    nccopy $outfile $outfile_ctrl
+    create_hot_spot.sh $outfile $outfile_hot
 done
