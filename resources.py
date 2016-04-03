@@ -41,7 +41,7 @@ def generate_domain(domain):
         x_max = 320000
         y_min = -2410000
         y_max = -2020000
-        pism_exec = '''\'pismo -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap\''''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
+        pism_exec = '''pismo -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
     else:
         print('Domain {} not recognized, exiting'.format(domain))
         import sys
@@ -327,7 +327,7 @@ def generate_calving(calving, **kwargs):
     '''
     
     params_dict = OrderedDict()
-    if calving in ('float_kill', 'ocean_kill', 'thickness_calving'):
+    if calving in ('float_kill', 'ocean_kill', 'thickness_calving', 'vanmises_calving'):
         params_dict['calving'] = calving
     elif calving in ('eigen_calving'):
         params_dict['calving'] = '{},thickness_calving'.format(calving)
@@ -353,6 +353,18 @@ def generate_climate(climate, **kwargs):
             params_dict['atmosphere_paleo_precip_file'] = 'pism_dT.nc'
         if 'atmosphere_delta_T_file' not in kwargs:
             params_dict['atmosphere_delta_T_file'] = 'pism_dT.nc'
+        params_dict['surface'] = 'pdd'
+    elif climate in ('pdd'):
+        params_dict['atmosphere'] = 'given'
+        if 'atmosphere_given_file' not in kwargs:
+            params_dict['atmosphere_given_file'] = 'foo.nc'
+        params_dict['surface'] = 'pdd'
+    elif climate in ('pdd_lapse'):
+        params_dict['atmosphere'] = 'given,lapse_rate'
+        if 'atmosphere_given_file' not in kwargs:
+            params_dict['atmosphere_given_file'] = 'foo.nc'
+        if 'temp_lapse_rate' not in kwargs:
+            params_dict['temp_lapse_rate'] = 0.0
         params_dict['surface'] = 'pdd'
     elif climate in ('const', 'relax', 'given'):
         params_dict['surface'] = 'given'

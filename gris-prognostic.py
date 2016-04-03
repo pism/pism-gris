@@ -7,11 +7,12 @@ import os
 from argparse import ArgumentParser
 from resources import *
 
-grid_choices = [18000, 9000, 6000, 4500, 3600, 1800, 1500, 1200, 900, 600, 450, 300, 150]
+grid_choices = [18000, 9000, 6000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900, 600, 450, 300, 150]
 
 # set up the option parser
 parser = ArgumentParser()
-parser.description = "Generating scripts for model initialization."
+parser.description = "Generating scripts for prognostic simulations."
+parser.add_argument("FILE", nargs=1)
 parser.add_argument("-n", '--n_procs', dest="n", type=int,
                     help='''number of cores/processors. default=64.''', default=64)
 parser.add_argument("-w", '--wall_time', dest="walltime",
@@ -19,14 +20,20 @@ parser.add_argument("-w", '--wall_time', dest="walltime",
 parser.add_argument("-q", '--queue', dest="queue", choices=['standard_4', 'standard_16', 'standard', 'gpu', 'gpu_long', 'long', 'normal'],
                     help='''queue. default=standard_4.''', default='standard_4')
 parser.add_argument("--climate", dest="climate",
-                    choices=['const', 'paleo'],
-                    help="Climate", default='paleo')
+                    choices=['const', 'pdd'],
+                    help="Climate", default='const')
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vanmises_calving'],
+                    choices=['float_kill',
+                             'ocean_kill',
+                             'eigen_calving',
+                             'thickness_calving',
+                             'vanmises_calving'],
                     help="claving", default='thickness_calving')
 parser.add_argument("-d", "--domain", dest="domain",
-                    choices=['gris', 'gris_ext'],
+                    choices=['gris', 'gris_ext', 'jakobshavn'],
                     help="sets the modeling domain", default='gris_ext')
+parser.add_argument("--duration", dest="dura", type=int,
+                    help="Length of simulation in years (integers)", default=100)
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
@@ -51,6 +58,8 @@ parser.add_argument("--forcing_type", dest="forcing_type",
 parser.add_argument("--hydrology", dest="hydrology",
                     choices=['null', 'diffuse'],
                     help="Basal hydrology model.", default='diffuse')
+parser.add_argument("--regrid_thickness", dest="regrid_thickness", action="store_true",
+                    help="Regrid ice thickness from input file rather than from boot file", default=False)
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
@@ -63,6 +72,7 @@ parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity
 
 
 options = parser.parse_args()
+filename = options.FILE[0]
 
 nn = options.n
 oformat = options.oformat
@@ -88,8 +98,8 @@ save_times = [-25000, -5000, -1500, -1000, -500, -200, -100, -5]
 
     
 infile = ''
-if domain.lower() in ('greenland_ext', 'gris_ext'):
-    pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
+if domain.lower() in ('greenland_ext', 'gris_ext', 'jakobshavn'):
+    pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}.nc'.format(grid, version)
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
@@ -113,13 +123,22 @@ topg_min_values = [-700]
 topg_max_values = [700]
 combinations = list(itertools.product(thickness_calving_threshold_vales, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
-tsstep = 'yearly'
-exstep = '100'
+tsstep = 'daily'
+exstep = 'monthly'
 
 scripts = []
 
-start = -125000
-end = 0
+dura = options.dura
+regridfile = filename
+regrid_thickness = options.regrid_thickness
+#regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href'
+regridvars = 'litho_temp,enthalpy,tillwat,bmelt,Href'
+if regrid_thickness:
+    regridvars = '{},thk'.format(regridvars)
+
+
+start = 0
+end = dura
 
 for n, combination in enumerate(combinations):
 
@@ -144,7 +163,7 @@ for n, combination in enumerate(combinations):
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
 
         
-    script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+    script = 'prog_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
     
     for filename in (script):
@@ -166,6 +185,8 @@ for n, combination in enumerate(combinations):
         general_params_dict = OrderedDict()
         general_params_dict['i'] = pism_dataname
         general_params_dict['bootstrap'] = ''
+        general_params_dict['regrid_file'] = regridfile
+        general_params_dict['regrid_vars'] = regridvars
         general_params_dict['ys'] = start
         general_params_dict['ye'] = end
         general_params_dict['o'] = outfile
