@@ -1,0 +1,30 @@
+# PISM name,  , ISMIP6 name            , units, standard name, dimension
+acabf         , surface_mass_balance_average , kg m-2 s-1, land_ice_surface_specific_mass_balance_flux, 2
+dlithkdt      , dHdt                  , m s-1, tendency_of_land_ice_thickness, 2
+hfgeoubed     , hfgeoubed             , W m-2, upward_geothermal_heat_flux_at_ground_level, 2
+iareaf        , iareaf                , m2, floating_ice_shelf_area, 1
+iareag        , iareag                , m2, grounded_land_ice_area, 1
+libmassbf     , basal_mass_balance_average , kg m-2 s-1, land_ice_basal_specific_mass_balance_flux, 2
+licalvf       , discharge_flux        , kg m-2 s-1, land_ice_specific_mass_flux_due_to_calving, 2
+lim           , imass                 , kg, land_ice_mass, 1
+limnsw        , limnsw                , kg, land_ice_mass_not_displacing_sea_water, 1
+litempbot     , tempbase              , K, land_ice_basal_temperature, 2
+litempsnic    , tempsurf              , K, temperature_at_ground_level_in_snow_or_firn, 2
+lithk         , thk                   , m, land_ice_thickness, 2
+orog          , usurf                 , m, surface_altitude, 2
+sftgrf        , sftgrf                , 1, grounded_ice_sheet_area_fraction, 2
+sftflf        , sftflf                , 1, floating_ice_sheet_area_fraction, 2
+sftgif        , sftgif                , 1, land_ice_area_fraction, 2
+strbasemag    , taub_mag              , Pa, magnitude_of_land_ice_basal_drag, 2
+tendacabf     , surface_ice_flux      , kg s-1, tendency_of_land_ice_mass_due_to_surface_mass_balance, 1
+tendlibmassbf , grounded_basal_ice_flux, kg s-1, tendency_of_land_ice_mass_due_to_basal_mass_balance, 1
+tendlicalvf   , discharge_flux        , kg s-1, tendency_of_land_ice_mass_due_to_calving, 1
+topg          , topg                  , m, bedrock_altitude, 2
+uvelbase      , uvelbase              , m s-1, land_ice_basal_x_velocity, 2
+uvelmean      , ubar                  , m s-1, land_ice_vertical_mean_x_velocity, 2
+uvelsurf      , uvelsurf              , m s-1, land_ice_surface_x_velocity, 2
+vvelbase      , vvelbase              , m s-1, land_ice_basal_y_velocity, 2
+vvelmean      , vbar                  , m s-1, land_ice_vertical_mean_y_velocity, 2
+vvelsurf      , vvelsurf              , m s-1, land_ice_surface_y_velocity, 2
+wvelbase      , wvelbase              , m s-1, land_ice_basal_upward_velocity, 2
+wvelsurf      , wvelsurf              , m s-1, land_ice_surface_upward_velocity, 2
