@@ -5,6 +5,8 @@ import itertools
 from collections import OrderedDict
 import os
 from argparse import ArgumentParser
+import sys
+sys.path.append('../resources/')
 from resources import *
 
 grid_choices = [6000, 3000]
@@ -96,6 +98,13 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
+pism_config = 'init_config'
+pism_config_nc = '.'.join([pism_config, 'nc'])
+pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
+if not os.path.isfile(pism_config_nc):
+    cmd = ['ncgen', '-o',
+           pism_config_nc, pism_config_cdl]
+    sub.call(cmd)
 
 # ########################################################
 # set up model initialization
@@ -186,7 +195,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['o'] = outfile
         general_params_dict['o_format'] = oformat
         general_params_dict['o_size'] = osize
-        general_params_dict['config_override'] = 'init_config.nc'
+        general_params_dict['config_override'] = pism_config_nc
         general_params_dict['age'] = ''
         if bed_deformation is not None:
             general_params_dict['bed_def'] = bed_deformation

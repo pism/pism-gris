@@ -1,12 +1,15 @@
 #!/usr/bin/env python
-# Copyright (C) 2015 Andy Aschwanden
+# Copyright (C) 2016 Andy Aschwanden
 
 import itertools
 from collections import OrderedDict
 import os
 from argparse import ArgumentParser
+import sys
+sys.path.append('../resources/')
 from resources import *
 import numpy as np
+
 grid_choices = [18000, 9000, 6000, 4500, 3600, 1800, 1500, 1200, 900, 600, 450, 300, 150]
 
 # set up the option parser
@@ -92,6 +95,13 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
     
+pism_config = 'init_config'
+pism_config_nc = '.'.join([pism_config, 'nc'])
+pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
+if not os.path.isfile(pism_config_nc):
+    cmd = ['ncgen', '-o',
+           pism_config_nc, pism_config_cdl]
+    sub.call(cmd)
 
 
 # ########################################################
@@ -182,7 +192,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['o'] = outfile
         general_params_dict['o_format'] = oformat
         general_params_dict['o_size'] = osize
-        general_params_dict['config_override'] = 'init_config.nc'
+        general_params_dict['config_override'] = pism_config_nc
         general_params_dict['age'] = ''
         if forcing_type in ('e_age'):
             general_params_dict['e_age_coupling'] = ''

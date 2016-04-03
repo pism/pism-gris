@@ -5,6 +5,8 @@ import itertools
 from collections import OrderedDict
 import os
 from argparse import ArgumentParser
+import sys
+sys.path.append('../resources/')
 from resources import *
 
 grid_choices = [18000, 9000, 6000, 4500, 3600, 1800, 1500, 1200, 900, 600, 450, 300, 150]
@@ -105,6 +107,13 @@ else:
     
 infile = filename
 
+pism_config = 'init_config'
+pism_config_nc = '.'.join([pism_config, 'nc'])
+pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
+if not os.path.isfile(pism_config_nc):
+    cmd = ['ncgen', '-o',
+           pism_config_nc, pism_config_cdl]
+    sub.call(cmd)
 
 
 # ########################################################

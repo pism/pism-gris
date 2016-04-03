@@ -5,6 +5,8 @@ import itertools
 from collections import OrderedDict
 import os
 from argparse import ArgumentParser
+import sys
+sys.path.append('../resources/')
 from resources import *
 
 grid_choices = [18000, 9000, 6000, 4500, 3600, 1800, 1500, 1200, 900, 600, 450, 300, 150]
@@ -109,6 +111,14 @@ regridvars = 'litho_temp,enthalpy,tillwat,bmelt,Href'
 if regrid_thickness:
     regridvars = '{},thk'.format(regridvars)
 
+pism_config = 'init_config'
+pism_config_nc = '.'.join([pism_config, 'nc'])
+pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
+if not os.path.isfile(pism_config_nc):
+    cmd = ['ncgen', '-o',
+           pism_config_nc, pism_config_cdl]
+    sub.call(cmd)
+
 
 # ########################################################
 # set up initMIP relaxation run
@@ -193,7 +203,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['o'] = outfile
         general_params_dict['o_format'] = oformat
         general_params_dict['o_size'] = osize
-        general_params_dict['config_override'] = 'init_config.nc'
+        general_params_dict['config_override'] = pism_config_nc
         if bed_deformation is not None:
             general_params_dict['bed_def'] = bed_deformation
         if forcing_type in ('e_age'):

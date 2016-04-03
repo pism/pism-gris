@@ -12,12 +12,12 @@ except:
     
 from argparse import ArgumentParser
 from netCDF4 import Dataset as CDF
+sys.path.append('../resources/')
 from resources_ismip6 import *
 
 # Set up the option parser
 parser = ArgumentParser()
 parser.description = "Script to make ISMIP6-conforming scalar time series."
-#parser.add_argument("INIT_FILE", nargs=1)
 parser.add_argument("EXP_FILE", nargs=1)
 parser.add_argument("-e", "--experiment", dest="experiment",
                     choices=['ctrl', 'asmb'],

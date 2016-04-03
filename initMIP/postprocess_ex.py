@@ -13,7 +13,8 @@ except:
     
 from argparse import ArgumentParser
 from netCDF4 import Dataset as CDF
-from resources_ismip6 import *
+sys.path.append('../resources/')
+from resources import *
 
 # Set up the option parser
 parser = ArgumentParser()
