@@ -85,6 +85,7 @@ bed_deformation = options.bed_deformation
 bed_type = options.bed_type
 calving = options.calving
 climate = options.climate
+dura = options.dura
 forcing_type = options.forcing_type
 grid = options.grid
 hydrology = options.hydrology
@@ -94,9 +95,8 @@ version = options.version
 
 domain = options.domain
 pism_exec = generate_domain(domain)
-save_times = [-25000, -5000, -1500, -1000, -500, -200, -100, -5]
+save_times = range(dura)
 
-    
 infile = ''
 if domain.lower() in ('greenland_ext', 'gris_ext', 'jakobshavn'):
     pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}.nc'.format(grid, version)
@@ -178,7 +178,7 @@ for n, combination in enumerate(combinations):
 
         f.write(batch_header)
 
-        outfile = '{domain}_g{grid}m_straight_{experiment}_0.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+        outfile = '{domain}_g{grid}m_{experiment}_{dura}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment, dura=dura)
 
         prefix = generate_prefix_str(pism_exec)
 
@@ -211,10 +211,11 @@ for n, combination in enumerate(combinations):
         sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
-        atmosphere_given_file = 'GR6b_ERAI_1989_2011_4800M_BIL_1989_baseline.nc'
+        atmosphere_file = 'GR6b_ERAI_1989_2011_4800M_BIL_MM_mday-1.nc'
         temp_lapse_rate = 6.
         climate_params_dict = generate_climate(climate,
-                                               atmosphere_given_file=atmosphere_given_file,
+                                               atmosphere_given_file=atmosphere_file,
+                                               atmosphere_lapse_rate_file=atmosphere_file,
                                                temp_lapse_rate=temp_lapse_rate)
         ocean_params_dict = generate_ocean('given',
                                            ocean_given_file='ocean_forcing_latitudinal.nc')
