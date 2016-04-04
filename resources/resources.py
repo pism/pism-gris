@@ -355,6 +355,18 @@ def generate_climate(climate, **kwargs):
         if 'atmosphere_delta_T_file' not in kwargs:
             params_dict['atmosphere_delta_T_file'] = 'pism_dT.nc'
         params_dict['surface'] = 'pdd'
+    elif climate in ('pdd'):
+        params_dict['atmosphere'] = 'given'
+        if 'atmosphere_given_file' not in kwargs:
+            params_dict['atmosphere_given_file'] = 'foo.nc'
+        params_dict['surface'] = 'pdd'
+    elif climate in ('pdd_lapse'):
+        params_dict['atmosphere'] = 'given,lapse_rate'
+        if 'atmosphere_given_file' not in kwargs:
+            params_dict['atmosphere_given_file'] = 'foo.nc'
+        if 'temp_lapse_rate' not in kwargs:
+            params_dict['temp_lapse_rate'] = 0.0
+        params_dict['surface'] = 'pdd'
     elif climate in ('const', 'relax', 'given'):
         params_dict['surface'] = 'given'
     elif climate in ('flux'):
