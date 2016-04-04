@@ -125,6 +125,7 @@ if not os.path.isfile(pism_config_nc):
 sia_e = (3.0)
 ssa_n = (3.25)
 ssa_e = (1.0)
+eigen_calving_k = (1e18)
 
 thickness_calving_threshold_vales = [300]
 ppq_values = [0.60]
