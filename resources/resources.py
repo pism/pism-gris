@@ -41,7 +41,7 @@ def generate_domain(domain):
         x_max = 320000
         y_min = -2410000
         y_max = -2020000
-        pism_exec = '''\'pismo -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap\''''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
+        pism_exec = '''pismo -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
     else:
         print('Domain {} not recognized, exiting'.format(domain))
         import sys
@@ -328,7 +328,10 @@ def generate_calving(calving, **kwargs):
     '''
     
     params_dict = OrderedDict()
-    if calving in ('float_kill', 'ocean_kill', 'thickness_calving'):
+    if calving in ('float_kill',
+                   'ocean_kill',
+                   'thickness_calving',
+                   'vanmises_calving'):
         params_dict['calving'] = calving
     elif calving in ('eigen_calving'):
         params_dict['calving'] = '{},thickness_calving'.format(calving)

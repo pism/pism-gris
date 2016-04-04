@@ -151,6 +151,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     # remove regridding artifacts, give precedence to mask: we set thickness and
     # surface to 0 where mask has ocean
     ncap2 -O -s "where(thickness<0) thickness=0; ftt_mask[\$y,\$x]=1b; where(mask==0) {thickness=0.; surface=0.;};" $outfile $outfile
+    ncks -O -v topg,Band1 -x $outfile $outfile
 
     nccopy $outfile $outfile_ctrl
     sh create_hot_spot.sh $outfile $outfile_hot
