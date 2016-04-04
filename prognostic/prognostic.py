@@ -153,7 +153,7 @@ end = dura
 
 for n, combination in enumerate(combinations):
 
-    ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
