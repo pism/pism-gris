@@ -41,7 +41,7 @@ parser.add_argument("-f", "--o_format", dest="oformat",
                     help="output format", default='netcdf4_parallel')
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
-                    help="horizontal grid resolution", default=9000)
+                    help="horizontal grid resolution", default=1500)
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', '2dbig'],
                     help="output size type", default='2dbig')
@@ -122,11 +122,9 @@ sia_e = (3.0)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
-eigen_calving_k = 1e18
-
-thickness_calving_threshold_vales = [50, 100, 150]
-ppq_values = [0.25, 0.33, 0.60]
-tefo_values = [0.020, 0.025, 0.030]
+thickness_calving_threshold_vales = [300]
+ppq_values = [0.60]
+tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
@@ -151,22 +149,20 @@ end = dura
 
 for n, combination in enumerate(combinations):
 
-    thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
     name_options['ppq'] = ppq
     name_options['tefo'] = tefo
-    name_options['bed_deformation'] = bed_deformation
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
         name_options['k'] = eigen_calving_k
         name_options['threshold'] = thickness_calving_threshold
     if calving in ('thickness_calving'):
         name_options['threshold'] = thickness_calving_threshold
-    name_options['forcing_type'] = forcing_type
-    name_options['hydro'] = hydrology
+
     
     vversion = 'v' + str(version)
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
@@ -187,7 +183,7 @@ for n, combination in enumerate(combinations):
 
         f.write(batch_header)
 
-        outfile = '{domain}_g{grid}m_{experiment}_{dura}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment, dura=dura)
+        outfile = '{domain}_g{grid}m_{experiment}_{dura}a.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment, dura=dura)
 
         prefix = generate_prefix_str(pism_exec)
 
@@ -220,7 +216,7 @@ for n, combination in enumerate(combinations):
         sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
-        atmosphere_file = 'GR6b_ERAI_1989_2011_4800M_BIL_MM_mday-1.nc'
+        atmosphere_file = 'GR6b_ERAI_1989_2011_4800M_BIL_MMEAN_mday-1.nc'
         temp_lapse_rate = 6.
         climate_params_dict = generate_climate(climate,
                                                atmosphere_given_file=atmosphere_file,

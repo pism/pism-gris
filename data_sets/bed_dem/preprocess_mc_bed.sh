@@ -76,7 +76,7 @@ ymin=$((-3349600 - $buffer_y))
 xmax=$((864700 + $buffer_x))
 ymax=$((-657600 + $buffer_y))
 
-CUT="-cutline ../shape-files/gris-domain.shp"
+CUT="-cutline ../shape_files/gris-domain.shp"
 
 for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
     outfile_prefix=pism_Greenland_ext_${GRID}m_mcb_jpl_v${ver}
