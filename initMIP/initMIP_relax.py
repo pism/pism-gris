@@ -5,6 +5,10 @@ import itertools
 from collections import OrderedDict
 import os
 from argparse import ArgumentParser
+try:
+    import subprocess32 as sub
+except:
+    import subprocess as sub
 import sys
 sys.path.append('../resources/')
 from resources import *
