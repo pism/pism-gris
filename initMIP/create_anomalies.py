@@ -107,9 +107,9 @@ for k in range(nt):
     if t < 0:
         smb_var[k,::] = np.squeeze(smb_background[:])
     elif (t >= 0) and (t < 40):
-        smb_var[k,::] = np.squeeze(smb_background[:]) + np.squeeze(smb_anomaly[:]) * np.floor(t) / 40
+        smb_var[k,::] = np.squeeze(smb_background[:]) - np.squeeze(smb_anomaly[:]) * np.floor(t) / 40
     else:
-        smb_var[k,::] = np.squeeze(smb_background[:]) + np.squeeze(smb_anomaly[:])
+        smb_var[k,::] = np.squeeze(smb_background[:]) - np.squeeze(smb_anomaly[:])
         
 
 nc.close()
