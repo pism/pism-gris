@@ -159,11 +159,11 @@ def create_searise_grid(filename, grid_spacing, **kwargs):
     e1 = 700000.0
     n1 = -600000.0
 
-    # Shift to cell centers
-    e0 += grid_spacing / 2
-    n0 += grid_spacing / 2
-    e1 -= grid_spacing / 2
-    n1 -= grid_spacing / 2
+    # # Shift to cell centers
+    # e0 += grid_spacing / 2
+    # n0 += grid_spacing / 2
+    # e1 -= grid_spacing / 2
+    # n1 -= grid_spacing / 2
 
     de = dn = grid_spacing  # m
     M = int((e1 - e0) / de) + 1
