@@ -331,7 +331,7 @@ def generate_calving(calving, **kwargs):
     if calving in ('float_kill',
                    'ocean_kill',
                    'thickness_calving',
-                   'vanmises_calving'):
+                   'stress_calving'):
         params_dict['calving'] = calving
     elif calving in ('eigen_calving'):
         params_dict['calving'] = '{},thickness_calving'.format(calving)

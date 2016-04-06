@@ -33,7 +33,7 @@ parser.add_argument("--calving", dest="calving",
                              'ocean_kill',
                              'eigen_calving',
                              'thickness_calving',
-                             'vanmises_calving'],
+                             'stress_calving'],
                     help="claving", default='thickness_calving')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext', 'jakobshavn'],

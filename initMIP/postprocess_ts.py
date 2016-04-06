@@ -12,6 +12,7 @@ except:
     
 from argparse import ArgumentParser
 from netCDF4 import Dataset as CDF
+import sys
 sys.path.append('../resources/')
 from resources_ismip6 import *
 
@@ -48,7 +49,7 @@ project = '{IS}_{GROUP}_{MODEL}'.format(IS=IS, GROUP=GROUP, MODEL=MODEL)
 pism_stats_vars = ['pism_config',
                    'run_stats']
 
-ismip6_vars_dict = get_ismip6_vars_dict('ismip6vars.csv', 1)
+ismip6_vars_dict = get_ismip6_vars_dict('../resources/ismip6vars.csv', 1)
 ismip6_to_pism_dict = dict((k, v.pism_name) for k, v in ismip6_vars_dict.iteritems())
 pism_to_ismip6_dict = dict((v.pism_name, k) for k, v in ismip6_vars_dict.iteritems())
 
@@ -77,15 +78,19 @@ if __name__ == "__main__":
         if m_var not in nc.variables:
             print("Requested variable '{}' missing".format(m_var))
     nc.close()
+    print('  Removing times < 0 in file {}'.format(out_file))
     cmd = ['ncks', '-O',
+           '-d', 'time,4,-1',
            '-v', '{}'.format(','.join(pism_copy_vars)),
            infile, out_file]
     sub.call(cmd)
     
+
     # Adjust the time axis
     print('Adjusting time axis')
     adjust_time_axis(out_file)
     make_scalar_vars_ismip6_conforming(out_file, ismip6_vars_dict)
+
 
     # Update attributes
     print('Adjusting attributes')

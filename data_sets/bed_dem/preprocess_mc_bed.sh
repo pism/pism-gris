@@ -71,7 +71,7 @@ unzip -o ${ibcaofile}_tif.zip
 # and works for grid resolutions up to 36km.
 buffer_x=148650
 buffer_y=130000
-xmin=$((-638000 - $buffer_x))
+xmin=$((-638000 - $buffer_x - 468000))
 ymin=$((-3349600 - $buffer_y))
 xmax=$((864700 + $buffer_x))
 ymax=$((-657600 + $buffer_y))

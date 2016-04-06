@@ -13,8 +13,9 @@ except:
     
 from argparse import ArgumentParser
 from netCDF4 import Dataset as CDF
+import sys
 sys.path.append('../resources/')
-from resources import *
+from resources_ismip6 import *
 
 # Set up the option parser
 parser = ArgumentParser()
@@ -69,7 +70,7 @@ pism_proj_vars = ['cell_area',
                   'lat_bnds',
                   'lon',
                   'lon_bnds']
-ismip6_vars_dict = get_ismip6_vars_dict('ismip6vars.csv', 2)
+ismip6_vars_dict = get_ismip6_vars_dict('../resources/ismip6vars.csv', 2)
 ismip6_to_pism_dict = dict((k, v.pism_name) for k, v in ismip6_vars_dict.iteritems())
 pism_to_ismip6_dict = dict((v.pism_name, k) for k, v in ismip6_vars_dict.iteritems())
 
