@@ -23,7 +23,7 @@ parser.add_argument("-n", '--n_procs', dest="n", type=int,
                     help='''number of cores/processors. default=192.''', default=192)
 parser.add_argument("-w", '--wall_time', dest="walltime",
                     help='''walltime. default: 96:00:00.''', default="96:00:00")
-parser.add_argument("-q", '--queue', dest="queue", choices=list_queues()],
+parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
                     help='''queue. default=t1standard.''', default='t1standard')
 parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving'],
