@@ -436,6 +436,22 @@ def list_queues():
     return list
 
 
+
+def list_bed_types():
+
+    '''
+    Return a list of supported bed types.
+    '''
+    
+    list = ['ctrl',
+            'ba01_bed',
+            '970mW_hs',
+            'jak_1985',
+            'no_bath']
+    
+    return list
+
+
 def make_batch_header(system, cores, walltime, queue):
     '''
     Generate header file for different HPC system.

@@ -48,9 +48,9 @@ parser.add_argument("-s", "--system", dest="system",
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=['ctrl', 'old_bed', 'ba01_bed', '970mW_hs', 'jak_1985', 'cresis'],
                     help="output size type", default='ctrl')
-parser.add_argument("--bed_deformation", dest="bed_deformation",
-                    choices=[None, 'lc', 'iso'],
-                    help="Bed deformation model.", default=None)
+parser.add_argument("-b", "--bed_type", dest="bed_type",
+                    choices=list_bed_types(),
+                    help="output size type", default='ctrl')
 parser.add_argument("--hydrology", dest="hydrology",
                     choices=['null', 'diffuse'],
                     help="Basal hydrology model.", default='diffuse')

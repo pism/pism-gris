@@ -41,8 +41,8 @@ parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', '2dbig'],
                     help="output size type", default='2dbig')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
-                    choices=['ctrl', 'old_bed', 'ba01_bed', '970mW_hs', 'jak_1985', 'cresis'],
-                    help="output size type", default=None)
+                    choices=list_bed_types(),
+                    help="output size type", default='ctrl')
 parser.add_argument("--bed_deformation", dest="bed_deformation",
                     choices=[None, 'lc', 'iso'],
                     help="Bed deformation model.", default=None)
