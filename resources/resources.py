@@ -418,6 +418,24 @@ def list_systems():
     return list
 
 
+def list_queues():
+
+    '''
+    Return a list of supported queues.
+    '''
+    
+    list = ['debug',
+            'gpu',
+            'gpu_long',
+            'normal',
+            'long',
+            'standard_16',
+            't1standard',
+            't1small']
+    
+    return list
+
+
 def make_batch_header(system, cores, walltime, queue):
     '''
     Generate header file for different HPC system.
@@ -445,7 +463,6 @@ def make_batch_header(system, cores, walltime, queue):
                          'work_dir' : 'PBS_O_WORKDIR',
                          'job_id' : 'PBS_JOBID',
                          'queue' : {
-                             'standard_4' : 4,
                              'standard_16' : 16 }}
     mpido = 'mpirun -np {cores} -machinefile ./nodes_$SLURM_JOBID'.format(cores=cores)                         
     systems['chinook'] = {'mpido' : mpido,
@@ -480,7 +497,7 @@ def make_batch_header(system, cores, walltime, queue):
     elif system in ('chinook'):
         
         header = """#!/bin/sh
-#SBATCH --partition=standard
+#SBATCH --partition={queue}
 #SBATCH --ntasks={cores}
 #SBATCH --tasks-per-node={ppn}
 #SBATCH --time={walltime}

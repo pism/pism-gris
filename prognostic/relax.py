@@ -20,8 +20,8 @@ parser.add_argument("-n", '--n_procs', dest="n", type=int,
                     help='''number of cores/processors. default=64.''', default=64)
 parser.add_argument("-w", '--wall_time', dest="walltime",
                     help='''walltime. default: 12:00:00.''', default="12:00:00")
-parser.add_argument("-q", '--queue', dest="queue", choices=['standard_4', 'standard_16', 'standard', 'gpu', 'gpu_long', 'long', 'normal'],
-                    help='''queue. default=standard_4.''', default='standard_4')
+parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
+                    help='''queue. default=t1standard.''', default='t1standard')
 parser.add_argument("--regrid_thickness", dest="regrid_thickness", action="store_true",
                     help="Regrid ice thickness from input file rather than from boot file", default=False)
 parser.add_argument("--climate", dest="climate",
