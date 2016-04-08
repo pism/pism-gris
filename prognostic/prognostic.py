@@ -228,7 +228,7 @@ for n, combination in enumerate(combinations):
                                                atmosphere_lapse_rate_file=atmosphere_file,
                                                temp_lapse_rate=temp_lapse_rate)
         ocean_params_dict = generate_ocean('given',
-                                           ocean_given_file='ocean_forcing_latitudinal.nc')
+                                           ocean_given_file='ocean_forcing_latitudinal_285.nc')
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving,
                                                thickness_calving_threshold=thickness_calving_threshold,
@@ -238,10 +238,11 @@ for n, combination in enumerate(combinations):
         exvars = default_spatial_ts_vars()
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end)
-        snap_shot_dict = generate_snap_shots(outfile, save_times)
+        # snap_shot_dict = generate_snap_shots(outfile, save_times)
 
         
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
+        all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
         
         cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee job.${batch}'.format(batch=batch_system['job_id'])])

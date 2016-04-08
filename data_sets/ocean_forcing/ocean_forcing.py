@@ -19,17 +19,19 @@ from argparse import ArgumentParser
 parser = ArgumentParser()
 parser.description = "Script adds ocean forcing to HIRHAM atmosphere/surface forcing file. Sets a constant, spatially-uniform basal melt rate of b_a before time t_a, and b_e after time t_a."
 parser.add_argument("FILE", nargs='*')
-parser.add_argument("--bmelt_0",dest="bmelt_0",
-                    help="southern basal melt rate, in kg m-2 s-1",default=228e3*0.91)
-parser.add_argument("--bmelt_1",dest="bmelt_1",
-                    help="northern basal melt rate, in kg m-2 s-1",default=10*0.91)
+parser.add_argument("--bmelt_0",dest="bmelt_0", type=float,
+                    help="southern basal melt rate, in m yr-1",default=228)
+parser.add_argument("--bmelt_1",dest="bmelt_1", type=float,
+                    help="northern basal melt rate, in m yr-1",default=10)
 
 
 options = parser.parse_args()
 args = options.FILE
 
-bmelt_0 = options.bmelt_0
-bmelt_1 = options.bmelt_1
+ice_density = 910.
+
+bmelt_0 = options.bmelt_0 * ice_density
+bmelt_1 = options.bmelt_1 * ice_density
 
 infile = args[0]
 
