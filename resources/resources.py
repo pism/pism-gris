@@ -326,16 +326,16 @@ def generate_calving(calving, **kwargs):
 
     Returns: OrderedDict
     '''
-    
+
     params_dict = OrderedDict()
-    if calving in ('float_kill',
-                   'ocean_kill',
+    if calving in ('ocean_kill',
                    'thickness_calving',
                    'stress_calving'):
         params_dict['calving'] = calving
     elif calving in ('eigen_calving'):
         params_dict['calving'] = '{},thickness_calving'.format(calving)
     elif calving in ('float_kill'):
+        params_dict['calving'] = calving
         params_dict['float_kill_margin_only'] = ''
     else:
         print('calving {} not recognized, exiting'.format(calving))
