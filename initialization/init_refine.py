@@ -223,7 +223,7 @@ for n, combination in enumerate(combinations):
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
         
-        exvars = default_spatial_ts_vars()
+        exvars = init_spatial_ts_vars()
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end)
         snap_shot_dict = generate_snap_shots(outfile, save_times[grid_mapping[grid]+1::])

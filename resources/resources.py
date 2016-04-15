@@ -95,6 +95,44 @@ def default_spatial_ts_vars():
     
     return exvars
 
+def initial_spatial_ts_vars():
+    '''
+    Returns a list of commonly-used extra vars for initialization
+    '''
+    
+    exvars = ['basal_mass_balance_average',
+              'beta',
+              'bmelt',
+              'cell_area',
+              'dbdt',
+              'dHdt',
+              'diffusivity',
+              'discharge_flux',
+              'mask',
+              'lat',
+              'lat_bnds',
+              'lon',
+              'lon_bnds',
+              'nuH',
+              'surface_mass_balance_average',
+              'taub_mag',
+              'tauc',
+              'taud_mag',
+              'tempicethk_basal',
+              'temppabase',
+              'tempsurf',
+              'thk',
+              'topg',
+              'usurf',
+              'velbase',
+              'velbase_mag',
+              'velsurf',
+              'velsurf_mag',
+              'wvelbase',
+              'wvelsurf']
+    
+    return exvars
+
 
 def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None):
     '''
