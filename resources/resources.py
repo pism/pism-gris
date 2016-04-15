@@ -95,7 +95,7 @@ def default_spatial_ts_vars():
     
     return exvars
 
-def initial_spatial_ts_vars():
+def init_spatial_ts_vars():
     '''
     Returns a list of commonly-used extra vars for initialization
     '''
