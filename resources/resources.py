@@ -488,6 +488,8 @@ def list_bed_types():
     '''
     
     list = ['ctrl',
+            'minus',
+            'plus',
             'ba01_bed',
             '970mW_hs',
             'jak_1985',
