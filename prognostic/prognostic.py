@@ -227,7 +227,7 @@ for n, combination in enumerate(combinations):
         if climate in ('flux'):
             climate_params_dict = generate_climate(climate,
                                                    surface_given_file=atmosphere_file,
-                                                   force_to_thk_file=pism_dataname)            
+                                                   force_to_thickness_file=pism_dataname)            
         else:
             climate_params_dict = generate_climate(climate,
                                                    atmosphere_given_file=atmosphere_file,
