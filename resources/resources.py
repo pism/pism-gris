@@ -261,7 +261,7 @@ def generate_grid_description(grid_resolution, domain):
         mzb = 11
 
     vertical_grid = OrderedDict()
-    vertical_grid['Lz'] = 5000
+    vertical_grid['Lz'] = 4000
     vertical_grid['Lzb'] = 2000
     vertical_grid['z_spacing'] = 'equal'
     vertical_grid['Mz'] = mz
