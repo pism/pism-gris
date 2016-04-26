@@ -226,7 +226,8 @@ for n, combination in enumerate(combinations):
         temp_lapse_rate = 6.
         if climate in ('flux'):
             climate_params_dict = generate_climate(climate,
-                                                   surface_given_file=atmosphere_file)            
+                                                   surface_given_file=atmosphere_file,
+                                                   force_to_thk_file=pism_dataname)            
         else:
             climate_params_dict = generate_climate(climate,
                                                    atmosphere_given_file=atmosphere_file,
