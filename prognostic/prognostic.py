@@ -26,7 +26,7 @@ parser.add_argument("-w", '--wall_time', dest="walltime",
 parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
                     help='''queue. default=t1standard.''', default='t1standard')
 parser.add_argument("--climate", dest="climate",
-                    choices=['const', 'pdd', 'pdd_lapse'],
+                    choices=['const', 'pdd', 'pdd_lapse', 'flux'],
                     help="Climate", default='pdd_lapse')
 parser.add_argument("--calving", dest="calving",
                     choices=['float_kill',
@@ -109,7 +109,7 @@ if domain.lower() in ('greenland_ext', 'gris_ext', 'jakobshavn'):
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
     
-pism_config = 'init_config'
+pism_config = 'relax_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
 if not os.path.isfile(pism_config_nc):
@@ -224,10 +224,14 @@ for n, combination in enumerate(combinations):
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         atmosphere_file = 'GR6b_ERAI_1989_2011_4800M_BIL_MMEAN_mday-1.nc'
         temp_lapse_rate = 6.
-        climate_params_dict = generate_climate(climate,
-                                               atmosphere_given_file=atmosphere_file,
-                                               atmosphere_lapse_rate_file=atmosphere_file,
-                                               temp_lapse_rate=temp_lapse_rate)
+        if climate in ('flux'):
+            climate_params_dict = generate_climate(climate,
+                                                   surface_given_file=atmosphere_file)            
+        else:
+            climate_params_dict = generate_climate(climate,
+                                                   atmosphere_given_file=atmosphere_file,
+                                                   atmosphere_lapse_rate_file=atmosphere_file,
+                                                   temp_lapse_rate=temp_lapse_rate)
         ocean_params_dict = generate_ocean('given',
                                            ocean_given_file='ocean_forcing_latitudinal_285.nc')
         hydro_params_dict = generate_hydrology(hydrology)
