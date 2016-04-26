@@ -122,12 +122,12 @@ if not os.path.isfile(pism_config_nc):
 # set up model initialization
 # ########################################################
 
-sia_e = (3.0)
 ssa_n = (3.25)
 ssa_e = (1.0)
 eigen_calving_k = (1e18)
 
 thickness_calving_threshold_vales = [300]
+sia_e_values = [1.25, 1.5, 3.0]
 ppq_values = [0.60]
 tefo_values = [0.020]
 phi_min_values = [5.0]
@@ -159,6 +159,7 @@ for n, combination in enumerate(combinations):
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
+    name_options['sia_e'] = sia_e
     name_options['ppq'] = ppq
     name_options['tefo'] = tefo
     name_options['calving'] = calving
