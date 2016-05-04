@@ -59,6 +59,47 @@ def default_spatial_ts_vars():
               'beta',
               'bmelt',
               'cell_area',
+              'dHdt',
+              'diffusivity',
+              'discharge_flux',
+              'flux_divergence',
+              'height_above_flotation',
+              'mask',
+              'lat',
+              'lat_bnds',
+              'lon',
+              'lon_bnds',
+              'nuH',
+              'surface_mass_balance_average',
+              'taub_mag',
+              'tauc',
+              'taud_mag',
+              'tempicethk_basal',
+              'tempbase',
+              'temppabase',
+              'tempsurf',
+              'thk',
+              'topg',
+              'usurf',
+              'velbar',
+              'velbase',
+              'velbase_mag',
+              'velsurf',
+              'velsurf_mag',
+              'wvelbase',
+              'wvelsurf']
+    
+    return exvars
+
+def ismip6_spatial_ts_vars():
+    '''
+    Returns a list of commonly-used extra vars
+    '''
+    
+    exvars = ['basal_mass_balance_average',
+              'beta',
+              'bmelt',
+              'cell_area',
               'dbdt',
               'dHdt',
               'diffusivity',
@@ -117,7 +158,6 @@ def init_spatial_ts_vars():
               'lon',
               'lon_bnds',
               'nuH',
-              'relative_flotation',
               'surface_mass_balance_average',
               'taub_mag',
               'tauc',
@@ -131,9 +171,7 @@ def init_spatial_ts_vars():
               'velbase',
               'velbase_mag',
               'velsurf',
-              'velsurf_mag',
-              'wvelbase',
-              'wvelsurf']
+              'velsurf_mag']
     
     return exvars
 

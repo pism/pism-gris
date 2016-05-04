@@ -223,7 +223,7 @@ for n, combination in enumerate(combinations):
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
-        exvars = default_spatial_ts_vars()
+        exvars = ismip6_spatial_ts_vars()
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end)
 
@@ -231,7 +231,8 @@ for n, combination in enumerate(combinations):
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
         
-        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee job.${batch}'.format(batch=batch_system['job_id'])])
+        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> job.${batch 2>&1 2>&1 }'.format(batch=batch_system['job_id'])])
+
 
         f.write(cmd)
         f.write('\n')

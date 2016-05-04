@@ -82,6 +82,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     outfile_prefix=pism_Greenland_ext_${GRID}m_mcb_jpl_v${ver}
     outfile=${outfile_prefix}.nc
     outfile_ctrl=${outfile_prefix}_ctrl.nc
+    outfile_cresis=${outfile_prefix}_cresis.nc
     outfile_nb=${outfile_prefix}_no_bath.nc
     outfile_hot=${outfile_prefix}_970mW_hs.nc
     outfile_plus=${outfile_prefix}_plus.nc
@@ -161,29 +162,34 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     # nccopy $outfile $outfile_ctrl
     # ncap2 -O -s "where(mask==0) bed=-9999.;" $outfile $outfile_nb
     # sh create_hot_spot.sh $outfile $outfile_hot
-    ncap2 -O -s "bed=bed+errbed; thickness=thickness-errbed; where(thickness<0) thickness=0.;" $outfile $outfile_plus
-    ncap2 -O -s "bed=bed-errbed; thickness=thickness+errbed; where(thickness<0) thickness=0.;" $outfile $outfile_minus
-    e0=-638000
-    n0=-3349600
-    e1=864700
-    n1=-657600
 
-    # Add a buffer on each side such that we get nice grids up to a grid spacing
-    # of 36 km.
+    cresis_jakfile=Jakobshavn_2006_2014_Composite_V3
+    wget -nc https://data.cresis.ku.edu/data/grids/$cresis_jakfile.zip
+    unzip -o $cresis_jakfile.zip
+    
+    # ncap2 -O -s "bed=bed+errbed; thickness=thickness-errbed; where(thickness<0) thickness=0.;" $outfile $outfile_plus
+    # ncap2 -O -s "bed=bed-errbed; thickness=thickness+errbed; where(thickness<0) thickness=0.;" $outfile $outfile_minus
+    # e0=-638000
+    # n0=-3349600
+    # e1=864700
+    # n1=-657600
 
-    buffer_e=40650
-    buffer_n=22000
-    e0=$(($e0 - $buffer_e))
-    n0=$(($n0 - $buffer_n))
-    e1=$(($e1 + $buffer_e))
-    n1=$(($n1 + $buffer_n))
+    # # Add a buffer on each side such that we get nice grids up to a grid spacing
+    # # of 36 km.
 
-    # Shift to cell centers
-    e0=$(($e0 + $GRID / 2 ))
-    n0=$(($n0 + $GRID / 2))
-    e1=$(($e1 - $GRID / 2))
-    n1=$(($n1 - $GRID / 2))
+    # buffer_e=40650
+    # buffer_n=22000
+    # e0=$(($e0 - $buffer_e))
+    # n0=$(($n0 - $buffer_n))
+    # e1=$(($e1 + $buffer_e))
+    # n1=$(($n1 + $buffer_n))
 
-    ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1.  $outfile_plus  $outfile_sm_plus
-    ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1.  $outfile_minus  $outfile_sm_minus
+    # # Shift to cell centers
+    # e0=$(($e0 + $GRID / 2 ))
+    # n0=$(($n0 + $GRID / 2))
+    # e1=$(($e1 - $GRID / 2))
+    # n1=$(($n1 - $GRID / 2))
+
+    # ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1.  $outfile_plus  $outfile_sm_plus
+    # ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1.  $outfile_minus  $outfile_sm_minus
 done
