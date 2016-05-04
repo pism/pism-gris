@@ -526,6 +526,7 @@ def list_bed_types():
     '''
     
     list = ['ctrl',
+            'cresis',
             'minus',
             'plus',
             'ba01_bed',
