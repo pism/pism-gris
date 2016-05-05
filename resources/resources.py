@@ -192,6 +192,7 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None)
     params_dict = OrderedDict()
     params_dict['extra_file'] = 'ex_' + outfile
     params_dict['extra_vars'] = exvars
+    params_dict['extra_split'] = ''
         
     if step is None:
         step = 'yearly'
