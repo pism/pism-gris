@@ -167,25 +167,26 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     # cresis_jakfile=Jakobshavn_2006_2014_Composite_V3
     # wget -nc https://data.cresis.ku.edu/data/grids/$cresis_jakfile.zip
     # unzip -o $cresis_jakfile.zip
-    source jib_interp.sh
-    var=bed
-    nccopy g${GRID}m_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    ncks -A -v cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    ncap2 -O -s "where(cresis_bed>-9999) bed=cresis_bed;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    gdalwarp -overwrite -dstnodata 0 -cutline  /Volumes/Isunnguata_Sermia/data/pism-gris/data_sets/shape_files/jib_interp_buffer.shp NETCDF:g${GRID}m_cresis_${var}_v${ver}.nc:bed g${GRID}m_cresis_${var}_v${ver}_buffered.tif
-    gdal_translate -co "FORMAT=NC2" -of netCDF g${GRID}m_cresis_${var}_v${ver}_buffered.tif g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    ncrename -O -v bed,buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    ncatted -a _FillValue,buffer,d,, g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    ncks -A -v buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    ncap2 -O -s "where(buffer!=0) bed=9999;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    ncatted -a _FillValue,bed,o,f,9999. g${GRID}m_cresis_${var}_v${ver}.nc
-    mpiexec -np $NN  fill_missing_petsc.py -v bed -f g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
-    ncks -O -v bed tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
-    ncrename -O -v bed,bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
-    nccopy $outfile $outfile_cresis
-    ncatted -a _FillValue,bed,d,, $outfile_cresis
-    ncks -A -v bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc $outfile_cresis
-    ncap2 -O -s "where(mask!=0) bed=bed_cresis; where(mask==2) thickness=surface-bed; where(thickness<0) thickness=0.;" $outfile_cresis $outfile_cresis
+    # source jib_interp.sh
+    # var=bed
+    # nccopy g${GRID}m_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    # ncks -A -v cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    # ncap2 -O -s "where(cresis_bed>-9999) bed=cresis_bed;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    # gdalwarp -overwrite -dstnodata 0 -cutline  /Volumes/Isunnguata_Sermia/data/pism-gris/data_sets/shape_files/jib_interp_buffer.shp NETCDF:g${GRID}m_cresis_${var}_v${ver}.nc:bed g${GRID}m_cresis_${var}_v${ver}_buffered.tif
+    # gdal_translate -co "FORMAT=NC2" -of netCDF g${GRID}m_cresis_${var}_v${ver}_buffered.tif g${GRID}m_cresis_${var}_v${ver}_buffered.nc
+    # ncrename -O -v bed,buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}_buffered.nc
+    # ncatted -a _FillValue,buffer,d,, g${GRID}m_cresis_${var}_v${ver}_buffered.nc
+    # ncks -A -v buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    # ncap2 -O -s "where(buffer!=0) bed=9999;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    # ncatted -a _FillValue,bed,o,f,9999. g${GRID}m_cresis_${var}_v${ver}.nc
+    # mpiexec -np $NN  fill_missing_petsc.py -v bed -f g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
+    # ncks -O -v bed tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
+    # ncrename -O -v bed,bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
+    # nccopy $outfile $outfile_cresis
+    # ncatted -a _FillValue,bed,d,, $outfile_cresis
+    # ncks -A -v bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc $outfile_cresis
+    # ncap2 -O -s "where(mask!=0) bed=bed_cresis; where(mask==2) thickness=surface-bed; where(thickness<0) thickness=0.;" $outfile_cresis $outfile_cresis
+    ncks -O -v bed_cresis -x $outfile_cresis $outfile_cresis
     
     # ncap2 -O -s "bed=bed+errbed; thickness=thickness-errbed; where(thickness<0) thickness=0.;" $outfile $outfile_plus
     # ncap2 -O -s "bed=bed-errbed; thickness=thickness+errbed; where(thickness<0) thickness=0.;" $outfile $outfile_minus
