@@ -507,7 +507,13 @@ def list_systems():
     Return a list of supported systems.
     '''
     
-    list = ['debug', 'chinook', 'fish', 'pacman', 'pleiades']
+    list = ['debug',
+            'chinook',
+            'fish',
+            'pacman',
+            'pleiades',
+            'pleiades_ivy',
+            'pleiades_broadwell']
     
     return list
 
@@ -595,6 +601,20 @@ def make_batch_header(system, cores, walltime, queue):
                            'queue' : {
                                'long' : 20,
                                'normal': 20}}
+    systems['pleiades_ivy'] = {'mpido' : mpido,
+                           'submit' : 'qsub',
+                           'work_dir' : 'PBS_O_WORKDIR',
+                           'job_id' : 'PBS_JOBID',
+                           'queue' : {
+                               'long' : 20,
+                               'normal': 20}}
+    systems['pleiades_broadwell'] = {'mpido' : mpido,
+                           'submit' : 'qsub',
+                           'work_dir' : 'PBS_O_WORKDIR',
+                           'job_id' : 'PBS_JOBID',
+                           'queue' : {
+                               'long' : 28,
+                               'normal': 28}}
 
     assert system in systems.keys()
     if system not in 'debug':
@@ -639,6 +659,21 @@ srun -l /bin/hostname | sort -n | awk \'{{print $2}}\' > ./nodes_$SLURM_JOBID
 #PBS -m e
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=ivy
+#PBS -j oe
+
+module list
+
+cd $PBS_O_WORKDIR
+
+""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
+    elif system in ('pleiades_broadwell'):
+        
+        header = """#PBS -S /bin/bash
+#PBS -N cfd
+#PBS -l walltime={walltime}
+#PBS -m e
+#PBS -q {queue}
+#PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=bro
 #PBS -j oe
 
 module list

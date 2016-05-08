@@ -128,6 +128,10 @@ if not os.path.isdir(odir):
     os.mkdir(odir)
 
 pism_timefile = 'timefile_{start}_{end}.nc'.format(start=start_date, end=end_date)
+try:
+    os.remove(pism_timefile)
+except OSError:
+    pass
 cmd = ['create_timeline.py',
        '-a', start_date,
        '-e', end_date,
