@@ -176,7 +176,7 @@ def init_spatial_ts_vars():
     return exvars
 
 
-def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None):
+def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None, odir=None):
     '''
     Return dict to generate spatial time series
 
@@ -190,7 +190,10 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None)
         pass
     
     params_dict = OrderedDict()
-    params_dict['extra_file'] = 'ex_' + outfile
+    if odir is None:
+        params_dict['extra_file'] = 'ex_' + outfile
+    else:
+        params_dict['extra_file'] = os.path.join(odir, 'ex_' + outfile)
     params_dict['extra_vars'] = exvars
     params_dict['extra_split'] = ''
         
@@ -210,7 +213,7 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None)
     return params_dict
 
 
-def generate_scalar_ts(outfile, step, start=None, end=None):
+def generate_scalar_ts(outfile, step, start=None, end=None, odir=None):
     '''
     Return dict to create scalar time series
 
@@ -218,7 +221,10 @@ def generate_scalar_ts(outfile, step, start=None, end=None):
     '''
 
     params_dict = OrderedDict()
-    params_dict['ts_file'] = 'ts_' + outfile
+    if odir is None:
+        params_dict['ts_file'] = 'ts_' + outfile
+    else:
+        params_dict['ts_file'] = os.path.join(odir, 'ts_' + outfile)
     
     if step is None:
         step = 'yearly'
@@ -232,7 +238,7 @@ def generate_scalar_ts(outfile, step, start=None, end=None):
     return params_dict
 
 
-def generate_snap_shots(outfile, times):
+def generate_snap_shots(outfile, times, odir=None):
     '''
     Return dict to generate snap shots
 
@@ -240,6 +246,11 @@ def generate_snap_shots(outfile, times):
     '''
     
     params_dict = OrderedDict()
+    if odir is None:
+        params_dict['save_file'] = 'save_' + outfile.split('.nc')[0]
+    else:
+        params_dict['save_file'] = os.path.join(odir, 'save_' + outfile.split('.nc')[0])
+
     params_dict['save_file'] = 'save_' + outfile.split('.nc')[0]
     params_dict['save_times'] = ','.join(str(e) for e in times)
     params_dict['save_split'] = ''

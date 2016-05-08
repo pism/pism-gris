@@ -19,6 +19,12 @@ grid_choices = [18000, 9000, 6000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900
 parser = ArgumentParser()
 parser.description = "Generating scripts for prognostic simulations."
 parser.add_argument("FILE", nargs=1)
+parser.add_argument("-a", "--start_date", dest="start_date",
+                    help='''Start date in ISO format. Default=1989-1-1''',
+                    default='2000-1-1')
+parser.add_argument("-e", "--end_date", dest="end_date",
+                    help='''End date in ISO format. Default=2012-1-1''',
+                    default='2008-1-1')
 parser.add_argument("-n", '--n_procs', dest="n", type=int,
                     help='''number of cores/processors. default=64.''', default=64)
 parser.add_argument("-w", '--wall_time', dest="walltime",
@@ -38,8 +44,6 @@ parser.add_argument("--calving", dest="calving",
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext', 'jakobshavn'],
                     help="sets the modeling domain", default='gris_ext')
-parser.add_argument("--duration", dest="dura", type=int,
-                    help="Length of simulation in years (integers)", default=100)
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
@@ -83,18 +87,20 @@ options = parser.parse_args()
 filename = options.FILE[0]
 
 nn = options.n
-odir = = options.odir
+odir = options.odir
 oformat = options.oformat
 osize = options.osize
 queue = options.queue
 walltime = options.walltime
 system = options.system
 
+start_date = options.start_date
+end_date = options.end_date
+
 bed_deformation = options.bed_deformation
 bed_type = options.bed_type
 calving = options.calving
 climate = options.climate
-dura = options.dura
 forcing_type = options.forcing_type
 grid = options.grid
 hydrology = options.hydrology
@@ -104,7 +110,6 @@ version = options.version
 
 domain = options.domain
 pism_exec = generate_domain(domain)
-save_times = range(dura)
 
 infile = ''
 if domain.lower() in ('greenland_ext', 'gris_ext', 'jakobshavn'):
@@ -122,6 +127,12 @@ if not os.path.isfile(pism_config_nc):
 if not os.path.isdir(odir):
     os.mkdir(odir)
 
+pism_timefile = 'timefile_{start}_{end}.nc'.format(start=start_date, end=end_date)
+cmd = ['create_timeline.py',
+       '-a', start_date,
+       '-e', end_date,
+       '-d', '2000-01-01',
+       pism_timefile]
 
 # ########################################################
 # set up model initialization
@@ -146,7 +157,6 @@ exstep = 'monthly'
 
 scripts = []
 
-dura = options.dura
 regridfile = filename
 regrid_thickness = options.regrid_thickness
 #regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href'
@@ -154,8 +164,6 @@ regridvars = 'litho_temp,enthalpy,tillwat,bmelt,Href'
 if regrid_thickness:
     regridvars = '{},thk'.format(regridvars)
 
-start = 0
-end = dura
 
 for n, combination in enumerate(combinations):
 
@@ -179,7 +187,7 @@ for n, combination in enumerate(combinations):
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
 
         
-    script = 'prog_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+    script = 'hc_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
     
     for filename in (script):
@@ -194,7 +202,11 @@ for n, combination in enumerate(combinations):
 
         f.write(batch_header)
 
-        outfile = '{domain}_g{grid}m_{experiment}_{dura}a.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment, dura=dura)
+        outfile = '{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(),
+                                                                           grid=grid,
+                                                                           experiment=experiment,
+                                                                           start=start_date,
+                                                                           end=end_date)
 
         prefix = generate_prefix_str(pism_exec)
 
@@ -203,8 +215,9 @@ for n, combination in enumerate(combinations):
         general_params_dict['bootstrap'] = ''
         general_params_dict['regrid_file'] = regridfile
         general_params_dict['regrid_vars'] = regridvars
-        general_params_dict['ys'] = start
-        general_params_dict['ye'] = end
+        general_params_dict['time_file'] = pism_timefile        
+        # general_params_dict['ys'] = start
+        # general_params_dict['ye'] = end
         general_params_dict['o'] = os.path.join(odir, outfile)
         general_params_dict['o_format'] = oformat
         general_params_dict['o_size'] = osize
@@ -227,7 +240,7 @@ for n, combination in enumerate(combinations):
         sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
-        atmosphere_file = 'GR6b_ERAI_1989_2011_4800M_BIL_MMEAN_mday-1.nc'
+        atmosphere_file = 'GR6b_ERAI_1989_2011_4800M_BIL_MM_mday-1.nc'
         temp_lapse_rate = 6.
         if climate in ('flux'):
             climate_params_dict = generate_climate(climate,
@@ -247,8 +260,8 @@ for n, combination in enumerate(combinations):
                                                ocean_kill_file=pism_dataname)
 
         exvars = default_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end, odir=odir)
-        scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
+        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir)
+        scalar_ts_dict = generate_scalar_ts(outfile, tsstep, odir=odir)
         # snap_shot_dict = generate_snap_shots(outfile, save_times)
 
         
