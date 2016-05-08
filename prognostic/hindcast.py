@@ -133,6 +133,7 @@ cmd = ['create_timeline.py',
        '-e', end_date,
        '-d', '2000-01-01',
        pism_timefile]
+sub.call(cmd)
 
 # ########################################################
 # set up model initialization
