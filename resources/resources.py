@@ -523,6 +523,7 @@ def list_queues():
             'gpu_long',
             'normal',
             'long',
+            'standard',
             'standard_16',
             't1standard',
             't1small']

@@ -83,7 +83,7 @@ options = parser.parse_args()
 filename = options.FILE[0]
 
 nn = options.n
-odir = = options.odir
+odir = options.odir
 oformat = options.oformat
 osize = options.osize
 queue = options.queue
