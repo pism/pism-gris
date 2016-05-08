@@ -20,11 +20,11 @@ parser = ArgumentParser()
 parser.description = "Generating scripts for prognostic simulations."
 parser.add_argument("FILE", nargs=1)
 parser.add_argument("-a", "--start_date", dest="start_date",
-                    help='''Start date in ISO format. Default=2000-1-1''',
-                    default='2000-1-1')
-parser.add_argument("-e", "--end_date", dest="end_date",
-                    help='''End date in ISO format. Default=2008-1-1''',
+                    help='''Start date in ISO format. Default=2008-1-1''',
                     default='2008-1-1')
+parser.add_argument("-e", "--end_date", dest="end_date",
+                    help='''End date in ISO format. Default=2018-1-1''',
+                    default='2018-1-1')
 parser.add_argument("-n", '--n_procs', dest="n", type=int,
                     help='''number of cores/processors. default=64.''', default=64)
 parser.add_argument("-w", '--wall_time', dest="walltime",
@@ -192,7 +192,7 @@ for n, combination in enumerate(combinations):
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
 
         
-    script = 'hc_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+    script = 'fc_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
     
     for filename in (script):
