@@ -245,7 +245,7 @@ for n, combination in enumerate(combinations):
         sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
-        atmosphere_file = 'GR6b_ERAI_1989_2011_4800M_BIL_MM_mday-1.nc'
+        atmosphere_file = 'GR6b_ERAI_1989_2011_4800M_BIL_MMEAN_mday-1.nc'
         temp_lapse_rate = 6.
         if climate in ('flux'):
             climate_params_dict = generate_climate(climate,
@@ -254,6 +254,7 @@ for n, combination in enumerate(combinations):
         else:
             climate_params_dict = generate_climate(climate,
                                                    atmosphere_given_file=atmosphere_file,
+                                                   atmosphere_given_period=1,
                                                    atmosphere_lapse_rate_file=atmosphere_file,
                                                    temp_lapse_rate=temp_lapse_rate)
         ocean_params_dict = generate_ocean('given',
