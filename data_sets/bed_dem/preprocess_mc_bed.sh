@@ -63,6 +63,9 @@ nc2cdo.py $PISMVERSION
 echo "done."
 echo
 
+# plummerfile=2008_Jakobshavn.zip
+# wget -nc ftp://data.cresis.ku.edu/data/grids/old_format/$plummerfile
+
 ibcaofile=IBCAO_V3_500m_RR
 # wget -nc http://www.ngdc.noaa.gov/mgg/bathymetry/arctic/grids/version3_0/${ibcaofile}_tif.zip
 # unzip -o ${ibcaofile}_tif.zip
@@ -76,14 +79,21 @@ ymin=$((-3349600 - $buffer_y))
 xmax=$((864700 + $buffer_x))
 ymax=$((-657600 + $buffer_y))
 
+
+cresis_jakfile=Jakobshavn_2006_2014_Composite_V3
+wget -nc https://data.cresis.ku.edu/data/grids/$cresis_jakfile.zip
+unzip -o $cresis_jakfile.zip
+#source jib_interp.sh
+
+
 CUT="-cutline ../shape_files/gris-domain.shp"
 
-#for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
-for GRID in 150; do
+# for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
+for GRID in 600; do
     outfile_prefix=pism_Greenland_ext_${GRID}m_mcb_jpl_v${ver}
     outfile=${outfile_prefix}.nc
     outfile_ctrl=${outfile_prefix}_ctrl.nc
-    outfile_cresis=${outfile_prefix}_cresis.nc
+    outfile_cresis=${outfile_prefix}_cresisp.nc
     outfile_nb=${outfile_prefix}_no_bath.nc
     outfile_hot=${outfile_prefix}_970mW_hs.nc
     outfile_plus=${outfile_prefix}_plus.nc
@@ -160,14 +170,15 @@ for GRID in 150; do
     # surface to 0 where mask has ocean
     ncap2 -O -s "where(thickness<0) thickness=0; ftt_mask[\$y,\$x]=1b; where(mask==0) {thickness=0.; surface=0.;};" $outfile $outfile
 
-    nccopy $outfile $outfile_ctrl
-    ncap2 -O -s "where(mask==0) bed=-9999.;" $outfile $outfile_nb
-    sh create_hot_spot.sh $outfile $outfile_hot
+    # nccopy $outfile $outfile_ctrl
+    # ncap2 -O -s "where(mask==0) bed=-9999.;" $outfile $outfile_nb
+    # sh create_hot_spot.sh $outfile $outfile_hot
 
-    cresis_jakfile=Jakobshavn_2006_2014_Composite_V3
-    wget -nc https://data.cresis.ku.edu/data/grids/$cresis_jakfile.zip
-    unzip -o $cresis_jakfile.zip
-    source jib_interp.sh
+    # CReSIS bed
+    gdalwarp -overwrite  -cutline /Volumes/Isunnguata_Sermia/data/pism-gris/data_sets/shape_files/jib_cresis_channel_area_cutline.shp -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff /Volumes/Isunnguata_Sermia/data/pism-gris/data_sets/bed_dem/jakobshavn_bedmap_3413.tif g${GRID}m_cresis.tif
+    gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_cresis.tif g${GRID}m_cresis.nc
+    ncrename -O -v Band1,cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis.nc
+    
     var=bed
     nccopy g${GRID}m_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
     ncks -A -v cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis_${var}_v${ver}.nc
@@ -175,8 +186,9 @@ for GRID in 150; do
     gdalwarp -overwrite -dstnodata 0 -cutline  /Volumes/Isunnguata_Sermia/data/pism-gris/data_sets/shape_files/jib_interp_buffer.shp NETCDF:g${GRID}m_cresis_${var}_v${ver}.nc:bed g${GRID}m_cresis_${var}_v${ver}_buffered.tif
     gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_cresis_${var}_v${ver}_buffered.tif g${GRID}m_cresis_${var}_v${ver}_buffered.nc
     ncrename -O -v bed,buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}_buffered.nc
+    ncks -O -4 g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}_buffered.nc
     ncatted -a _FillValue,buffer,d,, g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    ncks -A -v buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    ncks -4 -A -v buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}.nc
     ncap2 -O -s "where(buffer!=0) bed=9999;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
     ncatted -a _FillValue,bed,o,f,9999. g${GRID}m_cresis_${var}_v${ver}.nc
     mpiexec -np $NN  fill_missing_petsc.py -v bed -f g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
