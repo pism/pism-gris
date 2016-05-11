@@ -23,6 +23,9 @@ parser.add_argument("--bmelt_0",dest="bmelt_0", type=float,
                     help="southern basal melt rate, in m yr-1",default=228)
 parser.add_argument("--bmelt_1",dest="bmelt_1", type=float,
                     help="northern basal melt rate, in m yr-1",default=10)
+parser.add_argument("-m", "--process_mask", dest="mask", action="store_true",
+                    help='''
+                    Process the mask, no melting on land''', default=False)
 
 
 options = parser.parse_args()
@@ -32,6 +35,7 @@ ice_density = 910.
 
 bmelt_0 = options.bmelt_0 * ice_density
 bmelt_1 = options.bmelt_1 * ice_density
+mask = options.mask
 
 infile = args[0]
 
@@ -110,6 +114,10 @@ else:
     btemp_var = nc.variabels[var]
 btemp_var.grid_mapping = "mapping"
     
+if mask:
+    mask_var = nc.variables['mask'][:]
+    nc.variables['mask'].grid_mapping = "mapping"
+
 
 nt = len(time_var[:])
 for t in range(nt):
