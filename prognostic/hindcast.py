@@ -257,7 +257,7 @@ for n, combination in enumerate(combinations):
                                                    atmosphere_lapse_rate_file=atmosphere_file,
                                                    temp_lapse_rate=temp_lapse_rate)
         ocean_params_dict = generate_ocean('given',
-                                           ocean_given_file='ocean_forcing_latitudinal_285.nc')
+                                           ocean_given_file='ocean_forcing_latitudinal_masked_285.nc')
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving,
                                                thickness_calving_threshold=thickness_calving_threshold,
@@ -268,7 +268,6 @@ for n, combination in enumerate(combinations):
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, odir=odir)
         # snap_shot_dict = generate_snap_shots(outfile, save_times)
-
         
         # all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)

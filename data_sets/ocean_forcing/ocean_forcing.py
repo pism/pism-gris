@@ -83,7 +83,10 @@ time_units = 'years since 1-1-1'
 time_calendar = 'none'
 
 # create time variable
-time_var = nc.createVariable(time_var_name, 'd', dimensions=(time_dim))
+if time_var_name not in nc.variables:
+    time_var = nc.createVariable(time_var_name, 'd', dimensions=(time_dim))
+else:
+    time_var = nc.variables[time_var_name]
 time_var.bounds = bnds_var_name
 time_var.units = time_units
 time_var.standard_name = time_var_name
@@ -91,7 +94,10 @@ time_var.axis = "T"
 time_var[:] = [1.]
 
 # create time bounds variable
-time_bnds_var = nc.createVariable(bnds_var_name, 'd', dimensions=(time_dim, bnds_dim))
+if bnds_var_name not in nc.variables:
+    time_bnds_var = nc.createVariable(bnds_var_name, 'd', dimensions=(time_dim, bnds_dim))
+else:
+    time_bnds_var = nc.variables[bnds_var_name]
 time_bnds_var[:, 0] = [0]
 time_bnds_var[:, 1] = [1]
     
@@ -117,6 +123,7 @@ btemp_var.grid_mapping = "mapping"
 if mask:
     mask_var = nc.variables['mask'][:]
     nc.variables['mask'].grid_mapping = "mapping"
+    land_mask = (mask_var != 0) & (mask_var !=3)
 
 
 nt = len(time_var[:])
@@ -128,6 +135,8 @@ for t in range(nt):
     bmelt = a * Y + b
     bmelt[Y<y0] = a * y0 + b
     bmelt[Y>y1] = a * y1 + b
+    if mask:
+        bmelt[land_mask] = 0.
     bmelt_var[t,::] = bmelt
     btemp_var[t,::] = 0
     nc.sync()
