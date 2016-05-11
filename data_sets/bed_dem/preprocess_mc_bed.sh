@@ -88,8 +88,8 @@ unzip -o $cresis_jakfile.zip
 
 CUT="-cutline ../shape_files/gris-domain.shp"
 
-# for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
-for GRID in 600; do
+for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
+#for GRID in 3600; do
     outfile_prefix=pism_Greenland_ext_${GRID}m_mcb_jpl_v${ver}
     outfile=${outfile_prefix}.nc
     outfile_ctrl=${outfile_prefix}_ctrl.nc
@@ -157,7 +157,7 @@ for GRID in 600; do
     fi
     mpiexec -np $NN fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
     ncks -A -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp2_${GRID}m.nc $outfile
-    ncatted -a long_name,bed,o,c,"bed topography" -a standard_name,bed,o,c,"bedrock_altitude" -a units,bed,o,c,"meters" -a _FillValue,bed,o,f,-9999. $outfile
+    ncatted -a units,bheatflx,o,c,"W m-2" -a long_name,bed,o,c,"bed topography" -a standard_name,bed,o,c,"bedrock_altitude" -a units,bed,o,c,"meters" -a _FillValue,bed,o,f,-9999. $outfile
     ncatted -a long_name,surface,o,c,"ice surface elevation" -a standard_name,surface,o,c,"surface_altitude" -a units,surface,o,c,"meters" $outfile
     ncatted -a long_name,errbed,o,c,"bed topography/ice thickness error" -a units,errbed,o,c,"meters" $outfile
     ncatted -a long_name,thickness,o,c,"ice thickness" -a standard_name,thickness,o,c,"land_ice_thickness" -a units,thickness,o,c,"meters" $outfile
@@ -170,7 +170,7 @@ for GRID in 600; do
     # surface to 0 where mask has ocean
     ncap2 -O -s "where(thickness<0) thickness=0; ftt_mask[\$y,\$x]=1b; where(mask==0) {thickness=0.; surface=0.;};" $outfile $outfile
 
-    # nccopy $outfile $outfile_ctrl
+    ncks -O $outfile $outfile_ctrl
     # ncap2 -O -s "where(mask==0) bed=-9999.;" $outfile $outfile_nb
     # sh create_hot_spot.sh $outfile $outfile_hot
 
@@ -182,6 +182,7 @@ for GRID in 600; do
     var=bed
     nccopy g${GRID}m_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
     ncks -A -v cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    ncatted -a _FillValue,cresis_bed,d,, g${GRID}m_cresis_${var}_v${ver}.nc
     ncap2 -O -s "where(cresis_bed>-9999) bed=cresis_bed;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
     gdalwarp -overwrite -dstnodata 0 -cutline  /Volumes/Isunnguata_Sermia/data/pism-gris/data_sets/shape_files/jib_interp_buffer.shp NETCDF:g${GRID}m_cresis_${var}_v${ver}.nc:bed g${GRID}m_cresis_${var}_v${ver}_buffered.tif
     gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_cresis_${var}_v${ver}_buffered.tif g${GRID}m_cresis_${var}_v${ver}_buffered.nc
@@ -194,7 +195,7 @@ for GRID in 600; do
     mpiexec -np $NN  fill_missing_petsc.py -v bed -f g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
     ncks -O -v bed tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
     ncrename -O -v bed,bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
-    nccopy $outfile $outfile_cresis
+    ncks -O  $outfile $outfile_cresis
     ncatted -a _FillValue,bed,d,, $outfile_cresis
     ncks -A -v bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc $outfile_cresis
     ncap2 -O -s "where(mask!=0) bed=bed_cresis; where(mask==2) thickness=surface-bed; where(thickness<0) thickness=0.;" $outfile_cresis $outfile_cresis
