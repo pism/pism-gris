@@ -39,6 +39,8 @@ parser.add_argument("-f", "--o_format", dest="oformat",
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
                     help="horizontal grid resolution", default=9000)
+parser.add_argument("--o_dir", dest="odir",
+                    help="output directory. Default: current directory", default='.')
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', '2dbig'],
                     help="output size type", default='2dbig')
@@ -71,6 +73,7 @@ parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity
 options = parser.parse_args()
 
 nn = options.n
+odir = options.odir
 oformat = options.oformat
 osize = options.osize
 queue = options.queue
@@ -106,6 +109,8 @@ if not os.path.isfile(pism_config_nc):
     cmd = ['ncgen', '-o',
            pism_config_nc, pism_config_cdl]
     sub.call(cmd)
+if not os.path.isdir(odir):
+    os.mkdir(odir)
 
 # ########################################################
 # set up model initialization
@@ -181,7 +186,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['bootstrap'] = ''
         general_params_dict['ys'] = start
         general_params_dict['ye'] = end
-        general_params_dict['o'] = outfile
+        general_params_dict['o'] = os.path.join(odir, outfile)
         general_params_dict['o_format'] = oformat
         general_params_dict['o_size'] = osize
         general_params_dict['config_override'] = pism_config_nc
@@ -209,8 +214,8 @@ for n, combination in enumerate(combinations):
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
         exvars = init_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
-        scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end)
+        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end, odir=odir)
+        scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
         snap_shot_dict = generate_snap_shots(outfile, save_times)
 
         
