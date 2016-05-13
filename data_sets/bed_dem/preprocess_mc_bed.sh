@@ -89,7 +89,7 @@ unzip -o $cresis_jakfile.zip
 CUT="-cutline ../shape_files/gris-domain.shp"
 
 for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
-#for GRID in 3600; do
+#for GRID in 450; do
     outfile_prefix=pism_Greenland_ext_${GRID}m_mcb_jpl_v${ver}
     outfile=${outfile_prefix}.nc
     outfile_ctrl=${outfile_prefix}_ctrl.nc
@@ -101,62 +101,62 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     outfile_sm_prefix=pism_Greenland_${GRID}m_mcb_jpl_v${ver}
     outfile_sm_plus=${outfile_sm_prefix}_plus.nc
     outfile_sm_minus=${outfile_sm_prefix}_minus.nc
-    for var in "bed" "errbed"; do
-        rm -f g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc
-        gdalwarp $CUT -overwrite  -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff NETCDF:$infile:$var g${GRID}m_${var}_v${ver}.tif
-        gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc 
-        ncatted -a nx,global,d,, -a ny,global,d,, -a xmin,global,d,, -a ymax,global,d,, -a spacing,global,d,, g${GRID}m_${var}_v${ver}.nc
+    # for var in "bed" "errbed"; do
+    #     rm -f g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc
+    #     gdalwarp $CUT -overwrite  -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff NETCDF:$infile:$var g${GRID}m_${var}_v${ver}.tif
+    #     gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc 
+    #     ncatted -a nx,global,d,, -a ny,global,d,, -a xmin,global,d,, -a ymax,global,d,, -a spacing,global,d,, g${GRID}m_${var}_v${ver}.nc
         
-    done
-    for var in "surface" "thickness"; do
-        rm -f g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc
-        gdalwarp -overwrite -r average -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff NETCDF:$infile:$var g${GRID}m_${var}_v${ver}.tif
-        gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc
-        ncatted -a _FillValue,$var,d,, g${GRID}m_${var}_v${ver}.nc
-        ncap2 -O -s "where(${var}<=0) ${var}=0.;" g${GRID}m_${var}_v${ver}.nc g${GRID}m_${var}_v${ver}.nc
-    done
-    for var in "mask" "source"; do
-        rm -f g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc
-        gdalwarp -overwrite -r near -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff NETCDF:$infile:$var g${GRID}m_${var}_v${ver}.tif
-        gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc 
-    done
+    # done
+    # for var in "surface" "thickness"; do
+    #     rm -f g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc
+    #     gdalwarp -overwrite -r average -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff NETCDF:$infile:$var g${GRID}m_${var}_v${ver}.tif
+    #     gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc
+    #     ncatted -a _FillValue,$var,d,, g${GRID}m_${var}_v${ver}.nc
+    #     ncap2 -O -s "where(${var}<=0) ${var}=0.;" g${GRID}m_${var}_v${ver}.nc g${GRID}m_${var}_v${ver}.nc
+    # done
+    # for var in "mask" "source"; do
+    #     rm -f g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc
+    #     gdalwarp -overwrite -r near -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff NETCDF:$infile:$var g${GRID}m_${var}_v${ver}.tif
+    #     gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc 
+    # done
     
-    ncks -O g${GRID}m_bed_v${ver}.nc $outfile
-    ncatted -a _FillValue,bed,d,, $outfile
-    for var in "errbed" "surface" "thickness" "mask" "source"; do
-        ncks -A g${GRID}m_${var}_v${ver}.nc $outfile
-    done
+    # ncks -O g${GRID}m_bed_v${ver}.nc $outfile
+    # ncatted -a _FillValue,bed,d,, $outfile
+    # for var in "errbed" "surface" "thickness" "mask" "source"; do
+    #     ncks -A g${GRID}m_${var}_v${ver}.nc $outfile
+    # done
     
-    ncap2 -O -s "where(mask==3) bed=-9999" $outfile $outfile
+    # ncap2 -O -s "where(mask==3) bed=-9999" $outfile $outfile
     
-    # This is not needed, but it can be used by PISM to calculate correct cell volumes, and for remapping scripts"
-    ncatted -a proj4,global,o,c,"+init=epsg:3413" $outfile
+    # # This is not needed, but it can be used by PISM to calculate correct cell volumes, and for remapping scripts"
+    # ncatted -a proj4,global,o,c,"+init=epsg:3413" $outfile
     
-    ba13file=Greenland_bedrock_topography_V3_clean
-    rsync -rvu --progress $user@beauregard.gi.alaska.edu:/data/tmp/data_sets/greenland_beds_v3/${ba13file}.nc
+    # ba13file=Greenland_bedrock_topography_V3_clean
+    # rsync -rvu --progress $user@beauregard.gi.alaska.edu:/data/tmp/data_sets/greenland_beds_v3/${ba13file}.nc
     
-    gdalwarp $CUT -overwrite -r average -s_srs "+proj=stere +ellps=WGS84 +datum=WGS84 +lon_0=-39 +lat_0=90 +lat_ts=71 +units=m" -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -dstnodata -9999 -of GTiff NETCDF:${ba13file}.nc:topg ${ba13file}_epsg3413_g${GRID}m.tif
-    gdal_translate -co "FORMAT=NC4" -of netCDF ${ba13file}_epsg3413_g${GRID}m.tif ${ba13file}_epsg3413_g${GRID}m.nc
+    # gdalwarp $CUT -overwrite -r average -s_srs "+proj=stere +ellps=WGS84 +datum=WGS84 +lon_0=-39 +lat_0=90 +lat_ts=71 +units=m" -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -dstnodata -9999 -of GTiff NETCDF:${ba13file}.nc:topg ${ba13file}_epsg3413_g${GRID}m.tif
+    # gdal_translate -co "FORMAT=NC4" -of netCDF ${ba13file}_epsg3413_g${GRID}m.tif ${ba13file}_epsg3413_g${GRID}m.nc
     
-    ncks -A -v topg ${ba13file}_epsg3413_g${GRID}m.nc $outfile
-    ncap2 -O -s "where(thickness==0) {bed=topg;}; where(bed==-9999) {bed=topg;};" $outfile $outfile
+    # ncks -A -v topg ${ba13file}_epsg3413_g${GRID}m.nc $outfile
+    # ncap2 -O -s "where(thickness==0) {bed=topg;}; where(bed==-9999) {bed=topg;};" $outfile $outfile
 
-    gdalwarp $CUT -overwrite -r average -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff ${ibcaofile}_tif/${ibcaofile}.tif ${ibcaofile}_epsg3413_g${GRID}m.tif
-    gdal_translate -co "FORMAT=NC4" -of netCDF  ${ibcaofile}_epsg3413_g${GRID}m.tif  ${ibcaofile}_epsg3413_g${GRID}m.nc
-    ncks -A -v Band1 ${ibcaofile}_epsg3413_g${GRID}m.nc $outfile
-    ncap2 -O -s "where(bed==-9999) {bed=Band1;}; where(Band1<=-9990) {bed=-9999;};" $outfile $outfile
+    # gdalwarp $CUT -overwrite -r average -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff ${ibcaofile}_tif/${ibcaofile}.tif ${ibcaofile}_epsg3413_g${GRID}m.tif
+    # gdal_translate -co "FORMAT=NC4" -of netCDF  ${ibcaofile}_epsg3413_g${GRID}m.tif  ${ibcaofile}_epsg3413_g${GRID}m.nc
+    # ncks -A -v Band1 ${ibcaofile}_epsg3413_g${GRID}m.nc $outfile
+    # ncap2 -O -s "where(bed==-9999) {bed=Band1;}; where(Band1<=-9990) {bed=-9999;};" $outfile $outfile
 
-    ncks -O -v Band1,topg -x $outfile $outfile
+    # ncks -O -v Band1,topg -x $outfile $outfile
 
-    ncks -4 -L 3 -O g${GRID}m_${var}_v${ver}.nc griddes_${GRID}m.nc
-    nc2cdo.py --srs "+init=epsg:3413" griddes_${GRID}m.nc
-    if [[ $NN == 1 ]] ; then
-        REMAP_EXTRAPOLATE=on cdo -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
-    else
-        REMAP_EXTRAPOLATE=on cdo -P $NN -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
-    fi
-    mpiexec -np $NN fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
-    ncks -A -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp2_${GRID}m.nc $outfile
+    # ncks -4 -L 3 -O g${GRID}m_${var}_v${ver}.nc griddes_${GRID}m.nc
+    # nc2cdo.py --srs "+init=epsg:3413" griddes_${GRID}m.nc
+    # if [[ $NN == 1 ]] ; then
+    #     REMAP_EXTRAPOLATE=on cdo -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
+    # else
+    #     REMAP_EXTRAPOLATE=on cdo -P $NN -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
+    # fi
+    # mpiexec -np $NN fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
+    # ncks -A -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp2_${GRID}m.nc $outfile
     ncatted -a units,bheatflx,o,c,"W m-2" -a long_name,bed,o,c,"bed topography" -a standard_name,bed,o,c,"bedrock_altitude" -a units,bed,o,c,"meters" -a _FillValue,bed,o,f,-9999. $outfile
     ncatted -a long_name,surface,o,c,"ice surface elevation" -a standard_name,surface,o,c,"surface_altitude" -a units,surface,o,c,"meters" $outfile
     ncatted -a long_name,errbed,o,c,"bed topography/ice thickness error" -a units,errbed,o,c,"meters" $outfile
@@ -175,7 +175,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     # sh create_hot_spot.sh $outfile $outfile_hot
 
     # CReSIS bed
-    gdalwarp -overwrite  -cutline /Volumes/Isunnguata_Sermia/data/pism-gris/data_sets/shape_files/jib_cresis_channel_area_cutline.shp -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff /Volumes/Isunnguata_Sermia/data/pism-gris/data_sets/bed_dem/jakobshavn_bedmap_3413.tif g${GRID}m_cresis.tif
+    gdalwarp -overwrite  -cutline /Volumes/Isunnguata_Sermia/data/pism-gris/data_sets/shape_files/jib_cresis_channel_area_cutline.shp -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff /Volumes/Isunnguata_Sermia/data/pism-gris/data_sets/bed_dem/jakobshavn_bedmap_3413_edit.tif g${GRID}m_cresis.tif
     gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_cresis.tif g${GRID}m_cresis.nc
     ncrename -O -v Band1,cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis.nc
     
