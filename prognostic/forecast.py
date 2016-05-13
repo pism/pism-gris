@@ -70,8 +70,6 @@ parser.add_argument("--forcing_type", dest="forcing_type",
 parser.add_argument("--hydrology", dest="hydrology",
                     choices=['null', 'diffuse'],
                     help="Basal hydrology model.", default='diffuse')
-parser.add_argument("--regrid_thickness", dest="regrid_thickness", action="store_true",
-                    help="Regrid ice thickness from input file rather than from boot file", default=False)
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
@@ -163,7 +161,7 @@ exstep = 'monthly'
 scripts = []
 
 regridfile = filename
-regrid_thickness = options.regrid_thickness
+regrid_thickness = True
 #regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href'
 regridvars = 'litho_temp,enthalpy,tillwat,bmelt,Href'
 if regrid_thickness:

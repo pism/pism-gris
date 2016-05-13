@@ -99,6 +99,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     outfile_plus=${outfile_prefix}_plus.nc
     outfile_minus=${outfile_prefix}_minus.nc
     outfile_sm_prefix=pism_Greenland_${GRID}m_mcb_jpl_v${ver}
+    outfile_sm_cresis=${outfile_sm_prefix}_cresisp.nc
     outfile_sm_plus=${outfile_sm_prefix}_plus.nc
     outfile_sm_minus=${outfile_sm_prefix}_minus.nc
     # for var in "bed" "errbed"; do
@@ -203,27 +204,28 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     
     # ncap2 -O -s "bed=bed+errbed; thickness=thickness-errbed; where(thickness<0) thickness=0.;" $outfile $outfile_plus
     # ncap2 -O -s "bed=bed-errbed; thickness=thickness+errbed; where(thickness<0) thickness=0.;" $outfile $outfile_minus
-    # e0=-638000
-    # n0=-3349600
-    # e1=864700
-    # n1=-657600
 
-    # # Add a buffer on each side such that we get nice grids up to a grid spacing
-    # # of 36 km.
+    e0=-638000
+    n0=-3349600
+    e1=864700
+    n1=-657600
 
-    # buffer_e=40650
-    # buffer_n=22000
-    # e0=$(($e0 - $buffer_e))
-    # n0=$(($n0 - $buffer_n))
-    # e1=$(($e1 + $buffer_e))
-    # n1=$(($n1 + $buffer_n))
+    # Add a buffer on each side such that we get nice grids up to a grid spacing
+    # of 36 km.
 
-    # # Shift to cell centers
-    # e0=$(($e0 + $GRID / 2 ))
-    # n0=$(($n0 + $GRID / 2))
-    # e1=$(($e1 - $GRID / 2))
-    # n1=$(($n1 - $GRID / 2))
+    buffer_e=40650
+    buffer_n=22000
+    e0=$(($e0 - $buffer_e))
+    n0=$(($n0 - $buffer_n))
+    e1=$(($e1 + $buffer_e))
+    n1=$(($n1 + $buffer_n))
 
-    # ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1.  $outfile_plus  $outfile_sm_plus
+    # Shift to cell centers
+    e0=$(($e0 + $GRID / 2 ))
+    n0=$(($n0 + $GRID / 2))
+    e1=$(($e1 - $GRID / 2))
+    n1=$(($n1 - $GRID / 2))
+
+    ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1.  $outfile_cresis  $outfile_sm_cresis
     # ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1.  $outfile_minus  $outfile_sm_minus
 done
