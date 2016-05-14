@@ -16,6 +16,15 @@ set -x -e
 #gridfile=gris_ext_g${GRID}m.nc
 #create_greenland_ext_epsg3413_grid.py -g $GRID $gridfile
 
+start="2008-01-01"
+end="2108-01-01"
+
+outfile=ocean_forcing_${GRID}m_latitudinal_285_$start_$end.nc
+ncks -4 -L 3 -C -O -v x,y,mask,polar_stereographic $infile $outfile
+python create_prognostic_ocean.py -a $start -e $end --bmelt_0 285 $outfile
+
+exit
+
 outfile=ocean_forcing_latitudinal_masked_ctrl.nc
 ncks -4 -L 3 -C -O -v x,y,mask,polar_stereographic $infile $outfile
 python ocean_forcing.py  -m --bmelt_0 228 $outfile
