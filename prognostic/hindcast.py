@@ -70,6 +70,8 @@ parser.add_argument("--forcing_type", dest="forcing_type",
 parser.add_argument("--hydrology", dest="hydrology",
                     choices=['null', 'diffuse'],
                     help="Basal hydrology model.", default='diffuse')
+parser.add_argument("--melange_backpressure", dest="melange_backpressure", action="store_true",
+                    help="Melange backpressure model.", default=False)
 parser.add_argument("--regrid_thickness", dest="regrid_thickness", action="store_true",
                     help="Regrid ice thickness from input file rather than from boot file", default=False)
 parser.add_argument("--stress_balance", dest="stress_balance",
@@ -104,6 +106,7 @@ climate = options.climate
 forcing_type = options.forcing_type
 grid = options.grid
 hydrology = options.hydrology
+melange_backpressure = options.melange_backpressure
 stress_balance = options.stress_balance
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
@@ -256,8 +259,11 @@ for n, combination in enumerate(combinations):
                                                    atmosphere_given_file=atmosphere_file,
                                                    atmosphere_lapse_rate_file=atmosphere_file,
                                                    temp_lapse_rate=temp_lapse_rate)
-        ocean_params_dict = generate_ocean('given',
-                                           ocean_given_file='ocean_forcing_latitudinal_masked_285.nc')
+        start = "2000-01-01"
+        end = "2108-01-01"
+        ocean_params_dict = generate_ocean('given_mbp',
+                                           ocean_given_file='ocean_forcing_{grid}m_latitudinal_masked_285_{start}_{end}.nc'.format(grid=grid, start=start, end=end),
+                                           ocean_delta_MBP_file='ocean_forcing_{grid}m_latitudinal_masked_285_{start}_{end}.nc'.format(grid=grid, start=start, end=end))
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving,
                                                thickness_calving_threshold=thickness_calving_threshold,

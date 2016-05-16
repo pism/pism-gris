@@ -70,6 +70,7 @@ def default_spatial_ts_vars():
               'lon',
               'lon_bnds',
               'nuH',
+              'strain_rates',
               'surface_mass_balance_average',
               'taub_mag',
               'tauc',
@@ -86,6 +87,7 @@ def default_spatial_ts_vars():
               'velbase_mag',
               'velsurf',
               'velsurf_mag',
+              'vonmises_stresses',
               'wvelbase',
               'wvelsurf']
     
@@ -491,6 +493,8 @@ def generate_ocean(ocean, **kwargs):
             params_dict['ocean_given_file'] = kwargs['ocean_given_file']
     elif ocean in ('given', 'relax'):
         params_dict['ocean'] = 'given'
+    elif ocean in ('given_mbp'):
+        params_dict['ocean'] = 'given,delta_MBP'
     elif ocean in ('const'):
         params_dict['ocean'] = 'constant'
     else:

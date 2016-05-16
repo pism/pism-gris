@@ -166,7 +166,14 @@ if (var not in nc.variables.keys()):
 else:
     btemp_var = nc.variables[var]
 btemp_var.grid_mapping = "mapping"
-    
+
+var = "delta_MPB"
+if (var not in nc.variables.keys()):
+    mbp_var = nc.createVariable(var, 'f', dimensions=(time_dim), zlib=True, complevel=3)
+else:
+    mbp_var = nc.variables[var]
+mbp_var.grid_mapping = "mapping"
+
 if mask:
     mask_var = nc.variables['mask'][:]
     nc.variables['mask'].grid_mapping = "mapping"
@@ -190,8 +197,9 @@ for t in range(nt):
         mt = 12
     else:
         print('Periodicity {} not recognize'.format(periodicity))
-    bmelt_var[t,::] = bmelt * (1 + np.sin(2 * np.pi * t / mt))
-    btemp_var[t,Ellipsis] = 0
+    bmelt_var[t, Ellipsis] = bmelt * (1 + np.sin(2 * np.pi * t / mt))
+    btemp_var[t, Ellipsis] = 0
+    mbp_var[t] =  np.cos(2 * np.pi * t / mt) / 2 + 0.5
 
     nc.sync()
 
