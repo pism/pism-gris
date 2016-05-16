@@ -92,7 +92,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
             ncks -O -v height -x $MASK $MASK
             ncwa -O -a time $MASK $MASK
             ncks -O -v time -x $MASK $MASK
-            make_greenland_mask.py -v var232 $MASK $TMPFILE
+            python make_greenland_mask.py -v var232 $MASK $TMPFILE
             ncap2 -O -s "where(mask==0) smb=-9999;" $TMPFILE $TMPFILE
             ncatted -a _FillValue,smb,o,f,-9999 $TMPFILE
         fi
