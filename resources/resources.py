@@ -59,6 +59,7 @@ def default_spatial_ts_vars():
               'beta',
               'bmelt',
               'cell_area',
+              'cell_mass',
               'dHdt',
               'diffusivity',
               'discharge_flux',
