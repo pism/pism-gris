@@ -156,7 +156,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     ncatted -a long_name,air_temp,o,c,"near-surface air temperature" $OUTFILE
     python add_timebounds.py $OUTFILE
 
-    mpiexec -n $NN fill_missing_petsc.py -v climatic_mass_balance,precipitation,ice_surface_temp,usurf $OUTFILE tmp_$OUTFILE
+    mpirun -np $NN $SLURM_PRE fill_missing_petsc.py -v climatic_mass_balance,precipitation,ice_surface_temp,usurf $OUTFILE tmp_$OUTFILE
     mv tmp_$OUTFILE $OUTFILE
     ncap2 -O -s "precipitation=precipitation/910.;" $OUTFILE ${PREFIX}_${GRID}M_${METHOD}_MM_mday-1.nc
     ncatted -a units,precipitation,o,c,"m day-1"  ${PREFIX}_${GRID}M_${METHOD}_MM_mday-1.nc
