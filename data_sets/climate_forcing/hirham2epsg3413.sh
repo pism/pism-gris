@@ -48,8 +48,8 @@ for INPUT in $HIRHAMGRID $HIRHAMUSURF; do
 done
 
 
-for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
-#for GRID in 900 600 450 300; do
+#for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
+for GRID in 18000; do
 
     PISMGRID=epsg3413_${GRID}m_grid.nc
     create_greenland_ext_epsg3413_grid.py -g $GRID $PISMGRID
@@ -158,20 +158,15 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
 
     mpirun -np $NN $SLURM_PRE fill_missing_petsc.py -v climatic_mass_balance,precipitation,ice_surface_temp,usurf $OUTFILE tmp_$OUTFILE
     mv tmp_$OUTFILE $OUTFILE
-    ncap2 -O -s "precipitation=precipitation/910.;" $OUTFILE ${PREFIX}_${GRID}M_${METHOD}_MM_mday-1.nc
-    ncatted -a units,precipitation,o,c,"m day-1"  ${PREFIX}_${GRID}M_${METHOD}_MM_mday-1.nc
 
-    cdo ymonmean ${PREFIX}_${GRID}M_${METHOD}_MM_mday-1.nc ${PREFIX}_${GRID}M_${METHOD}_MMEAN_mday-1.nc
-    ncks -A -v x,y $PISMGRID ${PREFIX}_${GRID}M_${METHOD}_MMEAN_mday-1.nc
+    cdo ymonmean ${PREFIX}_${GRID}M_${METHOD}_MM_mday-1.nc ${PREFIX}_${GRID}M_${METHOD}_MMEAN.nc
+    ncks -A -v x,y $PISMGRID ${PREFIX}_${GRID}M_${METHOD}_MMEAN.nc
     
     start="2008-01-01"
     end="2108-01-01"
-    ncks -4 -L 3 -O ${PREFIX}_${GRID}M_${METHOD}_MMEAN_mday-1.nc ${PREFIX}_${GRID}M_${METHOD}_MMEAN_${start}_${end}_mday-1.nc 
-    python create_prognostic_climate.py -a $start -e $end ${PREFIX}_${GRID}M_${METHOD}_MMEAN_${start}_${end}_mday-1.nc 
+    ncks -4 -L 3 -O ${PREFIX}_${GRID}M_${METHOD}_MMEAN.nc ${PREFIX}_${GRID}M_${METHOD}_MMEAN_${start}_${end}.nc 
+    python create_prognostic_climate.py -a $start -e $end ${PREFIX}_${GRID}M_${METHOD}_MMEAN_${start}_${end}.nc 
     
-    cdo ymonmean $OUTFILE ${PREFIX}_${GRID}M_${METHOD}_MMEAN.nc  
-    ncks -A -v x,y $PISMGRID ${PREFIX}_${GRID}M_${METHOD}_MMEAN.nc  
-
     cdo timmean -seldate,1989-1-1,1990-1-1 $OUTFILE ${PREFIX}_${GRID}M_${METHOD}_1989_baseline.nc
     ncks -A -v x,y $PISMGRID ${PREFIX}_${GRID}M_${METHOD}_1989_baseline.nc  
 
