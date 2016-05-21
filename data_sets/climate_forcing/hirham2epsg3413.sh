@@ -156,10 +156,10 @@ for GRID in 18000; do
     ncatted -a long_name,air_temp,o,c,"near-surface air temperature" $OUTFILE
     python add_timebounds.py $OUTFILE
 
-    mpirun -np $NN $SLURM_PRE fill_missing_petsc.py -v climatic_mass_balance,precipitation,ice_surface_temp,usurf $OUTFILE tmp_$OUTFILE
+    mpirun -np $NN $SLURM_PRE fill_missing_petsc.py -v air_temp,climatic_mass_balance,precipitation,ice_surface_temp,usurf $OUTFILE tmp_$OUTFILE
     mv tmp_$OUTFILE $OUTFILE
 
-    cdo ymonmean ${PREFIX}_${GRID}M_${METHOD}_MM_mday-1.nc ${PREFIX}_${GRID}M_${METHOD}_MMEAN.nc
+    cdo ymonmean ${PREFIX}_${GRID}M_${METHOD}_MM.nc ${PREFIX}_${GRID}M_${METHOD}_MMEAN.nc
     ncks -A -v x,y $PISMGRID ${PREFIX}_${GRID}M_${METHOD}_MMEAN.nc
     
     start="2008-01-01"
