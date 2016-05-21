@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2011 Andy Aschwanden, University of Alaska Fairbanks
+# Copyright (C) 2011-2016 Andy Aschwanden, University of Alaska Fairbanks
 #
 # Script remaps ERA-Interim fields (climatic mass balance, 2-m air temperature
 # and precipication) from HIRHAM5 onto the grid used by PISM
@@ -20,7 +20,7 @@ fi
 
 # default interpolation method is conservative
 IMETHOD=bil
-if [ $# -gt 1 ] ; then  # if user says "./remap2pism.sh con2" then second order conservative remapping is used 
+if [ $# -gt 1 ] ; then  # if user says "./hirham2epsg3413.sh N con2" then second order conservative remapping is used 
   IMETHOD=$2
 fi
 METHOD=`echo $IMETHOD | tr [a-z] [A-Z]`
@@ -48,8 +48,8 @@ for INPUT in $HIRHAMGRID $HIRHAMUSURF; do
 done
 
 
-#for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
-for GRID in 18000; do
+for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
+#for GRID in 18000; do
 
     PISMGRID=epsg3413_${GRID}m_grid.nc
     create_greenland_ext_epsg3413_grid.py -g $GRID $PISMGRID
