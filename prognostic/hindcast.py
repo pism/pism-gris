@@ -271,7 +271,7 @@ for n, combination in enumerate(combinations):
                                                ocean_kill_file=pism_dataname)
 
         exvars = default_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir)
+        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir, split=True)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, odir=odir)
         # snap_shot_dict = generate_snap_shots(outfile, save_times)
         

@@ -86,7 +86,7 @@ def default_spatial_ts_vars():
               'velbase_mag',
               'velsurf',
               'velsurf_mag',
-              'vonmises_stresses',
+              'vonmises_stress',
               'wvelbase',
               'wvelsurf']
     
@@ -189,14 +189,14 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None,
         exvars = ','.join(exvars)
     except:
         pass
-    
+
+    oufile, ext = os.path.splitext(outfile)
     params_dict = OrderedDict()
     if odir is None:
         params_dict['extra_file'] = 'ex_' + outfile
     else:
         params_dict['extra_file'] = os.path.join(odir, 'ex_' + outfile)
     params_dict['extra_vars'] = exvars
-    params_dict['extra_split'] = ''
         
     if step is None:
         step = 'yearly'
