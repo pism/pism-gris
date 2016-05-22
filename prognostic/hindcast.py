@@ -262,8 +262,8 @@ for n, combination in enumerate(combinations):
         start = "2000-01-01"
         end = "2108-01-01"
         ocean_params_dict = generate_ocean('given_mbp',
-                                           ocean_given_file='ocean_forcing_{grid}m_latitudinal_masked_285_{start}_{end}.nc'.format(grid=grid, start=start, end=end),
-                                           ocean_delta_MBP_file='ocean_forcing_{grid}m_latitudinal_masked_285_{start}_{end}.nc'.format(grid=grid, start=start, end=end))
+                                           ocean_given_file='ocean_forcing_latitudinal_285.nc',
+                                           ocean_delta_MBP_file='ocean_forcing_latitudinal_285.nc')
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving,
                                                thickness_calving_threshold=thickness_calving_threshold,
