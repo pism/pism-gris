@@ -10,10 +10,7 @@ from dateutil.relativedelta import *
 import calendar
 import numpy as np
 
-try:
-    import netCDF4 as netCDF
-except:
-    import netCDF3 as netCDF
+import netCDF4 as netCDF
 NC = netCDF.Dataset
 from netcdftime import utime
 
@@ -167,7 +164,7 @@ else:
     btemp_var = nc.variables[var]
 btemp_var.grid_mapping = "mapping"
 
-var = "delta_MPB"
+var = "delta_MBP"
 if (var not in nc.variables.keys()):
     mbp_var = nc.createVariable(var, 'f', dimensions=(time_dim), zlib=True, complevel=3)
 else:
@@ -196,11 +193,11 @@ for t in range(nt):
     elif periodicity in 'MONTHLY':
         mt = 12
     else:
-        print('Periodicity {} not recognize'.format(periodicity))
+        print('Periodicity {} not recognized'.format(periodicity))
     bmelt_var[t, Ellipsis] = bmelt * (1 + np.sin(2 * np.pi * t / mt))
     btemp_var[t, Ellipsis] = 0
-    mbp_var[t] =  np.cos(2 * np.pi * t / mt) / 2 + 0.5
-
+    x = np.mod(t, mt)
+    mbp_var[t] =  np.piecewise(x, [x < (mt / 2) , x >= (mt / 2)], [1, 0])
     nc.sync()
 
 nc.close()

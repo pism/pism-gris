@@ -41,6 +41,10 @@ parser.add_argument("--calving", dest="calving",
                              'thickness_calving',
                              'vonmises_calving'],
                     help="claving", default='thickness_calving')
+parser.add_argument("--ocean", dest="ocean",
+                    choices=['given',
+                             'given_mbp'],
+                    help="ocean", default='given')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext', 'jakobshavn'],
                     help="sets the modeling domain", default='gris_ext')
@@ -106,7 +110,7 @@ climate = options.climate
 forcing_type = options.forcing_type
 grid = options.grid
 hydrology = options.hydrology
-melange_backpressure = options.melange_backpressure
+ocean = options.ocean
 stress_balance = options.stress_balance
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
@@ -164,6 +168,7 @@ tsstep = 'daily'
 exstep = 'monthly'
 
 scripts = []
+scripts_post = []
 
 regridfile = filename
 regrid_thickness = options.regrid_thickness
@@ -189,6 +194,7 @@ for n, combination in enumerate(combinations):
         name_options['threshold'] = thickness_calving_threshold
     if calving in ('thickness_calving'):
         name_options['threshold'] = thickness_calving_threshold
+    name_options['ocean'] = ocean
 
     
     vversion = 'v' + str(version)
@@ -197,6 +203,8 @@ for n, combination in enumerate(combinations):
         
     script = 'hc_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
+    script_post = 'hc_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, experiment)
+    scripts_post.append(script_post)
     
     for filename in (script):
         try:
@@ -261,9 +269,9 @@ for n, combination in enumerate(combinations):
                                                    temp_lapse_rate=temp_lapse_rate)
         start = "2000-01-01"
         end = "2108-01-01"
-        ocean_params_dict = generate_ocean('given_mbp',
+        ocean_params_dict = generate_ocean(ocean,
                                            ocean_given_file='ocean_forcing_latitudinal_masked_285.nc',
-                                           ocean_delta_MBP_file='ocean_forcing_latitudinal_masked_285.nc')
+                                           ocean_delta_MBP_file='ocean_forcing_{grid}m_latitudinal_masked_285_2108-01-01.nc'.format(grid=grid))
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving,
                                                thickness_calving_threshold=thickness_calving_threshold,
@@ -284,26 +292,31 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         f.write('\n')
 
-        if vversion in ('v2', 'v2_1985'):
-            mytype = "MO14 2015-04-27"
-        else:
-            import sys
-            print('TYPE {} not recognized, exiting'.format(vversion))
-            sys.exit(0)        
+    
+    with open(script_post, 'w') as f:
+        extra_file = spatial_ts_dict['extra_file']
+        exfile, ext = os.path.splitext(extra_file)
+        myfiles = '_'.join([exfile, '*.nc'])
+        myoutfile = exfile + '.nc'
+        cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile])
+        f.write(cmd)
+
     
 scripts = uniquify_list(scripts)
+scripts_post = uniquify_list(scripts_post)
+print '\n'.join([script for script in scripts])
+print('written')
+# submit = 'submit_{domain}_g{grid}m_{climate}_{bed_type}.sh'.format(domain=domain.lower(), grid=grid, climate=climate, bed_type=bed_type)
+# try:
+#     os.remove(submit)
+# except OSError:
+#     pass
 
-submit = 'submit_{domain}_g{grid}m_{climate}_{bed_type}.sh'.format(domain=domain.lower(), grid=grid, climate=climate, bed_type=bed_type)
-try:
-    os.remove(submit)
-except OSError:
-    pass
+# with open(submit, 'w') as f:
 
-with open(submit, 'w') as f:
+#     f.write('#!/bin/bash\n')
+#     for k in range(len(scripts)):
+#         f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
 
-    f.write('#!/bin/bash\n')
-    for k in range(len(scripts)):
-        f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
-
-print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
+# print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
 

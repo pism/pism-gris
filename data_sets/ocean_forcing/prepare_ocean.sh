@@ -1,16 +1,7 @@
 #!/bin/bash
 
-GRID=300
-if [ -n "$1" ]; then
-    GRID=$1
-fi
-
-#wget -nc ftp://sidads.colorado.edu/DATASETS/IDBMG4_BedMachineGr/$infile
 
 set -x -e
-
-#gridfile=gris_ext_g${GRID}m.nc
-#create_greenland_ext_epsg3413_grid.py -g $GRID $gridfile
 
 start="2000-01-01"
 end="2108-01-01"
