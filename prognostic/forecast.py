@@ -258,7 +258,7 @@ for n, combination in enumerate(combinations):
                                                    atmosphere_given_period=1,
                                                    atmosphere_lapse_rate_file=atmosphere_file,
                                                    temp_lapse_rate=temp_lapse_rate)
-        ocean_params_dict = generate_ocean('given_mbp',
+        ocean_params_dict = generate_ocean('given',
                                            ocean_given_file='ocean_forcing_latitudinal_285.nc',
                                            ocean_delta_MBP_file='ocean_forcing_latitudinal_285.nc')
         hydro_params_dict = generate_hydrology(hydrology)
