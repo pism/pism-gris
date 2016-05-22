@@ -59,25 +59,23 @@ def default_spatial_ts_vars():
               'beta',
               'bmelt',
               'cell_area',
-              'cell_mass',
               'dHdt',
               'diffusivity',
               'discharge_flux',
               'flux_divergence',
               'height_above_flotation',
+              'ice_mass',
               'mask',
               'lat',
               'lat_bnds',
               'lon',
               'lon_bnds',
-              'nuH',
               'strain_rates',
               'surface_mass_balance_average',
               'taub_mag',
               'tauc',
               'taud_mag',
               'tempicethk_basal',
-              'tempbase',
               'temppabase',
               'tempsurf',
               'thk',
@@ -425,7 +423,7 @@ def generate_calving(calving, **kwargs):
     params_dict = OrderedDict()
     if calving in ('ocean_kill',
                    'thickness_calving',
-                   'stress_calving'):
+                   'vonmises_calving'):
         params_dict['calving'] = calving
     elif calving in ('eigen_calving'):
         params_dict['calving'] = '{},thickness_calving'.format(calving)
