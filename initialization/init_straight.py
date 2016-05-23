@@ -132,9 +132,10 @@ topg_max_values = [700]
 combinations = list(itertools.product(thickness_calving_threshold_vales, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
-exstep = '100'
+exstep = 100
 
 scripts = []
+scripts_post = []
 
 start = -125000
 end = 0
@@ -164,6 +165,8 @@ for n, combination in enumerate(combinations):
         
     script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
+    script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, experiment)
+    scripts_post.append(script_post)
     
     for filename in (script):
         try:
@@ -227,26 +230,29 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         f.write('\n')
 
-        if vversion in ('v2', 'v2_1985'):
-            mytype = "MO14 2015-04-27"
-        else:
-            import sys
-            print('TYPE {} not recognized, exiting'.format(vversion))
-            sys.exit(0)        
+    with open(script_post, 'w') as f:
+        extra_file = spatial_ts_dict['extra_file']
+        exfile, ext = os.path.splitext(extra_file)
+        myfiles = ['{exfile}.nc-{year}000.nc'.format(exfile=exfile, year) for year in range(start+exstep, end, exstep)]
+        myoutfile = exfile + '.nc'
+        cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile])
+        f.write(cmd)
+
     
 scripts = uniquify_list(scripts)
+scripts_post = uniquify_list(scripts_post)
+print '\n'.join([script for script in scripts])
+print('written')
+# submit = 'submit_{domain}_g{grid}m_{climate}_{bed_type}.sh'.format(domain=domain.lower(), grid=grid, climate=climate, bed_type=bed_type)
+# try:
+#     os.remove(submit)
+# except OSError:
+#     pass
 
-submit = 'submit_{domain}_g{grid}m_{climate}_{bed_type}.sh'.format(domain=domain.lower(), grid=grid, climate=climate, bed_type=bed_type)
-try:
-    os.remove(submit)
-except OSError:
-    pass
+# with open(submit, 'w') as f:
 
-with open(submit, 'w') as f:
+#     f.write('#!/bin/bash\n')
+#     for k in range(len(scripts)):
+#         f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
 
-    f.write('#!/bin/bash\n')
-    for k in range(len(scripts)):
-        f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
-
-print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
-
+# print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
