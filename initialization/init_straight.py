@@ -233,7 +233,7 @@ for n, combination in enumerate(combinations):
     with open(script_post, 'w') as f:
         extra_file = spatial_ts_dict['extra_file']
         exfile, ext = os.path.splitext(extra_file)
-        myfiles = ' '.join(['{exfile}.nc-{year}000.nc'.format(exfile=exfile, year=year) for year in range(start+exstep, end, exstep)])
+        myfiles = ' '.join(['{exfile}.nc-{year}.000.nc'.format(exfile=exfile, year=year) for year in range(start+exstep, end, exstep)])
         myoutfile = exfile + '.nc'
         cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile])
         f.write(cmd)
