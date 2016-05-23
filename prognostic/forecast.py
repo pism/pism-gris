@@ -53,7 +53,7 @@ parser.add_argument("-f", "--o_format", dest="oformat",
                     help="output format", default='netcdf4_parallel')
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
-                    help="horizontal grid resolution", default=1500)
+                    help="horizontal grid resolution", default=600)
 parser.add_argument("--o_dir", dest="odir",
                     help="output directory. Default: current directory", default='.')
 parser.add_argument("--o_size", dest="osize",
@@ -74,6 +74,8 @@ parser.add_argument("--forcing_type", dest="forcing_type",
 parser.add_argument("--hydrology", dest="hydrology",
                     choices=['null', 'diffuse'],
                     help="Basal hydrology model.", default='diffuse')
+parser.add_argument("--mbp", dest="mbp",
+                    help="Melange back pressure.", default=1.)
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
@@ -106,6 +108,7 @@ climate = options.climate
 forcing_type = options.forcing_type
 grid = options.grid
 hydrology = options.hydrology
+mbp = options.mbp
 ocean = options.ocean
 stress_balance = options.stress_balance
 vertical_velocity_approximation = options.vertical_velocity_approximation
@@ -151,14 +154,15 @@ ssa_e = (1.0)
 eigen_calving_k = (1e18)
 
 thickness_calving_threshold_vales = [300]
-sia_e_values = [1.25, 1.5, 3.0]
+sia_e_values = [1.25]
 ppq_values = [0.60]
 tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(thickness_calving_threshold_vales, sia_e_values, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+mpb_values = [0.0, 0.2, 0.4, 0.6, 0.8 1.0]
+combinations = list(itertools.product(thickness_calving_threshold_vales, sia_e_values, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values, mbp_values))
 
 tsstep = 'daily'
 exstep = 'monthly'
@@ -176,7 +180,7 @@ if regrid_thickness:
 
 for n, combination in enumerate(combinations):
 
-    thickness_calving_threshold, sia_e, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    thickness_calving_threshold, sia_e, ppq, tefo, phi_min, phi_max, topg_min, topg_max, mbp = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -191,8 +195,8 @@ for n, combination in enumerate(combinations):
     if calving in ('thickness_calving'):
         name_options['threshold'] = thickness_calving_threshold
     name_options['ocean'] = ocean
+    name_options['mbp'] = mbp
 
-    
     vversion = 'v' + str(version)
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
 
@@ -266,7 +270,7 @@ for n, combination in enumerate(combinations):
                                                    temp_lapse_rate=temp_lapse_rate)
         ocean_params_dict = generate_ocean(ocean,
                                            ocean_given_file='ocean_forcing_latitudinal_285.nc',
-                                           ocean_delta_MBP_file='ocean_forcing_{grid}m_latitudinal_285_2108-01-01.nc'.format(grid=grid))
+                                           ocean_delta_MBP_file='mbp_forcing_{mbp}_2000-01-01_2108-01-01.nc'.format(mbp=mbp))
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving,
                                                thickness_calving_threshold=thickness_calving_threshold,
