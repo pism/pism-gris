@@ -39,7 +39,7 @@ parser.add_argument("-f", "--o_format", dest="oformat",
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
                     help="horizontal grid resolution", default=9000)
-parser.add_argument("-i", "--regrid_file", dest="regrid_file",
+parser.add_argument("-i", "--regrid_file", dest="regridfile",
                     help="Regrid file", default=None)
 parser.add_argument("--o_dir", dest="odir",
                     help="output directory. Default: current directory", default='.')
