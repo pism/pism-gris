@@ -161,7 +161,7 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-mpb_values = [0.0, 0.2, 0.4, 0.6, 0.8 1.0]
+mpb_values = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
 combinations = list(itertools.product(thickness_calving_threshold_vales, sia_e_values, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values, mbp_values))
 
 tsstep = 'daily'
