@@ -86,6 +86,7 @@ def default_spatial_ts_vars():
               'velbase_mag',
               'velsurf',
               'velsurf_mag',
+              'vonmises_calving_rate',
               'vonmises_stress',
               'wvelbase',
               'wvelsurf']
@@ -313,10 +314,10 @@ def generate_grid_description(grid_resolution, domain):
 
     vertical_grid = OrderedDict()
     vertical_grid['Lz'] = 4000
-    vertical_grid['Lzb'] = 2000
+    vertical_grid['Lbz'] = 2000
     vertical_grid['z_spacing'] = 'equal'
     vertical_grid['Mz'] = mz
-    vertical_grid['Mzb'] = mzb
+    vertical_grid['Mbz'] = mzb
 
     grid_options = {}
     grid_options['skip'] = ''
