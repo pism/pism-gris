@@ -39,6 +39,8 @@ parser.add_argument("-f", "--o_format", dest="oformat",
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
                     help="horizontal grid resolution", default=9000)
+parser.add_argument("-i", "--regrid_file", dest="regrid_file",
+                    help="Regrid file", default=None)
 parser.add_argument("--o_dir", dest="odir",
                     help="output directory. Default: current directory", default='.')
 parser.add_argument("--o_size", dest="osize",
@@ -87,13 +89,14 @@ climate = options.climate
 forcing_type = options.forcing_type
 grid = options.grid
 hydrology = options.hydrology
+regridfile = options.regridfile
 stress_balance = options.stress_balance
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 
 domain = options.domain
 pism_exec = generate_domain(domain)
-save_times = [-25000, -5000, -1500, -1000, -500, -200, -100, -5]
+save_times = [-25000, -15000, -5000, -1500, -1000, -500, -200, -100, -5]
 
     
 infile = ''
@@ -102,6 +105,10 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
+if regridfile is not None:
+    regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
+
+    
 pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
@@ -186,6 +193,9 @@ for n, combination in enumerate(combinations):
 
         general_params_dict = OrderedDict()
         general_params_dict['i'] = pism_dataname
+        if regridfile is not None:
+            general_params_dict['regrid_file'] = regridfile
+            general_params_dict['regrid_vars'] = regridvars
         general_params_dict['bootstrap'] = ''
         general_params_dict['ys'] = start
         general_params_dict['ye'] = end
@@ -233,7 +243,7 @@ for n, combination in enumerate(combinations):
     with open(script_post, 'w') as f:
         extra_file = spatial_ts_dict['extra_file']
         exfile, ext = os.path.splitext(extra_file)
-        myfiles = ' '.join(['{exfile}.nc-{year}.000.nc'.format(exfile=exfile, year=year) for year in range(start+exstep, end, exstep)])
+        myfiles = ' '.join(['{exfile}_{year}.000.nc'.format(exfile=exfile, year=year) for year in range(start+exstep, end, exstep)])
         myoutfile = exfile + '.nc'
         cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile])
         f.write(cmd)
