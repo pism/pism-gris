@@ -14,29 +14,20 @@ import netCDF4 as netCDF
 NC = netCDF.Dataset
 from netcdftime import utime
 
-try:
-    import pypismtools.pypismtools as ppt
-except:
-    import pypismtools as ppt
-
 
 # Set up the option parser
 parser = ArgumentParser()
-parser.description = "Script creates ocean forcing"
+parser.description = "Script creates melange back pressure time series"
 parser.add_argument("FILE", nargs=1)
+
 parser.add_argument("-a", "--start_date", dest="start_date",
                     help='''Start date in ISO format. Default=2008-1-1''',
                     default='2008-1-1')
 parser.add_argument("-e", "--end_date", dest="end_date",
                     help='''End date in ISO format. Default=2108-1-1''',
                     default='2108-1-1')
-parser.add_argument("--bmelt_0",dest="bmelt_0", type=float,
-                    help="southern basal melt rate, in m yr-1",default=228)
-parser.add_argument("--bmelt_1",dest="bmelt_1", type=float,
-                    help="northern basal melt rate, in m yr-1",default=10)
-parser.add_argument("-m", "--process_mask", dest="mask", action="store_true",
-                    help='''
-                    Process the mask, no melting on land''', default=False)
+parser.add_argument("--winter_value",dest="winter_value", type=float,
+                    help="Winter values of melange back pressure",default=1.)
 
 options = parser.parse_args()
 start_date = parse(options.start_date)
@@ -51,40 +42,13 @@ periodicity = "monthly".upper()
 time_var_name = "time"
 bnds_var_name = "time_bnds"
 
-ice_density = 910.
 
-bmelt_0 = options.bmelt_0 * ice_density
-bmelt_1 = options.bmelt_1 * ice_density
-mask = options.mask
+winter_value = options.winter_value
 
 infile = args[0]
 
-nc = NC(infile, 'a')
+nc = NC(infile, 'w')
     
-lon_0 = -45
-# Jakobshavn
-lat_0 = 69
-# Petermann
-lat_1 = 81
-
-p = ppt.get_projection_from_file(nc)
-
-xdim, ydim, zdim, tdim = ppt.get_dims(nc)
-
-x0, y0 = p(lon_0, lat_0)
-x1, y1 = p(lon_0, lat_1)
-
-# bmelt = a*y + b
-a = (bmelt_1 - bmelt_0) / (y1 - y0)
-b = bmelt_0 - a * y0
-    
-x = nc.variables[xdim]
-y = nc.variables[ydim]
-
-X, Y = np.meshgrid(x, y)
-
-
-nc = NC(infile, 'a')
 
 # create a new dimension for bounds only if it does not yet exist
 time_dim = "time"
@@ -145,41 +109,13 @@ time_bnds_var[:, 0] = bnds_interval_since_refdate[0:-1]
 time_bnds_var[:, 1] = bnds_interval_since_refdate[1::]
 
 
-def def_var(nc, name, units):
-    var = nc.createVariable(name, 'f', dimensions=(time_dim, ydim, xdim), zlib=True, complevel=3)
-    var.units = units
-    return var
-
-var = "shelfbmassflux"
-if (var not in nc.variables.keys()):
-    bmelt_var = def_var(nc, var, "kg m-2 yr-1")
-else:
-    bmelt_var = nc.variables[var]
-bmelt_var.grid_mapping = "mapping"
-
-var = "shelfbtemp"
-if (var not in nc.variables.keys()):
-    btemp_var = def_var(nc, var, "deg_C")
-else:
-    btemp_var = nc.variables[var]
-btemp_var.grid_mapping = "mapping"
-
 var = "delta_MBP"
 if (var not in nc.variables.keys()):
     mbp_var = nc.createVariable(var, 'f', dimensions=(time_dim), zlib=True, complevel=3)
 else:
     mbp_var = nc.variables[var]
 
-if mask:
-    mask_var = nc.variables['mask'][:]
-    nc.variables['mask'].grid_mapping = "mapping"
-    land_mask = (mask_var != 0) & (mask_var !=3)
 
-bmelt = a * Y + b
-bmelt[Y<y0] = a * y0 + b
-bmelt[Y>y1] = a * y1 + b
-if mask:
-    bmelt[land_mask] = 0.
 
 nt = len(time_interval_since_refdate)
 for t in range(nt):
@@ -193,10 +129,8 @@ for t in range(nt):
         mt = 12
     else:
         print('Periodicity {} not recognized'.format(periodicity))
-    bmelt_var[t, Ellipsis] = bmelt * (1 + np.sin(2 * np.pi * t / mt))
-    btemp_var[t, Ellipsis] = 0
     x = np.mod(t, mt)
-    mbp_var[t] =  np.piecewise(x, [x < (mt / 2) , x >= (mt / 2)], [1, 0])
+    mbp_var[t] =  np.piecewise(x, [x < (mt / 2) , x >= (mt / 2)], [winter_value, 0])
     nc.sync()
 
 nc.close()

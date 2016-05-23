@@ -389,7 +389,7 @@ def generate_stress_balance(stress_balance, additional_params_dict):
         params_dict['topg_to_phi'] = additional_params_dict['topg_to_phi']
         params_dict['tauc_slippery_grounding_lines'] = ''
 
-        return merge_dicts(additional_params_dict, params_dict)
+    return merge_dicts(additional_params_dict, params_dict)
 
 
 def generate_hydrology(hydro, **kwargs):

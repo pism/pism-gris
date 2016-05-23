@@ -6,6 +6,13 @@ set -x -e
 start="2000-01-01"
 end="2108-01-01"
 
+for winter_value in 0.2 0.4 0.6 0.8 1.0; do
+    python create_prognostic_mbp.py --winter_value $winter_value mbp_forcing_${winter_value}_${start}_${end}.nc
+done
+                    
+
+exit
+
 for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; do
     infile=../bed_dem/pism_Greenland_ext_${GRID}m_mcb_jpl_v2.nc
     outfile=ocean_forcing_${GRID}m_latitudinal_285_$start_$end.nc
