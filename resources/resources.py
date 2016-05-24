@@ -191,8 +191,10 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None,
     except:
         pass
 
-    oufile, ext = os.path.splitext(outfile)
     params_dict = OrderedDict()
+    if split is True:
+        outfile, ext = os.path.splitext(outfile)
+        params_dict['extra_split'] = ''
     if odir is None:
         params_dict['extra_file'] = 'ex_' + outfile
     else:
@@ -209,9 +211,7 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None,
         
     params_dict['extra_times'] = times
         
-    if split is True:
-        params_dict['extra_split'] = ''
-
+  
     return params_dict
 
 
