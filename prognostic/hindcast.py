@@ -133,6 +133,9 @@ if not os.path.isfile(pism_config_nc):
     sub.call(cmd)
 if not os.path.isdir(odir):
     os.mkdir(odir)
+odir_tmp = '_'.join([odir, 'tmp'])
+if not os.path.isdir(odir_tmp):
+    os.mkdir(odir_tmp)
 
 pism_timefile = 'timefile_{start}_{end}.nc'.format(start=start_date, end=end_date)
 try:
@@ -279,7 +282,7 @@ for n, combination in enumerate(combinations):
                                                ocean_kill_file=pism_dataname)
 
         exvars = default_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir, split=True)
+        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir_tmp, split=True)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, odir=odir)
         # snap_shot_dict = generate_snap_shots(outfile, save_times)
         
@@ -298,7 +301,10 @@ for n, combination in enumerate(combinations):
         exfile, ext = os.path.splitext(extra_file)
         myfiles = '_'.join([exfile, '*.nc'])
         myoutfile = exfile + '.nc'
-        cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile])
+        myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
+        cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile, '\n'])
+        f.write(cmd)
+        cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, outfile), os.path.join(odir, outfile), '\n'])
         f.write(cmd)
 
     

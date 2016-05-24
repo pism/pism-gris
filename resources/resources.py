@@ -209,7 +209,7 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None,
         
     params_dict['extra_times'] = times
         
-    if split:
+    if split is True:
         params_dict['extra_split'] = ''
 
     return params_dict

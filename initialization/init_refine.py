@@ -111,6 +111,9 @@ if not os.path.isfile(pism_config_nc):
     sub.call(cmd)
 if not os.path.isdir(odir):
     os.mkdir(odir)
+odir_tmp = '_'.join([odir, 'tmp'])
+if not os.path.isdir(odir_tmp):
+    os.mkdir(odir_tmp)
 
 # ########################################################
 # set up model initialization
@@ -141,6 +144,7 @@ else:
 regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href,thk'
 
 scripts = []
+scripts_post = []
 
 start = grid_start_times[grid]
 end = 0
@@ -170,6 +174,8 @@ for n, combination in enumerate(combinations):
         
     script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
+    script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, experiment)
+    scripts_post.append(script_post)
     
     for filename in (script):
         try:
@@ -226,7 +232,7 @@ for n, combination in enumerate(combinations):
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
         
         exvars = init_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end, odir=odir)
+        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir_tmp, split=True)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
         snap_shot_dict = generate_snap_shots(outfile, save_times[grid_mapping[grid]+1::])
 
@@ -239,20 +245,31 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         f.write('\n')
 
+    with open(script_post, 'w') as f:
+        extra_file = spatial_ts_dict['extra_file']
+        exfile, ext = os.path.splitext(extra_file)
+        myfiles = '_'.join([exfile, '*.nc'])
+        myoutfile = exfile + '.nc'
+        myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
+        cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile, '\n'])
+        f.write(cmd)
+        cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, outfile), os.path.join(odir, outfile), '\n'])
+        f.write(cmd)
 
 scripts = uniquify_list(scripts)
+scripts_post = uniquify_list(scripts_post)
 
-submit = 'submit_{domain}_g{grid}m_{climate}_{bed_type}.sh'.format(domain=domain.lower(), grid=grid, climate=climate, bed_type=bed_type)
-try:
-    os.remove(submit)
-except OSError:
-    pass
+# submit = 'submit_{domain}_g{grid}m_{climate}_{bed_type}.sh'.format(domain=domain.lower(), grid=grid, climate=climate, bed_type=bed_type)
+# try:
+#     os.remove(submit)
+# except OSError:
+#     pass
 
-with open(submit, 'w') as f:
+# with open(submit, 'w') as f:
 
-    f.write('#!/bin/bash\n')
-    for k in range(len(scripts)):
-        f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
+#     f.write('#!/bin/bash\n')
+#     for k in range(len(scripts)):
+#         f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
 
-print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
+# print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
 

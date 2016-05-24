@@ -118,6 +118,9 @@ if not os.path.isfile(pism_config_nc):
     sub.call(cmd)
 if not os.path.isdir(odir):
     os.mkdir(odir)
+odir_tmp = '_'.join([odir, 'tmp'])
+if not os.path.isdir(odir_tmp):
+    os.mkdir(odir_tmp)
 
 # ########################################################
 # set up model initialization
@@ -226,7 +229,7 @@ for n, combination in enumerate(combinations):
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
         exvars = init_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end, odir=odir)
+        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir_tmp, split=True)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
         snap_shot_dict = generate_snap_shots(outfile, save_times)
 
@@ -242,9 +245,12 @@ for n, combination in enumerate(combinations):
     with open(script_post, 'w') as f:
         extra_file = spatial_ts_dict['extra_file']
         exfile, ext = os.path.splitext(extra_file)
-        myfiles = ' '.join(['{exfile}_{year}.000.nc'.format(exfile=exfile, year=year) for year in range(start+exstep, end, exstep)])
+        myfiles = '_'.join([exfile, '*.nc'])
         myoutfile = exfile + '.nc'
-        cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile])
+        myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
+        cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile, '\n'])
+        f.write(cmd)
+        cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, outfile), os.path.join(odir, outfile), '\n'])
         f.write(cmd)
 
     
