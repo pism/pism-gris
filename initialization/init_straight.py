@@ -160,8 +160,7 @@ for n, combination in enumerate(combinations):
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
         name_options['k'] = eigen_calving_k
-        name_options['threshold'] = thickness_calving_threshold
-    if calving in ('thickness_calving'):
+    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving'):
         name_options['threshold'] = thickness_calving_threshold
     name_options['forcing_type'] = forcing_type
     name_options['hydro'] = hydrology
