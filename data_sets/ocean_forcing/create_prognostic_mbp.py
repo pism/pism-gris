@@ -130,7 +130,11 @@ for t in range(nt):
     else:
         print('Periodicity {} not recognized'.format(periodicity))
     x = np.mod(t, mt)
-    mbp_var[t] =  np.piecewise(x, [x < (mt / 2) , x >= (mt / 2)], [winter_value, 0])
+    if x < (mt / 2):
+        mbp = winter_value
+    else:
+        mbp = 0
+    mbp_var[t] = mbp
     nc.sync()
 
 nc.close()

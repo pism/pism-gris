@@ -6,7 +6,7 @@ set -x -e
 start="2000-01-01"
 end="2108-01-01"
 
-for winter_value in 0.2 0.4 0.6 0.8 1.0; do
+for winter_value in 0.0 0.2 0.4 0.6 0.8 1.0; do
     python create_prognostic_mbp.py --winter_value $winter_value mbp_forcing_${winter_value}_${start}_${end}.nc
 done
                     
