@@ -26,6 +26,8 @@ done
 
 exit
 
+GRID=3000
+infile=../bed_dem/pism_Greenland_ext_${GRID}m_mcb_jpl_v2.nc
 outfile=ocean_forcing_latitudinal_masked_ctrl.nc
 ncks -4 -L 3 -C -O -v x,y,mask,polar_stereographic $infile $outfile
 python ocean_forcing.py  -m --bmelt_0 228 $outfile
