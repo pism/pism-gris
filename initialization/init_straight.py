@@ -42,7 +42,7 @@ parser.add_argument("-g", "--grid", dest="grid", type=int,
 parser.add_argument("-i", "--regrid_file", dest="regridfile",
                     help="Regrid file", default=None)
 parser.add_argument("--o_dir", dest="odir",
-                    help="output directory. Default: current directory", default='.')
+                    help="output directory. Default: current directory", default='foo')
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', '2dbig'],
                     help="output size type", default='2dbig')
@@ -244,8 +244,7 @@ for n, combination in enumerate(combinations):
 
     with open(script_post, 'w') as f:
         extra_file = spatial_ts_dict['extra_file']
-        exfile, ext = os.path.splitext(extra_file)
-        myfiles = '_'.join([exfile, '*.nc'])
+        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(start, end, exstep)])
         myoutfile = exfile + '.nc'
         myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile, '\n'])
