@@ -245,7 +245,7 @@ for n, combination in enumerate(combinations):
     with open(script_post, 'w') as f:
         extra_file = spatial_ts_dict['extra_file']
         myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(start, end, exstep)])
-        myoutfile = exfile + '.nc'
+        myoutfile = extra_file + '.nc'
         myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile, '\n'])
         f.write(cmd)
