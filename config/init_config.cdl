@@ -28,4 +28,10 @@ netcdf pism_overrides {
 
     pism_overrides:climate_forcing_buffer_size = 13;
     pism_overrides:climate_forcing_buffer_size_doc = "; number of 2D climate forcing records to keep in memory; = 5 years of monthly records";
+
+    pism_overrides:mask_icefree_thickness_standard_units = "meters";
+    pism_overrides:mask_icefree_thickness_standard_type = "scalar";
+    pism_overrides:mask_icefree_thickness_standard = 10.0;
+    pism_overrides:mask_icefree_thickness_standard_doc = "If ice is thinner than this standard then the mask is set to MASK_ICE_FREE_BEDROCK or MASK_ICE_FREE_OCEAN.";
+
 }
