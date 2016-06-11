@@ -13,7 +13,7 @@ import sys
 sys.path.append('../resources/')
 from resources import *
 
-grid_choices = [18000, 9000, 6000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900, 600, 450, 300, 150]
+grid_choices = [18000, 9000, 6000, 4500, 3600, 1800, 1500, 1200, 900, 600, 450, 300, 150]
 
 # set up the option parser
 parser = ArgumentParser()
@@ -28,7 +28,7 @@ parser.add_argument("--climate", dest="climate",
                     choices=['const', 'paleo'],
                     help="Climate", default='paleo')
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'stress_calving'],
+                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving'],
                     help="claving", default='thickness_calving')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
@@ -39,6 +39,10 @@ parser.add_argument("-f", "--o_format", dest="oformat",
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
                     help="horizontal grid resolution", default=9000)
+parser.add_argument("-i", "--regrid_file", dest="regridfile",
+                    help="Regrid file", default=None)
+parser.add_argument("--o_dir", dest="odir",
+                    help="output directory. Default: current directory", default='foo')
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', '2dbig'],
                     help="output size type", default='2dbig')
@@ -71,6 +75,7 @@ parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity
 options = parser.parse_args()
 
 nn = options.n
+odir = options.odir
 oformat = options.oformat
 osize = options.osize
 queue = options.queue
@@ -84,13 +89,14 @@ climate = options.climate
 forcing_type = options.forcing_type
 grid = options.grid
 hydrology = options.hydrology
+regridfile = options.regridfile
 stress_balance = options.stress_balance
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 
 domain = options.domain
 pism_exec = generate_domain(domain)
-save_times = [-25000, -5000, -1500, -1000, -500, -200, -100, -5]
+save_times = [-25000, -15000, -5000, -1500, -1000, -500, -200, -100, -5]
 
     
 infile = ''
@@ -99,6 +105,10 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
+if regridfile is not None:
+    regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
+
+    
 pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
@@ -106,6 +116,11 @@ if not os.path.isfile(pism_config_nc):
     cmd = ['ncgen', '-o',
            pism_config_nc, pism_config_cdl]
     sub.call(cmd)
+if not os.path.isdir(odir):
+    os.mkdir(odir)
+odir_tmp = '_'.join([odir, 'tmp'])
+if not os.path.isdir(odir_tmp):
+    os.mkdir(odir_tmp)
 
 # ########################################################
 # set up model initialization
@@ -117,9 +132,9 @@ ssa_e = (1.0)
 
 eigen_calving_k = 1e18
 
-thickness_calving_threshold_vales = [50]
-ppq_values = [0.33]
-tefo_values = [0.025]
+thickness_calving_threshold_vales = [50, 100, 150]
+ppq_values = [0.25, 0.33, 0.60]
+tefo_values = [0.020, 0.025, 0.030]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
@@ -127,9 +142,10 @@ topg_max_values = [700]
 combinations = list(itertools.product(thickness_calving_threshold_vales, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
-exstep = '10'
+exstep = 100
 
 scripts = []
+scripts_post = []
 
 start = -125000
 end = -100000
@@ -141,8 +157,16 @@ for n, combination in enumerate(combinations):
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
+    name_options['ppq'] = ppq
+    name_options['tefo'] = tefo
+    name_options['bed_deformation'] = bed_deformation
+    name_options['calving'] = calving
+    if calving in ('eigen_calving'):
+        name_options['k'] = eigen_calving_k
+    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving'):
+        name_options['threshold'] = thickness_calving_threshold
+    name_options['forcing_type'] = forcing_type
     name_options['hydro'] = hydrology
-    name_options['wvel'] = vertical_velocity_approximation
     
     vversion = 'v' + str(version)
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
@@ -150,6 +174,8 @@ for n, combination in enumerate(combinations):
         
     script = 'eemian_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
+    script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, experiment)
+    scripts_post.append(script_post)
     
     for filename in (script):
         try:
@@ -163,16 +189,19 @@ for n, combination in enumerate(combinations):
 
         f.write(batch_header)
 
-        outfile = '{domain}_g{grid}m_{experiment}_eemian.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+        outfile = '{domain}_g{grid}m_straight_{experiment}_0.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
         prefix = generate_prefix_str(pism_exec)
 
         general_params_dict = OrderedDict()
         general_params_dict['i'] = pism_dataname
+        if regridfile is not None:
+            general_params_dict['regrid_file'] = regridfile
+            general_params_dict['regrid_vars'] = regridvars
         general_params_dict['bootstrap'] = ''
         general_params_dict['ys'] = start
         general_params_dict['ye'] = end
-        general_params_dict['o'] = outfile
+        general_params_dict['o'] = os.path.join(odir, outfile)
         general_params_dict['o_format'] = oformat
         general_params_dict['o_size'] = osize
         general_params_dict['config_override'] = pism_config_nc
@@ -195,13 +224,13 @@ for n, combination in enumerate(combinations):
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate)
-        ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal.nc')
+        ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc', ocean_frac_mass_flux_file='pism_fSMB.nc')
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
         exvars = init_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
-        scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end)
+        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir_tmp, split=True)
+        scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
         snap_shot_dict = generate_snap_shots(outfile, save_times)
 
         
@@ -213,26 +242,31 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         f.write('\n')
 
-        if vversion in ('v2', 'v2_1985'):
-            mytype = "MO14 2015-04-27"
-        else:
-            import sys
-            print('TYPE {} not recognized, exiting'.format(vversion))
-            sys.exit(0)        
+    with open(script_post, 'w') as f:
+        extra_file = spatial_ts_dict['extra_file']
+        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(start+exstep, end, exstep)])
+        myoutfile = extra_file + '.nc'
+        myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
+        cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile, '\n'])
+        f.write(cmd)
+        cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, outfile), os.path.join(odir, outfile), '\n'])
+        f.write(cmd)
+
     
 scripts = uniquify_list(scripts)
+scripts_post = uniquify_list(scripts_post)
+print '\n'.join([script for script in scripts])
+print('written')
+# submit = 'submit_{domain}_g{grid}m_{climate}_{bed_type}.sh'.format(domain=domain.lower(), grid=grid, climate=climate, bed_type=bed_type)
+# try:
+#     os.remove(submit)
+# except OSError:
+#     pass
 
-submit = 'submit_{domain}_g{grid}m_eemian.sh'.format(domain=domain.lower(), grid=grid)
-try:
-    os.remove(submit)
-except OSError:
-    pass
+# with open(submit, 'w') as f:
 
-with open(submit, 'w') as f:
+#     f.write('#!/bin/bash\n')
+#     for k in range(len(scripts)):
+#         f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
 
-    f.write('#!/bin/bash\n')
-    for k in range(len(scripts)):
-        f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
-
-print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
-
+# print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
