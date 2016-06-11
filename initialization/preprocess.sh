@@ -80,9 +80,9 @@ echo
 OSMBSERIES=pism_fSMB.nc
 echo -n "creating paleo-temperature file $OSMBSERIES from $DATANAME ... "
 ncks -O $TEMPSERIES $OSMBSERIES
-ncrename -v delta_T,frac_SMB $OSMBSERIES
-ncatted -O -a units,frac_SMB,d,, -a long_name,frac_SMB,o,c,"sub-shelf melt scalar fraction offset" $OSMBSERIES
-ncap2 -O -s "frac_SMB=(frac_SMB)/(max(abs(frac_SMB))*1.1)+1;" $OSMBSERIES $OSMBSERIES
+ncrename -v delta_T,frac_mass_flux $OSMBSERIES
+ncatted -O -a units,frac_mass_flux,d,, -a long_name,frac_mass_flux,o,c,"sub-shelf melt scalar fraction offset" $OSMBSERIES
+ncap2 -O -s "frac_mass_flux=(frac_mass_flux)/(max(abs(frac_mass_flux))*1.1)+1;" $OSMBSERIES $OSMBSERIES
 
 exit
 
