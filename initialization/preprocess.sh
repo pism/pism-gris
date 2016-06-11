@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2014 Andy Aschwanden
+# Copyright (C) 2014-16 Andy Aschwanden
 
 # generates config file
 # downloads "SeaRISE" master dataset
@@ -13,14 +13,6 @@ user=aaschwanden  # default number of processors
 if [ $# -gt 0 ] ; then
   user="$1"
 fi
-
-# generate config file
-echo "  Generating config files..."
-for CONFIG in "init_config"; do
-ncgen -o ${CONFIG}.nc ${CONFIG}.cdl
-done
-echo "  Done generating config file."
-echo
 
 
 # get file; see page http://websrv.cs.umt.edu/isis/index.php/Present_Day_Greenland
@@ -84,6 +76,17 @@ echo "done."
 echo
 
 # extract paleo-climate time series into files suitable for option
+# -ocean ...,frac_SMB
+OSMBSERIES=pism_fSMB.nc
+echo -n "creating paleo-temperature file $OSMBSERIES from $DATANAME ... "
+ncks -O $TEMPSERIES $OSMBSERIES
+ncrename -v delta_T,frac_SMB $OSMBSERIES
+ncatted -O -a units,frac_SMB,d,, -a long_name,frac_SMB,o,c,"sub-shelf melt scalar fraction offset" $OSMBSERIES
+ncap2 -O -s "frac_SMB=(frac_SMB)/(max(abs(frac_SMB))*1.1)+1;" $OSMBSERIES $OSMBSERIES
+
+exit
+
+# extract paleo-climate time series into files suitable for option
 # -ocean ...,delta_SL
 SLSERIES=pism_dSL.nc
 echo -n "creating paleo-sea-level file $SLSERIES from $DATANAME ... "
@@ -119,13 +122,3 @@ ncrename -O -d x1,x -d y1,y -v x1,x -v y1,y $PISMVERSIONOLD $PISMVERSIONOLD
 nc2cdo.py $PISMVERSIONOLD
 echo "done."
 echo
-
-nc2cdo.py $PISMVERSION
-VERSION=2
-for GS in "36000" "18000" "9000" "4500" "3600" "1800" "1500" "1200" "900" "600" "450"; do
-    for TYPE in "ctrl" "970mW_hs" "old_bed"; do 
-    DATANAME=pism_Greenland_${GS}m_mcb_jpl_v${VERSION}_${TYPE}
-    rsync -rvu --progress  $user@beauregard.gi.alaska.edu:/data/tmp/data_sets/boot-files/${DATANAME}.nc .
-    done
-done
-
