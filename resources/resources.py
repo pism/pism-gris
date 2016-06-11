@@ -487,11 +487,10 @@ def generate_ocean(ocean, **kwargs):
 
     params_dict = OrderedDict()
     if ocean in ('paleo'):
-        params_dict['ocean'] = 'given,delta_SL'
+        params_dict['ocean'] = 'given,delta_SL,frac_SMB'
         if 'ocean_delta_SL_file' not in kwargs:
             params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
-            params_dict['ocean_given_file'] = kwargs['ocean_given_file']
-    elif ocean in ('given', 'relax'):
+/    elif ocean in ('given', 'relax'):
         params_dict['ocean'] = 'given'
     elif ocean in ('given_mbp'):
         params_dict['ocean'] = 'given,delta_MBP'
