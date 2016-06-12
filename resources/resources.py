@@ -378,6 +378,7 @@ def generate_stress_balance(stress_balance, additional_params_dict):
     params_dict = OrderedDict()
     params_dict['stress_balance'] = stress_balance
     if stress_balance in ('ssa+sia'):
+        params_dict['pc_type'] = 'asm'
         params_dict['sub_pc_type'] = 'lu'
         params_dict['cfbc'] = ''
         params_dict['kill_icebergs'] = ''
@@ -422,9 +423,7 @@ def generate_calving(calving, **kwargs):
     '''
 
     params_dict = OrderedDict()
-    if calving in ('ocean_kill',
-                   'thickness_calving',
-                   'vonmises_calving'):
+    if calving in ('ocean_kill'):
         params_dict['calving'] = calving
     elif calving in ('eigen_calving', 'vonmises_calving'):
         params_dict['calving'] = '{},thickness_calving'.format(calving)
