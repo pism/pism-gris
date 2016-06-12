@@ -173,7 +173,9 @@ def init_spatial_ts_vars():
               'velbase',
               'velbase_mag',
               'velsurf',
-              'velsurf_mag']
+              'velsurf_mag',
+              'vonmises_calving_rate',
+              'vonmises_stress']
     
     return exvars
 
