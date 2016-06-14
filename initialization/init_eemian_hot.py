@@ -172,9 +172,9 @@ for n, combination in enumerate(combinations):
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
 
         
-    script = 'eemian_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+    script = 'eemian_hot_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
-    script_post = 'eemian_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, experiment)
+    script_post = 'eemian_hot_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, experiment)
     scripts_post.append(script_post)
     
     for filename in (script):
@@ -189,7 +189,7 @@ for n, combination in enumerate(combinations):
 
         f.write(batch_header)
 
-        outfile = '{domain}_g{grid}m_eemian_{experiment}_0.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+        outfile = '{domain}_g{grid}m_eemian_hot_{experiment}_0.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
         prefix = generate_prefix_str(pism_exec)
 
@@ -224,7 +224,7 @@ for n, combination in enumerate(combinations):
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate)
-        ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc', ocean_frac_mass_flux_file='pism_fSMB.nc')
+        ocean_params_dict = generate_ocean('paleo_const', ocean_given_file='ocean_forcing_latitudinal_285.nc')
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
