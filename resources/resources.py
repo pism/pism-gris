@@ -148,6 +148,8 @@ def init_spatial_ts_vars():
     exvars = ['basal_mass_balance_average',
               'beta',
               'bmelt',
+              'bwat',
+              'bwp',
               'cell_area',
               'dbdt',
               'dHdt',
