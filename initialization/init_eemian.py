@@ -59,7 +59,7 @@ parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
 parser.add_argument("--hydrology", dest="hydrology",
-                    choices=['null', 'diffuse'],
+                    choices=['null', 'diffuse', 'routing'],
                     help="Basal hydrology model.", default='diffuse')
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
