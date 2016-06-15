@@ -170,6 +170,8 @@ for n, combination in enumerate(combinations):
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_straight_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
 
+    outfiles = []
+
     for start in range(paleo_start_year, paleo_end_year, restart_step):
 
         end = start + restart_step
@@ -248,6 +250,7 @@ for n, combination in enumerate(combinations):
             f.write('\n')
 
             regridfile = os.path.join(odir, outfile)
+            outfiles.append(outfile)
 
 
     script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
@@ -260,8 +263,9 @@ for n, combination in enumerate(combinations):
         myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile, '\n'])
         f.write(cmd)
-        cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, outfile), os.path.join(odir, outfile), '\n'])
-        f.write(cmd)
+        for myfile in outfiles:
+            cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, myfile), os.path.join(odir, myfile), '\n'])
+            f.write(cmd)
 
     
 scripts = uniquify_list(scripts)
