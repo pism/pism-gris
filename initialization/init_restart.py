@@ -247,7 +247,7 @@ for n, combination in enumerate(combinations):
             f.write(cmd)
             f.write('\n')
 
-            regridfile = outfile
+            regridfile = os.path.join(odir, outfile)
 
 
     script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)

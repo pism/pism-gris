@@ -538,6 +538,7 @@ def list_queues():
     '''
     
     list = ['debug',
+            'devel',
             'gpu',
             'gpu_long',
             'normal',
