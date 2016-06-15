@@ -148,7 +148,7 @@ restart_step = 25000
 
 paleo_start_year = -125000
 paleo_end_year = -124000
-restart_step = 250
+restart_step = 500
 
 for n, combination in enumerate(combinations):
 
@@ -175,7 +175,6 @@ for n, combination in enumerate(combinations):
     for start in range(paleo_start_year, paleo_end_year, restart_step):
 
         end = start + restart_step
-        print start, end
 
         experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
@@ -236,7 +235,10 @@ for n, combination in enumerate(combinations):
 
             exvars = init_spatial_ts_vars()
             spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
-            scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
+            scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
+                                                start=paleo_start_year,
+                                                end=paleo_end_year,
+                                                odir=odir)
 
             if start == paleo_start_year:
                 all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
