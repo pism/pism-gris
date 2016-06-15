@@ -149,6 +149,7 @@ def init_spatial_ts_vars():
               'beta',
               'bmelt',
               'bwat',
+              'bwatvel',
               'bwp',
               'cell_area',
               'dbdt',
