@@ -132,9 +132,9 @@ ssa_e = (1.0)
 
 eigen_calving_k = 1e18
 
-thickness_calving_threshold_vales = [50, 100, 150]
-ppq_values = [0.25, 0.33, 0.60]
-tefo_values = [0.020, 0.025, 0.030]
+thickness_calving_threshold_vales = [50, 350]
+ppq_values = [0.33]
+tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
