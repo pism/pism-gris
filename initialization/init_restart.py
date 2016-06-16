@@ -146,10 +146,6 @@ paleo_start_year = -125000
 paleo_end_year = 0
 restart_step = 25000
 
-paleo_start_year = -125000
-paleo_end_year = -124000
-restart_step = 500
-
 for n, combination in enumerate(combinations):
 
     thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
