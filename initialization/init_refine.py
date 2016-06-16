@@ -13,7 +13,7 @@ import sys
 sys.path.append('../resources/')
 from resources import *
 
-grid_choices = [6000, 3000]
+grid_choices = [9000, 6000, 3000, 1500, 900]
 
 # set up the option parser
 parser = ArgumentParser()
@@ -32,15 +32,15 @@ parser.add_argument("--calving", dest="calving",
                     help="claving", default='ocean_kill')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
-                    help="sets the modeling domain", default='gris_ext')
+                    help="sets the modeling domain", default='gris')
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
-                    help="horizontal grid resolution", default=6000)
+                    help="horizontal grid resolution", default=9000)
 parser.add_argument("--o_dir", dest="odir",
-                    help="output directory. Default: current directory", default='.')
+                    help="output directory. Default: current directory", default='foo')
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', '2dbig'],
                     help="output size type", default='2dbig')
@@ -77,7 +77,6 @@ queue = options.queue
 walltime = options.walltime
 system = options.system
 
-bed_deformation = options.bed_deformation
 bed_type = options.bed_type
 calving = options.calving
 climate = options.climate
@@ -94,7 +93,7 @@ pism_exec = generate_domain(domain)
 no_grid_choices = len(grid_choices)
 grid_nos = range(0, no_grid_choices)
 grid_mapping = OrderedDict(zip(grid_choices, grid_nos))
-save_times = [-125000, -15000, -1000, -500, -200, -100, -5]
+save_times = [-125000, -25000, -15000, -1000, -500, -200, -100, -5]
 grid_start_times = OrderedDict(zip(grid_choices, save_times))
 infile = ''
 if domain.lower() in ('greenland_ext', 'gris_ext'):
@@ -128,7 +127,7 @@ eigen_calving_k = 1e18
 
 thickness_calving_threshold_vales = [50]
 
-ppq_values = [0.33]
+ppq_values = [0.6]
 tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]
@@ -158,10 +157,8 @@ for n, combination in enumerate(combinations):
     name_options = OrderedDict()
     name_options['ppq'] = ppq
     name_options['tefo'] = tefo
-    name_options['bed_deformation'] = bed_deformation
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
-        name_options['eigen_calving_k'] = eigen_calving_k
         name_options['thickness_calving_threshold'] = thickness_calving_threshold
     if calving in ('thickness_calving'):
         name_options['threshold'] = thickness_calving_threshold
@@ -189,7 +186,9 @@ for n, combination in enumerate(combinations):
 
         f.write(batch_header)
 
-        outfile = '{domain}_g{grid}m_refine_{experiment}_0.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+        outfile = '{domain}_g{grid}m_refine_{experiment}_0.nc'.format(domain=domain.lower(),
+                                                                      grid=grid,
+                                                                      experiment=experiment)
 
         prefix = generate_prefix_str(pism_exec)
         
@@ -198,7 +197,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['bootstrap'] = ''
         if grid_mapping[grid] > 0:
             previous_grid =  [k for k, v in grid_mapping.iteritems() if v == grid_mapping[grid] -1][0]
-            regridfile = 'save_{domain}_g{grid}m_refine_{experiment}_0_{start}.000.nc'.format(domain=domain.lower(),grid=previous_grid, experiment=experiment, start=start)
+            regridfile = os.path.join(odir, 'save_{domain}_g{grid}m_refine_{experiment}_0_{start}.000.nc'.format(domain=domain.lower(), grid=previous_grid, experiment=experiment, start=start))
             general_params_dict['regrid_file'] = regridfile
             general_params_dict['regrid_vars'] = regridvars
             general_params_dict['regrid_special'] = ''
@@ -209,8 +208,6 @@ for n, combination in enumerate(combinations):
         general_params_dict['o_size'] = osize
         general_params_dict['config_override'] = pism_config_nc
         general_params_dict['age'] = ''
-        if bed_deformation is not None:
-            general_params_dict['bed_def'] = bed_deformation
         if forcing_type in ('e_age'):
             general_params_dict['e_age_coupling'] = ''
         
@@ -234,8 +231,7 @@ for n, combination in enumerate(combinations):
         exvars = init_spatial_ts_vars()
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir_tmp, split=True)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
-        snap_shot_dict = generate_snap_shots(outfile, save_times[grid_mapping[grid]+1::])
-
+        snap_shot_dict = generate_snap_shots(outfile, save_times[grid_mapping[grid]+1::], odir=odir)
         
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
