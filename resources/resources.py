@@ -385,7 +385,7 @@ def generate_stress_balance(stress_balance, additional_params_dict):
     if stress_balance in ('ssa+sia'):
         params_dict['options_left'] = ''
         params_dict['ssafd_pc_type'] = 'asm'
-        params_dict['ssafd_sub_pc_type'] = 'lu'
+        params_dict['ssafd_sub_pc_type'] = 'jacobi'
         params_dict['cfbc'] = ''
         params_dict['kill_icebergs'] = ''
         params_dict['part_grid'] = ''
