@@ -19,11 +19,13 @@ from argparse import ArgumentParser
 parser = ArgumentParser()
 parser.description = "Create delta mass flux fractions from GRIP record."
 parser.add_argument("FILE", nargs='*')
+parser.add_argument("-n",dest="n", type=float,
+                    help="power-law exponent",default=2)
 
 
 options = parser.parse_args()
 args = options.FILE
-
+n = options.n
 
 infile = args[0]
 
@@ -37,17 +39,17 @@ def def_var(nc, name, units):
     return var
 
 
-x1 = 1
-x2 = 11.
+x1 = 0
+x2 = 10.
 y1 = 0.01
 y2 = 1.
-n = -3
+
 a = (y2-y1)/(np.power(x2,n)-np.power(x1,n))
 b = y1 - a*np.power(x1, n)
 
 frac = np.zeros_like(temp)
-frac = a*temp**n+b
-frac[temp<x1] = y1
+frac = a*(temp+x2)**n + b
+frac[temp<-x2] = y1
 
 var = "frac_mass_flux"
 if (var not in nc.variables.keys()):
@@ -55,6 +57,7 @@ if (var not in nc.variables.keys()):
 else:
     frac_var = nc.variables[var]
 
+frac_var[:] = frac
     
 
 nc.close()
