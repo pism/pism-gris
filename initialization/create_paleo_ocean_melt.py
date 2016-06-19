@@ -3,15 +3,6 @@
 
 import numpy as np
 from netCDF4 import Dataset as NC
-
-try:
-    import pypismtools.pypismtools as ppt
-except:
-    import pypismtools as ppt
-
-from netcdftime import utime
-import dateutil
-import numpy as np
 from argparse import ArgumentParser                            
     
 
