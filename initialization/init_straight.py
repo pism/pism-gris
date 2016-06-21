@@ -96,7 +96,7 @@ version = options.version
 
 domain = options.domain
 pism_exec = generate_domain(domain)
-save_times = [-25000, -15000, -5000, -1500, -1000, -500, -200, -100, -5]
+save_times = [-125000, -25000, -20000, -15000, -11700, -1000, -500, -200, -100, -5]
 
     
 infile = ''
@@ -132,8 +132,8 @@ ssa_e = (1.0)
 
 eigen_calving_k = 1e18
 
-ocean_melt_power_values = [2, 3]
-thickness_calving_threshold_vales = [50, 100, 150, 350]
+ocean_melt_power_values = [1, 2]
+thickness_calving_threshold_vales = [100, 150, 200]
 ppq_values = [0.33]
 tefo_values = [0.020]
 phi_min_values = [5.0]
@@ -235,13 +235,13 @@ for n, combination in enumerate(combinations):
         exvars = init_spatial_ts_vars()
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir_tmp, split=True)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
-        snap_shot_dict = generate_snap_shots(outfile, save_times)
+        snap_shot_dict = generate_snap_shots(outfile, save_times, odir=odir)
 
         
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
         
-        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> job.${batch}  2>&1'.format(batch=batch_system['job_id'])])
+        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
 
         f.write(cmd)
         f.write('\n')
@@ -254,6 +254,9 @@ for n, combination in enumerate(combinations):
         cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile, '\n'])
         f.write(cmd)
         cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, outfile), os.path.join(odir, outfile), '\n'])
+        for t in save_times[1::]:
+            snap_file = '{}_{}.000.nc'.format(snap_shot_dict['save_file'], t)
+            cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, snap_file), os.path.join(odir, snap_file), '\n'])
         f.write(cmd)
 
     

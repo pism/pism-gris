@@ -77,7 +77,7 @@ echo
 
 # extract paleo-climate time series into files suitable for option
 # -ocean ...,frac_SMB
-for n in 2 3; do
+for n in 1 2 3; do
     OSMBSERIES=pism_fSMB_n_$n.nc
     echo -n "creating paleo-temperature file $OSMBSERIES from $DATANAME ... "
     ncks -O $TEMPSERIES $OSMBSERIES
