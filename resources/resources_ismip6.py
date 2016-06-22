@@ -10,11 +10,13 @@ class ISMIP6Var(object):
     pism_name = None
     units = None
     standard_name = None
-    def __init__(self, ismip6_name, pism_name, units, standard_name):
+    def __init__(self, ismip6_name, pism_name, units, standard_name, state, do_mask):
         self.ismip6_name = ismip6_name
         self.pism_name = pism_name
         self.units = units
         self.standard_name = standard_name
+        self.state = state
+        self.do_mask = do_mask
 
     def __repr__(self):
         return "ISMIP6 Variable"
@@ -43,8 +45,10 @@ def get_ismip6_vars_dict(file, dim):
             units = m_list[2]
             standard_name = m_list[3]
             dimension = int(m_list[4])
+            state = int(m_list[5])
+            do_mask = int(m_list[6])
             if dimension == dim:
-                ismip6_vars[ismip6_name] = ISMIP6Var(ismip6_name, pism_name, units, standard_name)
+                ismip6_vars[ismip6_name] = ISMIP6Var(ismip6_name, pism_name, units, standard_name, state, do_mask)
         
     return ismip6_vars
 

@@ -29,10 +29,10 @@ parser.add_argument("-e", "--experiment", dest="experiment",
                     help="Experiment type", default='ctrl')
 parser.add_argument("-r", "--remap_method", dest="remap_method",
                     choices=['con', 'bil'],
-                    help="Remapping method", default='con')
+                    help="Remapping method", default='bil')
 parser.add_argument("-t", "--target_resolution", dest="target_resolution", type=int,
                     choices=[1000, 5000],
-                    help="Horizontal grid resolution", default=1000)
+                    help="Horizontal grid resolution", default=5000)
 
 parser.add_argument("-w", "--override_weights_file",
                     dest="override_weights_file", action="store_true",
@@ -55,7 +55,7 @@ PISM_GRID_RES_ID = str(pism_grid_dx / 100)
 TARGET_GRID_RES_ID = str(target_resolution / 1000)
 
 IS = 'GIS'
-GROUP = 'UAF'
+GROUP = 'TEST'
 MODEL = 'PISM' + PISM_GRID_RES_ID
 EXP = experiment
 TYPE = '_'.join([EXP, '0' + TARGET_GRID_RES_ID])
@@ -76,6 +76,7 @@ pism_to_ismip6_dict = dict((v.pism_name, k) for k, v in ismip6_vars_dict.iterite
 
 pism_copy_vars = [x for x in (ismip6_to_pism_dict.values() + pism_stats_vars + pism_proj_vars)]
 
+mask_var = 'sftgif' 
 
     
 if __name__ == "__main__":
@@ -110,74 +111,74 @@ if __name__ == "__main__":
            infile, tmp_file]
     sub.call(cmd)
     
-    # Make the file ISMIP6 conforming
-    make_spatial_vars_ismip6_conforming(tmp_file, ismip6_vars_dict)
-    # Should be temporary until new runs
-    ncatted_cmd = ["ncatted",
-                   "-a", '''bounds,lat,o,c,lat_bnds''',
-                   "-a", '''bounds,lon,o,c,lon_bnds''',
-                   "-a", '''coordinates,lat_bnds,d,,''',
-                   "-a", '''coordinates,lon_bnds,d,,''',
-                   tmp_file]
-    sub.call(ncatted_cmd)
+    # # Make the file ISMIP6 conforming
+    # make_spatial_vars_ismip6_conforming(tmp_file, ismip6_vars_dict)
+    # # Should be temporary until new runs
+    # ncatted_cmd = ["ncatted",
+    #                "-a", '''bounds,lat,o,c,lat_bnds''',
+    #                "-a", '''bounds,lon,o,c,lon_bnds''',
+    #                "-a", '''coordinates,lat_bnds,d,,''',
+    #                "-a", '''coordinates,lon_bnds,d,,''',
+    #                tmp_file]
+    # sub.call(ncatted_cmd)
                 
-    # Create source grid definition file
-    source_grid_filename = 'source_grid.nc'
-    source_grid_file = os.path.join(tmp_dir, source_grid_filename)
-    ncks_cmd = ['ncks', '-O', '-v', 'thk,mapping', infile, source_grid_file]
-    sub.call(ncks_cmd)
-    nc2cdo_cmd = ['nc2cdo.py', source_grid_file]
-    sub.call(nc2cdo_cmd)
+    # # Create source grid definition file
+    # source_grid_filename = 'source_grid.nc'
+    # source_grid_file = os.path.join(tmp_dir, source_grid_filename)
+    # ncks_cmd = ['ncks', '-O', '-v', 'thk,mapping', infile, source_grid_file]
+    # sub.call(ncks_cmd)
+    # nc2cdo_cmd = ['nc2cdo.py', source_grid_file]
+    # sub.call(nc2cdo_cmd)
 
-    # If exist, remove target grid description file
+    # # If exist, remove target grid description file
     target_grid_file = os.path.join(tmp_dir, target_grid_filename)
-    try:
-        os.remove(target_grid_file)
-    except OSError:
-        pass
+    # try:
+    #     os.remove(target_grid_file)
+    # except OSError:
+    #     pass
 
-    # Create target grid description file
-    create_searise_grid(target_grid_file, target_resolution)
+    # # Create target grid description file
+    # create_searise_grid(target_grid_file, target_resolution)
     
-    # Generate weights if weights file does not exist yet
-    cdo_weights_filename = 'searise_grid_{resolution}m_{method}_weights.nc'.format(resolution=target_resolution, method=remap_method)
-    cdo_weights_file = os.path.join(tmp_dir, cdo_weights_filename)
-    if (not os.path.isfile(cdo_weights_file)) or (override_weights_file is True):
-        print('Generating CDO weights file {}'.format(cdo_weights_file))
-        cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
-                   'gen{method},{grid}'.format(method=remap_method, grid=target_grid_file),
-            source_grid_file,
-            cdo_weights_file]
-        sub.call(cdo_cmd)
+    # # Generate weights if weights file does not exist yet
+    # cdo_weights_filename = 'searise_grid_{resolution}m_{method}_weights.nc'.format(resolution=target_resolution, method=remap_method)
+    # cdo_weights_file = os.path.join(tmp_dir, cdo_weights_filename)
+    # if (not os.path.isfile(cdo_weights_file)) or (override_weights_file is True):
+    #     print('Generating CDO weights file {}'.format(cdo_weights_file))
+    #     cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
+    #                'gen{method},{grid}'.format(method=remap_method, grid=target_grid_file),
+    #         source_grid_file,
+    #         cdo_weights_file]
+    #     sub.call(cdo_cmd)
 
     # Remap to SeaRISE grid    
     out_filename = '{project}_{exp}.nc'.format(project=project, exp=EXP)
     out_file = os.path.join(tmp_dir, out_filename)
-    try:
-        os.remove(out_file)
-    except OSError:
-        pass
-    print('Remapping to SeaRISE grid')
-    cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
-               'remap,{},{}'.format(target_grid_file, cdo_weights_file),
-               tmp_file,
-               out_file]
-    sub.call(cdo_cmd)
+    # try:
+    #     os.remove(out_file)
+    # except OSError:
+    #     pass
+    # print('Remapping to SeaRISE grid')
+    # cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
+    #            'remap,{},{}'.format(target_grid_file, cdo_weights_file),
+    #            tmp_file,
+    #            out_file]
+    # sub.call(cdo_cmd)
 
     # Adjust the time axis
     print('Adjusting time axis')
     adjust_time_axis(out_file)
-
+    
+    mask_file = '{}/{}_{}_{}.nc'.format(project_dir, mask_var, project, EXP)
     for m_var in ismip6_vars_dict.keys():
         final_file = '{}/{}_{}_{}.nc'.format(project_dir, m_var, project, EXP)
         print('Finalizing variable {}'.format(m_var))
         # Generate file
         print('  Copying to file {}'.format(final_file))
         ncks_cmd = ['ncks', '-O', '-4', '-L', '3',
-                    '-v', ','.join([m_var,'lat','lat_vertices','lon','lon_vertices']),
+                    '-v', ','.join([m_var,'lat','lon']),
                     out_file,
                     final_file]
-        sub.call(ncks_cmd)
         # Add stats vars
         print('  Adding config/stats variables')
         ncks_cmd = ['ncks', '-A',
@@ -191,6 +192,28 @@ if __name__ == "__main__":
                     target_grid_file,
                     final_file]
         sub.call(ncks_cmd)
+        # flip signs for some fluxes to comply with arbitrary sign convention
+        if m_var in ('libmassbf', 'libcalvf'):
+            cmd = ['ncap2', '-O', '-s', '''"{var}={var}*-1;"'''.format(var=m_var),
+                        final_file,
+                        final_file]
+            sub.call(cmd)
+        if ismip6_vars_dict[m_var].do_mask == 1:
+            # add mask variable
+            cmd = ['ncks', '-A', '-v', '{var}'.format(var=mask_var),
+                        mask_file,
+                        final_file]
+            sub.call(cmd)
+            # mask where mask==0
+            cmd = ['ncap2', '-O', '-s', '''"where({maskvar})==0 {var}=-2e9;"'''.format(maskvar=mask_var, var=m_var),
+                        final_file,
+                        final_file]
+            sub.call(cmd)
+            # remove mask variable
+            cmd = ['ncks', '-O', '-x', '-v', '{var}'.format(var=mask_var),
+                        final_file,
+                        final_file]
+            sub.call(cmd)
         # Update attributes
         print('  Adjusting attributes')
         nc = CDF(final_file, 'a')
@@ -200,6 +223,8 @@ if __name__ == "__main__":
             nc_var.mapping = 'mapping'
             nc_var.standard_name = ismip6_vars_dict[m_var].standard_name
             nc_var.units = ismip6_vars_dict[m_var].units
+            if ismip6_vars_dict[m_var].state == 1:
+                nc_var.cell_methods = 'time: mean (interval: 5 year)' 
         except:
             pass
         nc.Conventions = 'CF-1.6'
