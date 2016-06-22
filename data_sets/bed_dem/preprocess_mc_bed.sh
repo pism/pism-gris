@@ -100,8 +100,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     outfile_minus=${outfile_prefix}_minus.nc
     outfile_sm_prefix=pism_Greenland_${GRID}m_mcb_jpl_v${ver}
     outfile_sm_cresis=${outfile_sm_prefix}_cresisp.nc
-    outfile_sm_plus=${outfile_sm_prefix}_plus.nc
-    outfile_sm_minus=${outfile_sm_prefix}_minus.nc
+    outfile_sm_noem=${outfile_sm_prefix}_noem.nc
     # for var in "bed" "errbed"; do
     #     rm -f g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc
     #     gdalwarp $CUT -overwrite  -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff NETCDF:$infile:$var g${GRID}m_${var}_v${ver}.tif
@@ -201,9 +200,6 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     ncks -A -v bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc $outfile_cresis
     ncap2 -O -s "where(mask!=0) bed=bed_cresis; where(mask==2) thickness=surface-bed; where(thickness<0) thickness=0.;" $outfile_cresis $outfile_cresis
     ncks -O -v bed_cresis -x $outfile_cresis $outfile_cresis
-    
-    # ncap2 -O -s "bed=bed+errbed; thickness=thickness-errbed; where(thickness<0) thickness=0.;" $outfile $outfile_plus
-    # ncap2 -O -s "bed=bed-errbed; thickness=thickness+errbed; where(thickness<0) thickness=0.;" $outfile $outfile_minus
 
     e0=-638000
     n0=-3349600

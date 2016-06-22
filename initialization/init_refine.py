@@ -157,7 +157,8 @@ for n, combination in enumerate(combinations):
     name_options['ppq'] = ppq
     name_options['tefo'] = tefo
     name_options['calving'] = calving
-    name_options['threshold'] = thickness_calving_threshold
+    if calving in ('eigen_calving', 'vonmises_calving'):
+        name_options['threshold'] = thickness_calving_threshold
     name_options['ocean_n'] = ocean_melt_power
     name_options['forcing_type'] = forcing_type
 
