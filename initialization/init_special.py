@@ -206,7 +206,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['o_size'] = osize
         general_params_dict['config_override'] = pism_config_nc
         general_params_dict['age'] = ''
-        if bed_deformation is not in ('off'):
+        if bed_deformation not in ('off'):
             general_params_dict['bed_def'] = bed_deformation
         if forcing_type in ('e_age'):
             general_params_dict['e_age_coupling'] = ''
