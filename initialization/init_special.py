@@ -51,7 +51,7 @@ parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
                     help="output size type", default='ctrl')
 parser.add_argument("--bed_deformation", dest="bed_deformation",
-                    choices=[None, 'lc', 'iso'],
+                    choices=['off', 'lc', 'iso'],
                     help="Bed deformation model.", default='lc')
 parser.add_argument("--hydrology", dest="hydrology",
                     choices=['null', 'diffuse'],
@@ -206,7 +206,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['o_size'] = osize
         general_params_dict['config_override'] = pism_config_nc
         general_params_dict['age'] = ''
-        if bed_deformation is not None:
+        if bed_deformation is not in ('off'):
             general_params_dict['bed_def'] = bed_deformation
         if forcing_type in ('e_age'):
             general_params_dict['e_age_coupling'] = ''
