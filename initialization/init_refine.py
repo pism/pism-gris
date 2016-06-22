@@ -125,7 +125,7 @@ ssa_e = (1.0)
 
 eigen_calving_k = 1e18
 ocean_melt_power_values = [1, 2]
-thickness_calving_threshold_vales = [100, 150, 200]
+thickness_calving_threshold_vales = [50, 100, 150, 200]
 ppq_values = [0.33]
 tefo_values = [0.020]
 phi_min_values = [5.0]
@@ -160,7 +160,6 @@ for n, combination in enumerate(combinations):
     name_options['threshold'] = thickness_calving_threshold
     name_options['ocean_n'] = ocean_melt_power
     name_options['forcing_type'] = forcing_type
-    name_options['hydro'] = hydrology
 
     vversion = 'v' + str(version)
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
