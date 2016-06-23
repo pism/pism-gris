@@ -163,6 +163,7 @@ def init_spatial_ts_vars():
               'lon',
               'lon_bnds',
               'nuH',
+              'strain_rates',
               'surface_mass_balance_average',
               'taub_mag',
               'tauc',
