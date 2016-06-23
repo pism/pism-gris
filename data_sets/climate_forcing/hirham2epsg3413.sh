@@ -16,13 +16,16 @@ METHOD=`echo $IMETHOD | tr [a-z] [A-Z]`
 
 HIRHAMMASK=glmask_geog.nc
 HIRHAMUSURF=topo_geog.nc
-SERVER=http://prudence.dmi.dk/data/temp/RUM/ANDY
+SERVER=aaschwanden@chinook.alaska.edu:/center/d/ICESHEET/HIRHAM5
 STARTY=1980
 ENDY=2014
 DMIPREFIX=DMI-HIRHAM5_GL2
 PREFIX=${DMIPREFIX}_ERAI_${STARTY}_${ENDY}
+TARFILE=HIRHAM5_ERAI_${STARTY}_${ENDY}_DM.tar
 
-# source ./prepare_files.sh
+
+#source ./prepare_files.sh
+
 
 for INPUT in $HIRHAMMASK $HIRHAMUSURF; do
   if [ -e "$INPUT" ] ; then  # check if file exist
@@ -34,7 +37,7 @@ for INPUT in $HIRHAMMASK $HIRHAMUSURF; do
 done
 
 
-for GRID in 18000; do
+for GRID in 9000; do
 
     PISMGRID=epsg3413_${GRID}m_grid.nc
     create_greenland_ext_epsg3413_grid.py -g $GRID $PISMGRID
