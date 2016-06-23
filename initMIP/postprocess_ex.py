@@ -193,7 +193,7 @@ if __name__ == "__main__":
                     final_file]
         sub.call(ncks_cmd)
         # flip signs for some fluxes to comply with arbitrary sign convention
-        if m_var in ('libmassbf', 'libcalvf'):
+        if m_var in ('libmassbf', 'licalvf'):
             cmd = ['ncap2', '-O', '-s', '''"{var}={var}*-1;"'''.format(var=m_var),
                         final_file,
                         final_file]
