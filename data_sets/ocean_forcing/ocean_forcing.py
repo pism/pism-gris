@@ -23,6 +23,10 @@ parser.add_argument("--bmelt_0",dest="bmelt_0", type=float,
                     help="southern basal melt rate, in m yr-1",default=228)
 parser.add_argument("--bmelt_1",dest="bmelt_1", type=float,
                     help="northern basal melt rate, in m yr-1",default=10)
+parser.add_argument("--lat_0",dest="lat_0", type=float,
+                    help="latitude to apply southern basal melt rate",default=69)
+parser.add_argument("--lat_1",dest="lat_1", type=float,
+                    help="latitude to apply northern basal melt rate",default=81)
 parser.add_argument("-m", "--process_mask", dest="mask", action="store_true",
                     help='''
                     Process the mask, no melting on land''', default=False)
@@ -35,6 +39,8 @@ ice_density = 910.
 
 bmelt_0 = options.bmelt_0 * ice_density
 bmelt_1 = options.bmelt_1 * ice_density
+lat_0 = options.lat_0
+lat_1 = options.lat_1
 mask = options.mask
 
 infile = args[0]
@@ -42,26 +48,24 @@ infile = args[0]
 nc = NC(infile, 'a')
     
 lon_0 = -45
-# Jakobshavn
-lat_0 = 69
-# Petermann
-lat_1 = 81
 
 p = ppt.get_projection_from_file(nc)
 
 xdim, ydim, zdim, tdim = ppt.get_dims(nc)
 
-x0, y0 = p(lon_0, lat_0)
-x1, y1 = p(lon_0, lat_1)
+# x0, y0 = p(lon_0, lat_0)
+# x1, y1 = p(lon_0, lat_1)
 
 # bmelt = a*y + b
-a = (bmelt_1 - bmelt_0) / (y1 - y0)
-b = bmelt_0 - a * y0
+a = (bmelt_1 - bmelt_0) / (lat_1 - lat_0)
+b = bmelt_0 - a * lat_0
     
 x = nc.variables[xdim]
 y = nc.variables[ydim]
 
 X, Y = np.meshgrid(x, y)
+
+Lon, Lat = p(X, Y, inverse=True)
 
 # create a new dimension for bounds only if it does not yet exist
 if tdim is None:
@@ -132,9 +136,9 @@ for t in range(nt):
         print('Processing from {} to {}'.format(time_bnds_var[t,0], time_bnds_var[t,1]))
     else:
         print('Processing {}'.format(dates[t]))        
-    bmelt = a * Y + b
-    bmelt[Y<y0] = a * y0 + b
-    bmelt[Y>y1] = a * y1 + b
+    bmelt = a * Lat + b
+    bmelt[Lat<lat_0] = a * lat_0 + b
+    bmelt[Lat>lat_1] = a * lat_1 + b
     if mask:
         bmelt[land_mask] = 0.
     bmelt_var[t,::] = bmelt

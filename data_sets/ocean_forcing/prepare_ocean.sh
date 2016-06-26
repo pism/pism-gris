@@ -6,6 +6,18 @@ set -x -e
 start="2000-01-01"
 end="2108-01-01"
 
+GRID=3000
+
+infile=../bed_dem/pism_Greenland_ext_${GRID}m_mcb_jpl_v2.nc
+for lat in 78 79 80; do
+    outfile=ocean_forcing_latitudinal_${lat}n.nc
+    ncks -4 -L 3 -C -O -v x,y,mask,polar_stereographic $infile $outfile
+    python ocean_forcing.py --lat_1 ${lat} $outfile
+done
+
+
+exit
+
 for winter_value in 0.0 0.2 0.4 0.6 0.8 1.0; do
     python create_prognostic_mbp.py --winter_value $winter_value mbp_forcing_${winter_value}_${start}_${end}.nc
 done
@@ -24,9 +36,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     python create_prognostic_ocean.py -m -a $start -e $end --bmelt_0 285 $outfile
 done
 
-exit
 
-GRID=3000
 infile=../bed_dem/pism_Greenland_ext_${GRID}m_mcb_jpl_v2.nc
 outfile=ocean_forcing_latitudinal_masked_ctrl.nc
 ncks -4 -L 3 -C -O -v x,y,mask,polar_stereographic $infile $outfile

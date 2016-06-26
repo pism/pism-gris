@@ -435,6 +435,8 @@ def generate_calving(calving, **kwargs):
         params_dict['calving'] = calving
     elif calving in ('eigen_calving', 'vonmises_calving'):
         params_dict['calving'] = '{},thickness_calving'.format(calving)
+    elif calving in ('hybrid_calving'):
+        params_dict['calving'] = 'eigen_calving,vonmises_calving,thickness_calving'
     elif calving in ('float_kill'):
         params_dict['calving'] = calving
         params_dict['float_kill_margin_only'] = ''
