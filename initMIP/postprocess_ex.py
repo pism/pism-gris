@@ -111,59 +111,59 @@ if __name__ == "__main__":
            infile, tmp_file]
     sub.call(cmd)
     
-    # # Make the file ISMIP6 conforming
-    # make_spatial_vars_ismip6_conforming(tmp_file, ismip6_vars_dict)
-    # # Should be temporary until new runs
-    # ncatted_cmd = ["ncatted",
-    #                "-a", '''bounds,lat,o,c,lat_bnds''',
-    #                "-a", '''bounds,lon,o,c,lon_bnds''',
-    #                "-a", '''coordinates,lat_bnds,d,,''',
-    #                "-a", '''coordinates,lon_bnds,d,,''',
-    #                tmp_file]
-    # sub.call(ncatted_cmd)
+    # Make the file ISMIP6 conforming
+    make_spatial_vars_ismip6_conforming(tmp_file, ismip6_vars_dict)
+    # Should be temporary until new runs
+    ncatted_cmd = ["ncatted",
+                   "-a", '''bounds,lat,o,c,lat_bnds''',
+                   "-a", '''bounds,lon,o,c,lon_bnds''',
+                   "-a", '''coordinates,lat_bnds,d,,''',
+                   "-a", '''coordinates,lon_bnds,d,,''',
+                   tmp_file]
+    sub.call(ncatted_cmd)
                 
-    # # Create source grid definition file
-    # source_grid_filename = 'source_grid.nc'
-    # source_grid_file = os.path.join(tmp_dir, source_grid_filename)
-    # ncks_cmd = ['ncks', '-O', '-v', 'thk,mapping', infile, source_grid_file]
-    # sub.call(ncks_cmd)
-    # nc2cdo_cmd = ['nc2cdo.py', source_grid_file]
-    # sub.call(nc2cdo_cmd)
+    # Create source grid definition file
+    source_grid_filename = 'source_grid.nc'
+    source_grid_file = os.path.join(tmp_dir, source_grid_filename)
+    ncks_cmd = ['ncks', '-O', '-v', 'thk,mapping', infile, source_grid_file]
+    sub.call(ncks_cmd)
+    nc2cdo_cmd = ['nc2cdo.py', source_grid_file]
+    sub.call(nc2cdo_cmd)
 
-    # # If exist, remove target grid description file
+    # If exist, remove target grid description file
     target_grid_file = os.path.join(tmp_dir, target_grid_filename)
-    # try:
-    #     os.remove(target_grid_file)
-    # except OSError:
-    #     pass
+    try:
+        os.remove(target_grid_file)
+    except OSError:
+        pass
 
-    # # Create target grid description file
-    # create_searise_grid(target_grid_file, target_resolution)
+    # Create target grid description file
+    create_searise_grid(target_grid_file, target_resolution)
     
-    # # Generate weights if weights file does not exist yet
-    # cdo_weights_filename = 'searise_grid_{resolution}m_{method}_weights.nc'.format(resolution=target_resolution, method=remap_method)
-    # cdo_weights_file = os.path.join(tmp_dir, cdo_weights_filename)
-    # if (not os.path.isfile(cdo_weights_file)) or (override_weights_file is True):
-    #     print('Generating CDO weights file {}'.format(cdo_weights_file))
-    #     cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
-    #                'gen{method},{grid}'.format(method=remap_method, grid=target_grid_file),
-    #         source_grid_file,
-    #         cdo_weights_file]
-    #     sub.call(cdo_cmd)
+    # Generate weights if weights file does not exist yet
+    cdo_weights_filename = 'searise_grid_{resolution}m_{method}_weights.nc'.format(resolution=target_resolution, method=remap_method)
+    cdo_weights_file = os.path.join(tmp_dir, cdo_weights_filename)
+    if (not os.path.isfile(cdo_weights_file)) or (override_weights_file is True):
+        print('Generating CDO weights file {}'.format(cdo_weights_file))
+        cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
+                   'gen{method},{grid}'.format(method=remap_method, grid=target_grid_file),
+            source_grid_file,
+            cdo_weights_file]
+        sub.call(cdo_cmd)
 
     # Remap to SeaRISE grid    
     out_filename = '{project}_{exp}.nc'.format(project=project, exp=EXP)
     out_file = os.path.join(tmp_dir, out_filename)
-    # try:
-    #     os.remove(out_file)
-    # except OSError:
-    #     pass
-    # print('Remapping to SeaRISE grid')
-    # cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
-    #            'remap,{},{}'.format(target_grid_file, cdo_weights_file),
-    #            tmp_file,
-    #            out_file]
-    # sub.call(cdo_cmd)
+    try:
+        os.remove(out_file)
+    except OSError:
+        pass
+    print('Remapping to SeaRISE grid')
+    cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
+               'remap,{},{}'.format(target_grid_file, cdo_weights_file),
+               tmp_file,
+               out_file]
+    sub.call(cdo_cmd)
 
     # Adjust the time axis
     print('Adjusting time axis')
