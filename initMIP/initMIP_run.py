@@ -13,7 +13,7 @@ import sys
 sys.path.append('../resources/')
 from resources import *
 
-grid_choices = [18000, 9000, 6000, 4500, 3600, 1800, 1500, 1200, 900, 600, 450, 300, 150]
+grid_choices = [9000, 6000, 4500, 3600, 1800, 1500, 1200, 900, 600, 450, 300, 150]
 
 # set up the option parser
 parser = ArgumentParser()
@@ -30,7 +30,7 @@ parser.add_argument("--calving", dest="calving",
                     help="claving", default='ocean_kill')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
-                    help="sets the modeling domain", default='gris_ext')
+                    help="sets the modeling domain", default='gris')
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
@@ -55,6 +55,8 @@ parser.add_argument("--forcing_type", dest="forcing_type",
 parser.add_argument("--hydrology", dest="hydrology",
                     choices=['null', 'diffuse'],
                     help="Basal hydrology model.", default='diffuse')
+parser.add_argument("--o_dir", dest="odir",
+                    help="output directory. Default: current directory", default='foo')
 parser.add_argument("--regrid_thickness", dest="regrid_thickness", action="store_true",
                     help="Regrid ice thickness from input file rather than from boot file", default=False)
 
@@ -77,6 +79,7 @@ filename = options.FILE[0]
 
 
 nn = options.n
+odir = options.odir
 oformat = options.oformat
 osize = options.osize
 queue = options.queue
@@ -118,6 +121,11 @@ if not os.path.isfile(pism_config_nc):
     cmd = ['ncgen', '-o',
            pism_config_nc, pism_config_cdl]
     sub.call(cmd)
+if not os.path.isdir(odir):
+    os.mkdir(odir)
+odir_tmp = '_'.join([odir, 'tmp'])
+if not os.path.isdir(odir_tmp):
+    os.mkdir(odir_tmp)
 
 
 # ########################################################
@@ -197,7 +205,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['i'] = infile
         general_params_dict['ys'] = start
         general_params_dict['ye'] = end
-        general_params_dict['o'] = outfile
+        general_params_dict['o'] = os.path.join(odir, outfile)
         general_params_dict['o_format'] = oformat
         general_params_dict['o_size'] = osize
         general_params_dict['config_override'] = 'init_config.nc'
@@ -224,14 +232,14 @@ for n, combination in enumerate(combinations):
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
         exvars = ismip6_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
-        scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end)
+        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir)
+        scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
 
         
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
         
-        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> job.${batch}  2>&1'.format(batch=batch_system['job_id'])])
+        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
 
         f.write(cmd)
         f.write('\n')
