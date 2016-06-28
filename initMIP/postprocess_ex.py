@@ -106,6 +106,7 @@ if __name__ == "__main__":
         if m_var not in nc.variables:
             print("Requested variable '{}' missing".format(m_var))
     nc.close()
+    print('Copy {} to {}'.format(infile, tmp_file))
     cmd = ['ncks', '-O',
            '-v', '{}'.format(','.join(pism_copy_vars)),
            infile, tmp_file]
@@ -125,6 +126,7 @@ if __name__ == "__main__":
     # Create source grid definition file
     source_grid_filename = 'source_grid.nc'
     source_grid_file = os.path.join(tmp_dir, source_grid_filename)
+    print('create source grid file {}'.format(source_grid_file))
     ncks_cmd = ['ncks', '-O', '-v', 'thk,mapping', infile, source_grid_file]
     sub.call(ncks_cmd)
     nc2cdo_cmd = ['nc2cdo.py', source_grid_file]
@@ -138,6 +140,7 @@ if __name__ == "__main__":
         pass
 
     # Create target grid description file
+    print('create target grid file {}'.format(target_grid_file))
     create_searise_grid(target_grid_file, target_resolution)
     
     # Generate weights if weights file does not exist yet
@@ -169,7 +172,6 @@ if __name__ == "__main__":
     print('Adjusting time axis')
     adjust_time_axis(out_file)
     
-    mask_file = '{}/{}_{}_{}.nc'.format(project_dir, mask_var, project, EXP)
     for m_var in ismip6_vars_dict.keys():
         final_file = '{}/{}_{}_{}.nc'.format(project_dir, m_var, project, EXP)
         print('Finalizing variable {}'.format(m_var))
@@ -201,7 +203,7 @@ if __name__ == "__main__":
         if ismip6_vars_dict[m_var].do_mask == 1:
             # add mask variable
             cmd = ['ncks', '-A', '-v', '{var}'.format(var=mask_var),
-                        mask_file,
+                        out_file,
                         final_file]
             sub.call(cmd)
             # mask where mask==0

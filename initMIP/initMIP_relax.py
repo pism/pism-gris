@@ -54,9 +54,8 @@ parser.add_argument("--forcing_type", dest="forcing_type",
 parser.add_argument("--hydrology", dest="hydrology",
                     choices=['null', 'diffuse'],
                     help="Basal hydrology model.", default='diffuse')
-parser.add_argument("--regrid_thickness", dest="regrid_thickness", action="store_true",
-                    help="Regrid ice thickness from input file rather than from boot file", default=False)
-
+parser.add_argument("--o_dir", dest="odir",
+                    help="output directory. Default: current directory", default='foo')
 parser.add_argument("-s", "--system", dest="system",
                     choices=list_systems(),
                     help="computer system to use.", default='chinook')
@@ -76,6 +75,7 @@ filename = options.FILE[0]
 
 
 nn = options.n
+odir = options.odir
 oformat = options.oformat
 osize = options.osize
 queue = options.queue
@@ -112,6 +112,7 @@ regridfile = filename
 regrid_thickness = options.regrid_thickness
 #regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href'
 regridvars = 'litho_temp,enthalpy,tillwat,bmelt,Href'
+regrid_thickness = True
 if regrid_thickness:
     regridvars = '{},thk'.format(regridvars)
 
@@ -123,6 +124,11 @@ if not os.path.isfile(pism_config_nc):
            pism_config_nc, pism_config_cdl]
     sub.call(cmd)
 
+if not os.path.isdir(odir):
+    os.mkdir(odir)
+odir_tmp = '_'.join([odir, 'tmp'])
+if not os.path.isdir(odir_tmp):
+    os.mkdir(odir_tmp)
 
 # ########################################################
 # set up initMIP relaxation run
@@ -204,7 +210,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['regrid_vars'] = regridvars
         general_params_dict['ys'] = start
         general_params_dict['ye'] = end
-        general_params_dict['o'] = outfile
+        general_params_dict['o'] = os.path.join(odir, outfile)
         general_params_dict['o_format'] = oformat
         general_params_dict['o_size'] = osize
         general_params_dict['config_override'] = pism_config_nc
@@ -231,14 +237,13 @@ for n, combination in enumerate(combinations):
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
         exvars = default_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
-        scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end)
-
+        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir)
+        scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
         
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
         
-        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> job.${batch}  2>&1'.format(batch=batch_system['job_id'])])
+        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
 
         f.write(cmd)
         f.write('\n')
@@ -252,17 +257,4 @@ for n, combination in enumerate(combinations):
     
 scripts = uniquify_list(scripts)
 
-submit = 'submit_{domain}_g{grid}m_{climate}.sh'.format(domain=domain.lower(), grid=grid, climate=climate, bed_type=bed_type)
-try:
-    os.remove(submit)
-except OSError:
-    pass
-
-with open(submit, 'w') as f:
-
-    f.write('#!/bin/bash\n')
-    for k in range(len(scripts)):
-        f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
-
-print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
 

@@ -233,5 +233,6 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450 300; 
     gdalwarp -overwrite -dstnodata -9999 -cutline  ../shape_files/gris-domain-ismip6.shp NETCDF:$outfile_sm_nb:$var g${GRID}m_nb_${var}_v${ver}.tif
     gdal_translate -of netCDF -co "FORMAT=NC4" g${GRID}m_nb_${var}_v${ver}.tif g${GRID}m_nb_${var}_v${ver}.nc
     ncks -A -v $var g${GRID}m_nb_${var}_v${ver}.nc $outfile_sm_nb
-
+    ncatted -a _FillValue,bed,d,, -a _FillValue,thickness,d,, $outfile_sm_nb
+    ncap2 -O -s "where(bed==-9999) {mask=0; surface=0; thickness=0;};"  $outfile_sm_nb  $outfile_sm_nb
 done
