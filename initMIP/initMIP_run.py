@@ -30,7 +30,7 @@ parser.add_argument("--calving", dest="calving",
                     help="claving", default='ocean_kill')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
-                    help="sets the modeling domain", default='gris')
+                    help="sets the modeling domain", default='gris_ext')
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
@@ -42,7 +42,7 @@ parser.add_argument("--o_size", dest="osize",
                     help="output size type", default='2dbig')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
-                    help="output size type", default='ctrl')
+                    help="output size type", default='no_bath')
 parser.add_argument("--bed_deformation", dest="bed_deformation",
                     choices=[None, 'lc', 'iso'],
                     help="Bed deformation model.", default=None)

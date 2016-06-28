@@ -42,7 +42,7 @@ parser.add_argument("--o_size", dest="osize",
                     help="output size type", default='2dbig')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
-                    help="output size type", default='ctrl')
+                    help="output size type", default='no_bath')
 parser.add_argument("--bed_deformation", dest="bed_deformation",
                     choices=[None, 'lc', 'iso'],
                     help="Bed deformation model.", default=None)
@@ -111,7 +111,7 @@ dura = options.dura
 regridfile = filename
 #regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href'
 regridvars = 'litho_temp,enthalpy,tillwat,bmelt,Href'
-regrid_thickness = True
+regrid_thickness = False
 if regrid_thickness:
     regridvars = '{},thk'.format(regridvars)
 
