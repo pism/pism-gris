@@ -13,7 +13,7 @@ import sys
 sys.path.append('../resources/')
 from resources import *
 
-grid_choices = [18000, 9000, 6000, 4500, 3600, 1800, 1500, 1200, 900, 600, 450, 300, 150]
+grid_choices = [18000, 9000, 6000, 4500, 3600, 3000, 1800, 1500, 1200, 900, 600, 450, 300, 150]
 
 # set up the option parser
 parser = ArgumentParser()

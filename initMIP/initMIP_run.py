@@ -13,7 +13,7 @@ import sys
 sys.path.append('../resources/')
 from resources import *
 
-grid_choices = [9000, 6000, 4500, 3600, 1800, 1500, 1200, 900, 600, 450, 300, 150]
+grid_choices = [9000, 6000, 4500, 3600, 3000, 1800, 1500, 1200, 900, 600, 450, 300, 150]
 
 # set up the option parser
 parser = ArgumentParser()
@@ -57,9 +57,6 @@ parser.add_argument("--hydrology", dest="hydrology",
                     help="Basal hydrology model.", default='diffuse')
 parser.add_argument("--o_dir", dest="odir",
                     help="output directory. Default: current directory", default='foo')
-parser.add_argument("--regrid_thickness", dest="regrid_thickness", action="store_true",
-                    help="Regrid ice thickness from input file rather than from boot file", default=False)
-
 parser.add_argument("-s", "--system", dest="system",
                     choices=list_systems(),
                     help="computer system to use.", default='chinook')
