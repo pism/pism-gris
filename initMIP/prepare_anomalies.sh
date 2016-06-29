@@ -61,6 +61,7 @@ ncks -A -v climatic_mass_balance,ice_surface_temp tmp_smb_Greenland_${pism_grid}
 ncks -A -v x,y,mapping ${pism_grid_file} smb_Greenland_racmo_1960-1990_${pism_grid}m.nc
 
 outfilepre=initMIP_climate_forcing_${pism_grid}m_100a
+nc2cdo.py pism_Greenland_ext_${pism_grid}m_mcb_jpl_v2.nc
 python create_anomalies.py --topo_file pism_Greenland_ext_${pism_grid}m_mcb_jpl_v2.nc --background_file smb_Greenland_racmo_1960-1990_${pism_grid}m.nc ${outfilepre}_asmb.nc
 ncks -A -v x,y,mapping ${pism_grid_file} ${outfilepre}_asmb.nc
 ncatted  -a units,ice_surface_temp,o,c,"Celsius" -a standard_name,ice_surface_temp,o,c,"air_temperature"  -a units,climatic_mass_balance,o,c,"kg m-2 year-1" -a standard_name,climatic_mass_balance,o,c,"land_ice_surface_specific_mass_balance" -a grid_mapping,climatic_mass_balance,o,c,"mapping" -a grid_mapping,ice_surface_temp,o,c,"mapping" ${outfilepre}_asmb.nc

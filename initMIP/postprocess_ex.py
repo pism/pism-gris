@@ -27,9 +27,11 @@ parser.add_argument("-n", '--n_procs', dest="n_procs", type=int,
 parser.add_argument("-e", "--experiment", dest="experiment",
                     choices=['ctrl', 'asmb'],
                     help="Experiment type", default='ctrl')
+parser.add_argument('--id', dest="id", type=str,
+                    help='''Experiemnt ID''', default='1')
 parser.add_argument("-r", "--remap_method", dest="remap_method",
                     choices=['con', 'bil'],
-                    help="Remapping method", default='bil')
+                    help="Remapping method", default='con')
 parser.add_argument("-t", "--target_resolution", dest="target_resolution", type=int,
                     choices=[1000, 5000],
                     help="Horizontal grid resolution", default=5000)
@@ -53,10 +55,11 @@ pism_grid_dx = int(round(nc.variables['run_stats'].grid_dx_meters))
 nc.close()
 PISM_GRID_RES_ID = str(pism_grid_dx / 100)
 TARGET_GRID_RES_ID = str(target_resolution / 1000)
+ID = options.id
 
 IS = 'GIS'
-GROUP = 'TEST'
-MODEL = 'PISM' + PISM_GRID_RES_ID
+GROUP = 'UAF'
+MODEL = 'PISM' + PISM_GRID_RES_ID + ID
 EXP = experiment
 TYPE = '_'.join([EXP, '0' + TARGET_GRID_RES_ID])
 INIT = '_'.join(['init', '0' + TARGET_GRID_RES_ID])
@@ -178,9 +181,10 @@ if __name__ == "__main__":
         # Generate file
         print('  Copying to file {}'.format(final_file))
         ncks_cmd = ['ncks', '-O', '-4', '-L', '3',
-                    '-v', ','.join([m_var,'lat','lon']),
+                    '-v', ','.join([m_var,'lat','lon', 'lat_bnds', 'lon_bnds']),
                     out_file,
                     final_file]
+        sub.call(ncks_cmd)
         # Add stats vars
         print('  Adding config/stats variables')
         ncks_cmd = ['ncks', '-A',

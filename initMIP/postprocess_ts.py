@@ -23,9 +23,11 @@ parser.add_argument("EXP_FILE", nargs=1)
 parser.add_argument("-e", "--experiment", dest="experiment",
                     choices=['ctrl', 'asmb'],
                     help="Output size type", default='ctrl')
+parser.add_argument('--id', dest="id", type=str,
+                    help='''Experiemnt ID''', default='1')
 parser.add_argument("-t", "--target_resolution", dest="target_resolution", type=int,
                     choices=[1000, 5000],
-                    help="Horizontal grid resolution", default=1000)
+                    help="Horizontal grid resolution", default=5000)
 
 options = parser.parse_args()
 experiment = options.experiment
@@ -38,10 +40,11 @@ pism_grid_dx = int(round(nc.variables['run_stats'].grid_dx_meters))
 nc.close()
 PISM_GRID_RES_ID = str(pism_grid_dx / 100)
 TARGET_GRID_RES_ID = str(target_resolution / 1000)
+ID = options.id
 
 IS = 'GIS'
 GROUP = 'UAF'
-MODEL = 'PISM' + PISM_GRID_RES_ID
+MODEL = 'PISM' + PISM_GRID_RES_ID + ID
 EXP = experiment
 TYPE = '_'.join([EXP, '0' + TARGET_GRID_RES_ID])
 INIT = '_'.join(['init', '0' + TARGET_GRID_RES_ID])
