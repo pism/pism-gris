@@ -151,7 +151,7 @@ exstep = 5
 
 scripts = []
 
-start = -5
+start = -10
 end = 100
 
 for n, combination in enumerate(combinations):

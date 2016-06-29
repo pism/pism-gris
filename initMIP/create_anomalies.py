@@ -54,7 +54,7 @@ tdim = 'time'
 nx = len(nc_a.dimensions[xdim_a])
 ny = len(nc_a.dimensions[ydim_b])
 
-start = -5
+start = -10
 end = 100
 nt = end - start
 

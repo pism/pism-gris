@@ -2,7 +2,7 @@
 set -x -e
 N=4
 
-pism_grid=900
+pism_grid=3000
 if [ $# -gt 0 ] ; then
   pism_grid="$1"
 fi
