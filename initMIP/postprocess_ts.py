@@ -106,7 +106,7 @@ if __name__ == "__main__":
         init_file = '{}/scalar_{}_{}.nc'.format(init_dir, project, 'init')
         print('  Copying time 0 to file {}'.format(init_file))
         ncks_cmd = ['ncks', '-O', '-4', '-L', '3',
-                    '-d', 'time,0',
+                    '-d', 'time,1',
                     out_file,
                     init_file]
         sub.call(ncks_cmd)

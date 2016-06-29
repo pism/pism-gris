@@ -229,7 +229,7 @@ for n, combination in enumerate(combinations):
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
         exvars = ismip6_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir)
+        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end, odir=odir)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
 
         

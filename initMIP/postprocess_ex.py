@@ -241,7 +241,7 @@ if __name__ == "__main__":
             init_file = '{}/{}_{}_{}.nc'.format(init_dir, m_var, project, 'init')
             print('  Copying time 0 to file {}'.format(init_file))
             ncks_cmd = ['ncks', '-O', '-4', '-L', '3',
-                        '-d', 'time,0',
+                        '-d', 'time,1',
                         '-v', m_var,
                         final_file,
                         init_file]
