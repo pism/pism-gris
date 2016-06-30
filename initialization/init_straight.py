@@ -133,7 +133,7 @@ ssa_e = (1.0)
 eigen_calving_k = 1e18
 
 ocean_melt_power_values = [1, 2]
-thickness_calving_threshold_values = [50, 100, 150, 200]
+thickness_calving_threshold_values = [50, 75]
 ppq_values = [0.33]
 tefo_values = [0.020]
 phi_min_values = [5.0]
