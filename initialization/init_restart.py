@@ -19,11 +19,11 @@ grid_choices = [18000, 9000, 6000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900
 parser = ArgumentParser()
 parser.description = "Generating scripts for model initialization."
 parser.add_argument("-n", '--n_procs', dest="n", type=int,
-                    help='''number of cores/processors. default=64.''', default=64)
+                    help='''number of cores/processors. default=140.''', default=140)
 parser.add_argument("-w", '--wall_time', dest="walltime",
-                    help='''walltime. default: 12:00:00.''', default="12:00:00")
+                    help='''walltime. default: 100:00:00.''', default="100:00:00")
 parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
-                    help='''queue. default=t1standard.''', default='t1standard')
+                    help='''queue. default=long.''', default='long')
 parser.add_argument("--climate", dest="climate",
                     choices=['const', 'paleo'],
                     help="Climate", default='paleo')
@@ -46,7 +46,7 @@ parser.add_argument("--o_size", dest="osize",
                     help="output size type", default='2dbig')
 parser.add_argument("-s", "--system", dest="system",
                     choices=list_systems(),
-                    help="computer system to use.", default='pacman')
+                    help="computer system to use.", default='pleiades_broadwell')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
                     help="output size type", default='ctrl')
@@ -127,7 +127,7 @@ ssa_e = (1.0)
 
 eigen_calving_k = 1e18
 
-thickness_calving_threshold_vales = [50]
+thickness_calving_threshold_vales = [50, 75]
 ppq_values = [0.33]
 tefo_values = [0.020]
 phi_min_values = [5.0]
@@ -157,14 +157,13 @@ for n, combination in enumerate(combinations):
     name_options['tefo'] = tefo
     name_options['bed_deformation'] = bed_deformation
     name_options['calving'] = calving
-    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving'):
+    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
         name_options['threshold'] = thickness_calving_threshold
     name_options['forcing_type'] = forcing_type
-    name_options['hydro'] = hydrology
     
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
-    full_outfile = '{domain}_g{grid}m_straight_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
+    full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
 
     outfiles = []
 
