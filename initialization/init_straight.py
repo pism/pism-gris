@@ -133,14 +133,14 @@ ssa_e = (1.0)
 eigen_calving_k = 1e18
 
 ocean_melt_power_values = [1, 2]
-thickness_calving_threshold_vales = [50, 100, 150, 200]
+thickness_calving_threshold_values = [50, 100, 150, 200]
 ppq_values = [0.33]
 tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(ocean_melt_power_values, thickness_calving_threshold_vales, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+combinations = list(itertools.product(ocean_melt_power_values, thickness_calving_threshold_values, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
 exstep = 100
@@ -162,9 +162,9 @@ for n, combination in enumerate(combinations):
     name_options['tefo'] = tefo
     name_options['bed_deformation'] = bed_deformation
     name_options['calving'] = calving
-    if calving in ('eigen_calving'):
+    if calving in ('eigen_calving', 'hybrid_calving'):
         name_options['k'] = eigen_calving_k
-    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving'):
+    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
         name_options['threshold'] = thickness_calving_threshold
     name_options['ocean_n'] = ocean_melt_power
     name_options['forcing_type'] = forcing_type
