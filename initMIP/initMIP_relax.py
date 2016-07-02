@@ -47,7 +47,7 @@ parser.add_argument("--bed_deformation", dest="bed_deformation",
                     choices=[None, 'lc', 'iso'],
                     help="Bed deformation model.", default=None)
 parser.add_argument("--duration", dest="dura", type=int,
-                    help="Length of simulation in years (integers)", default=50)
+                    help="Length of simulation in years (integer)", default=50)
 parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
@@ -56,7 +56,7 @@ parser.add_argument("--hydrology", dest="hydrology",
                     help="Basal hydrology model.", default='diffuse')
 parser.add_argument("--o_dir", dest="odir",
                     help="output directory. Default: current directory", default='foo')
-parser.add_argument("--regrid_thickness", dest="regrid_thickness", action=store_true,
+parser.add_argument("--regrid_thickness", dest="regrid_thickness", action='store_true',
                     help="Regrid ice thickness from input file.", default=False)
 parser.add_argument("-s", "--system", dest="system",
                     choices=list_systems(),
@@ -92,6 +92,7 @@ climate_file = 'initMIP_climate_forcing_{grid}m_100a_ctrl.nc'.format(grid=option
 forcing_type = options.forcing_type
 grid = options.grid
 hydrology = options.hydrology
+regrid_thickness = options.regrid_thickness
 stress_balance = options.stress_balance
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
@@ -113,7 +114,6 @@ dura = options.dura
 regridfile = filename
 #regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href'
 regridvars = 'litho_temp,enthalpy,tillwat,bmelt,Href'
-regrid_thickness = False
 if regrid_thickness:
     regridvars = '{},thk'.format(regridvars)
 
