@@ -30,7 +30,7 @@ parser.add_argument("--climate", dest="climate",
 parser.add_argument("--climate_file", dest="climate_file",
                     help="Climate file with temperature and climatic mass balance.", default=None)
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving'],
+                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'stress_calving'],
                     help="claving", default='ocean_kill')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],

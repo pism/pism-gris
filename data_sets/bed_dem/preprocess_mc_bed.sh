@@ -188,31 +188,31 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     # sh create_hot_spot.sh $outfile $outfile_hot
 
     # CReSIS bed
-    # gdalwarp -overwrite  -cutline ../shape_files/jib_cresis_channel_area_cutline.shp -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff jakobshavn_bedmap_3413_edit.tif g${GRID}m_cresis.tif
-    # gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_cresis.tif g${GRID}m_cresis.nc
-    # ncrename -O -v Band1,cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis.nc
+    gdalwarp -overwrite  -cutline ../shape_files/jib_cresis_channel_area_cutline.shp -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff jakobshavn_bedmap_3413_edit.tif g${GRID}m_cresis.tif
+    gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_cresis.tif g${GRID}m_cresis.nc
+    ncrename -O -v Band1,cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis.nc
     
-    # var=bed
-    # nccopy g${GRID}m_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    # ncks -A -v cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    # ncatted -a _FillValue,cresis_bed,d,, g${GRID}m_cresis_${var}_v${ver}.nc
-    # ncap2 -O -s "where(cresis_bed>-9999) bed=cresis_bed;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    # gdalwarp -overwrite -dstnodata 0 -cutline  ../shape_files/jib_interp_buffer.shp NETCDF:g${GRID}m_cresis_${var}_v${ver}.nc:bed g${GRID}m_cresis_${var}_v${ver}_buffered.tif
-    # gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_cresis_${var}_v${ver}_buffered.tif g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    # ncrename -O -v bed,buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    # ncks -O -4 g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    # ncatted -a _FillValue,buffer,d,, g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    # ncks -4 -A -v buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    # ncap2 -O -s "where(buffer!=0) bed=9999;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    # ncatted -a _FillValue,bed,o,f,9999. g${GRID}m_cresis_${var}_v${ver}.nc
-    # mpiexec -np $NN  fill_missing_petsc.py -v bed -f g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
-    # ncks -O -v bed tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
-    # ncrename -O -v bed,bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
-    # ncks -O  $outfile $outfile_cresis
-    # ncatted -a _FillValue,bed,d,, $outfile_cresis
-    # ncks -A -v bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc $outfile_cresis
-    # ncap2 -O -s "where(mask!=0) bed=bed_cresis; where(mask==2) thickness=surface-bed; where(thickness<0) thickness=0.;" $outfile_cresis $outfile_cresis
-    # ncks -O -v bed_cresis -x $outfile_cresis $outfile_cresis
+    var=bed
+    nccopy g${GRID}m_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    ncks -A -v cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    ncatted -a _FillValue,cresis_bed,d,, g${GRID}m_cresis_${var}_v${ver}.nc
+    ncap2 -O -s "where(cresis_bed>-9999) bed=cresis_bed;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    gdalwarp -overwrite -dstnodata 0 -cutline  ../shape_files/jib_interp_buffer.shp NETCDF:g${GRID}m_cresis_${var}_v${ver}.nc:bed g${GRID}m_cresis_${var}_v${ver}_buffered.tif
+    gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_cresis_${var}_v${ver}_buffered.tif g${GRID}m_cresis_${var}_v${ver}_buffered.nc
+    ncrename -O -v bed,buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}_buffered.nc
+    ncks -O -4 g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}_buffered.nc
+    ncatted -a _FillValue,buffer,d,, g${GRID}m_cresis_${var}_v${ver}_buffered.nc
+    ncks -4 -A -v buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    ncap2 -O -s "where(buffer!=0) bed=9999;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
+    ncatted -a _FillValue,bed,o,f,9999. g${GRID}m_cresis_${var}_v${ver}.nc
+    mpiexec -np $NN  fill_missing_petsc.py -v bed -f g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
+    ncks -O -v bed tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
+    ncrename -O -v bed,bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
+    ncks -O  $outfile $outfile_cresis
+    ncatted -a _FillValue,bed,d,, $outfile_cresis
+    ncks -A -v bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc $outfile_cresis
+    ncap2 -O -s "where(mask!=0) bed=bed_cresis; where(mask==2) thickness=surface-bed; where(thickness<0) thickness=0.;" $outfile_cresis $outfile_cresis
+    ncks -O -v bed_cresis -x $outfile_cresis $outfile_cresis
 
     e0=-638000
     n0=-3349600

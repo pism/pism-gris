@@ -103,6 +103,7 @@ if __name__ == "__main__":
         os.remove(tmp_file)
     except OSError:
         pass
+
     # Check if request variables are present
     nc = CDF(infile, 'r')
     for m_var in pism_copy_vars:
@@ -180,7 +181,7 @@ if __name__ == "__main__":
         print('Finalizing variable {}'.format(m_var))
         # Generate file
         print('  Copying to file {}'.format(final_file))
-        ncks_cmd = ['ncks', '-O', '-4', '-L', '3',
+        ncks_cmd = ['ncks', '-O', '-4', '-L', '3', '-d', 'time,1,'
                     '-v', ','.join([m_var,'lat','lon', 'lat_bnds', 'lon_bnds']),
                     out_file,
                     final_file]
@@ -241,7 +242,7 @@ if __name__ == "__main__":
             init_file = '{}/{}_{}_{}.nc'.format(init_dir, m_var, project, 'init')
             print('  Copying time 0 to file {}'.format(init_file))
             ncks_cmd = ['ncks', '-O', '-4', '-L', '3',
-                        '-d', 'time,1',
+                        '-d', 'time,0',
                         '-v', m_var,
                         final_file,
                         init_file]

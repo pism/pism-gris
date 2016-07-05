@@ -83,7 +83,7 @@ if __name__ == "__main__":
     nc.close()
     print('  Removing times < 0 in file {}'.format(out_file))
     cmd = ['ncks', '-O',
-           '-d', 'time,4,-1',
+           '-d', 'time,9,-1',
            '-v', '{}'.format(','.join(pism_copy_vars)),
            infile, out_file]
     sub.call(cmd)

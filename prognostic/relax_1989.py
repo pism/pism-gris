@@ -46,12 +46,16 @@ parser.add_argument("-g", "--grid", dest="grid", type=int,
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', '2dbig'],
                     help="output size type", default='2dbig')
+parser.add_argument("--ocean", dest="ocean",
+                    choices=['given',
+                             'given_mbp'],
+                    help="ocean", default='given')
 parser.add_argument("-s", "--system", dest="system",
                     choices=['pleiades', 'fish', 'pacman', 'debug'],
                     help="computer system to use.", default='pacman')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
-                    help="output size type", default='no_bath')
+                    help="output size type", default='cresisp')
 parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
@@ -60,7 +64,7 @@ parser.add_argument("--stress_balance", dest="stress_balance",
                     help="stress balance solver", default='ssa+sia')
 parser.add_argument("--dataset_version", dest="version",
                     choices=['2'],
-                    help="input data set version", default='2')
+                    help="input data set version", default='2_1985')
 
 
 options = parser.parse_args()
@@ -83,6 +87,7 @@ climate_file = options.climate_file
 forcing_type = options.forcing_type
 grid = options.grid
 bed_type = options.bed_type
+ocean = options.ocean
 version = options.version
 stress_balance = options.stress_balance
 
@@ -209,7 +214,9 @@ for n, combination in enumerate(combinations):
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate, surface_given_file=climate_file)
-        ocean_params_dict = generate_ocean('const', shelf_base_melt_rate=10.)
+        ocean_params_dict = generate_ocean(ocean,
+                                           ocean_given_file='ocean_forcing_1200m_1989-2011_v2_1985_ctrl_const_ctrl_1989_baseline.nc',
+                                           ocean_delta_MBP_file='ocean_forcing_{grid}m_latitudinal_masked_285_2108-01-01.nc'.format(grid=grid))
         hydro_params_dict = generate_hydrology(hydro)
         calving_params_dict = generate_calving(calving, ocean_kill_file=pism_dataname)
 
