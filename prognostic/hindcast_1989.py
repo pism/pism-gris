@@ -40,7 +40,7 @@ parser.add_argument("--calving", dest="calving",
                              'eigen_calving',
                              'thickness_calving',
                              'vonmises_calving'],
-                    help="claving", default='thickness_calving')
+                    help="claving", default='vonmises_calving')
 parser.add_argument("--ocean", dest="ocean",
                     choices=['given',
                              'given_mbp'],

@@ -30,8 +30,8 @@ parser.add_argument("--climate", dest="climate",
 parser.add_argument("--climate_file", dest="climate_file",
                     help="Climate file with temperature and climatic mass balance.", default=None)
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving'],
-                    help="claving", default='ocean_kill')
+                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'vonmises_calving'],
+                    help="claving", default='vonmises_calving')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris_ext')
@@ -121,7 +121,7 @@ tefo = (0.02)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
-calving_thk_threshold_values = [300]
+calving_thk_threshold_values = [100, 300]
 calving_k_values = [1e18]
 phi_min_values = [5.0]
 phi_max_values = [40.]
@@ -160,9 +160,11 @@ for n, combination in enumerate(combinations):
     name_options['topg_max'] = topg_max
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
-        name_options['calving_k'] = calving
-        name_options['calving_thk_threshold'] = calving
-    name_options['forcing_type'] = forcing_type
+        name_options['k'] = eigen_calving_k
+        name_options['threshold'] = thickness_calving_threshold
+    if calving in ('thickness_calving'):
+        name_options['threshold'] = thickness_calving_threshold
+    name_options['ocean'] = ocean
     
     vversion = 'v' + str(version)
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
@@ -218,7 +220,10 @@ for n, combination in enumerate(combinations):
                                            ocean_given_file='ocean_forcing_1200m_1989-2011_v2_1985_ctrl_const_ctrl_1989_baseline.nc',
                                            ocean_delta_MBP_file='ocean_forcing_{grid}m_latitudinal_masked_285_2108-01-01.nc'.format(grid=grid))
         hydro_params_dict = generate_hydrology(hydro)
-        calving_params_dict = generate_calving(calving, ocean_kill_file=pism_dataname)
+        calving_params_dict = generate_calving(calving,
+                                               thickness_calving_threshold=thickness_calving_threshold,
+                                               eigen_calving_k=eigen_calving_k,
+                                               ocean_kill_file=pism_dataname)
 
         exvars = "climatic_mass_balance_cumulative,tempsurf,diffusivity,temppabase,bmeltvelsurf_mag,mask,thk,topg,usurf,taud_mag,velsurf_mag,climatic_mass_balance,climatic_mass_balance_original,velbase_mag,tauc,taub_mag"
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
