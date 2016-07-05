@@ -183,7 +183,7 @@ for n, combination in enumerate(combinations):
             
     with open(script, 'w') as f:
 
-        f.write(pbs_header)
+        f.write(batch_header)
 
         outfile = '{domain}_g{grid}m_{experiment}_{dura}a.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment, dura=dura)
 
