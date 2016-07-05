@@ -47,7 +47,7 @@ parser.add_argument("--ocean", dest="ocean",
                     help="ocean", default='given')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext', 'jakobshavn'],
-                    help="sets the modeling domain", default='gris_ext')
+                    help="sets the modeling domain", default='jakobshavn')
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')

@@ -33,8 +33,8 @@ parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'vonmises_calving'],
                     help="claving", default='vonmises_calving')
 parser.add_argument("-d", "--domain", dest="domain",
-                    choices=['gris', 'gris_ext'],
-                    help="sets the modeling domain", default='gris_ext')
+                    choices=['gris', 'gris_ext', 'jakobshavn'],
+                    help="sets the modeling domain", default='jakobshavn')
 parser.add_argument("--duration", dest="dura", type=int,
                     help="Length of simulation in years (integers)", default=10)
 parser.add_argument("-f", "--o_format", dest="oformat",
