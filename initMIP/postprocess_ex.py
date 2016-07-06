@@ -111,7 +111,7 @@ if __name__ == "__main__":
             print("Requested variable '{}' missing".format(m_var))
     nc.close()
     print('Copy {} to {}'.format(infile, tmp_file))
-    cmd = ['ncks', '-O',
+    cmd = ['ncks', '-O', '-d', 'time,1,',
            '-v', '{}'.format(','.join(pism_copy_vars)),
            infile, tmp_file]
     sub.call(cmd)
@@ -181,7 +181,7 @@ if __name__ == "__main__":
         print('Finalizing variable {}'.format(m_var))
         # Generate file
         print('  Copying to file {}'.format(final_file))
-        ncks_cmd = ['ncks', '-O', '-4', '-L', '3', '-d', 'time,1,'
+        ncks_cmd = ['ncks', '-O', '-4', '-L', '3',
                     '-v', ','.join([m_var,'lat','lon', 'lat_bnds', 'lon_bnds']),
                     out_file,
                     final_file]
@@ -192,7 +192,7 @@ if __name__ == "__main__":
                     '-v', ','.join(pism_stats_vars),
                     tmp_file,
                     final_file]
-        sub.call(ncks_cmd)
+        # sub.call(ncks_cmd)
         # Add coordinate vars and mapping
         print('  Adding coordinte and mapping variables')
         ncks_cmd = ['ncks', '-A', '-v', 'x,y,mapping',
