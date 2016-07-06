@@ -53,7 +53,7 @@ parser.add_argument("-f", "--o_format", dest="oformat",
                     help="output format", default='netcdf4_parallel')
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
-                    help="horizontal grid resolution", default=1500)
+                    help="horizontal grid resolution", default=600)
 parser.add_argument("--o_dir", dest="odir",
                     help="output directory. Default: current directory", default='.')
 parser.add_argument("--o_size", dest="osize",
@@ -64,7 +64,7 @@ parser.add_argument("-s", "--system", dest="system",
                     help="computer system to use.", default='pacman')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
-                    help="output size type", default='no_bath')
+                    help="output size type", default='cresisp')
 parser.add_argument("--bed_deformation", dest="bed_deformation",
                     choices=[None, 'lc', 'iso'],
                     help="Bed deformation model.", default=None)
@@ -83,7 +83,7 @@ parser.add_argument("--stress_balance", dest="stress_balance",
                     help="stress balance solver", default='ssa+sia')
 parser.add_argument("--dataset_version", dest="version",
                     choices=['2'],
-                    help="input data set version", default='2')
+                    help="input data set version", default='2_1985')
 parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity_approximation",
                     choices=['centered', 'upstream'],
                     help="How to approximate vertical velocities", default='upstream')
@@ -119,7 +119,7 @@ domain = options.domain
 pism_exec = generate_domain(domain)
 
 infile = ''
-if domain.lower() in ('greenland_ext', 'gris_ext', 'jakobshavn'):
+if domain.lower() in ('greenland_ext', 'gris_ext'):
     pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)

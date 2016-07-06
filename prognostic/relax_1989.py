@@ -28,7 +28,7 @@ parser.add_argument("--climate", dest="climate",
                     choices=['relax'],
                     help="Climate", default='relax')
 parser.add_argument("--climate_file", dest="climate_file",
-                    help="Climate file with temperature and climatic mass balance.", default=None)
+                    help="Climate file with temperature and climatic mass balance.", default='GR6b_ERAI_1989_2011_4800M_BIL_1989_mday-1.nc')
 parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'vonmises_calving'],
                     help="claving", default='vonmises_calving')
@@ -36,7 +36,7 @@ parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext', 'jakobshavn'],
                     help="sets the modeling domain", default='jakobshavn')
 parser.add_argument("--duration", dest="dura", type=int,
-                    help="Length of simulation in years (integers)", default=10)
+                    help="Length of simulation in years (integers)", default=25)
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
@@ -113,23 +113,24 @@ if not os.path.isfile(pism_config_nc):
 # set up relaxation simulation
 # ########################################################
 
-hydro = 'null'
+hydro = 'diffuse'
 
-sia_e = (3.0)
-ppq = (0.6)
-tefo = (0.02)
 ssa_n = (3.25)
 ssa_e = (1.0)
+eigen_calving_k = (1e18)
 
-calving_thk_threshold_values = [100, 300]
-calving_k_values = [1e18]
+thickness_calving_threshold_vales = [100, 300]
+sia_e_values = [1.25, 1.5, 3.0]
+ppq_values = [0.60]
+tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(calving_thk_threshold_values, calving_k_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+combinations = list(itertools.product(thickness_calving_threshold_vales, sia_e_values, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
-regridvars = 'age,litho_temp,enthalpy,tillwat,bmelt,Href'
+
+regridvars = 'litho_temp,enthalpy,tillwat,bmelt,Href'
 if regrid_thickness:
     regridvars = '{},thk'.format(regridvars)
 
@@ -144,7 +145,7 @@ end = dura
 
 for n, combination in enumerate(combinations):
 
-    calving_thk_threshold, calving_k , phi_min, phi_max, topg_min, topg_max = combination
+    thickness_calving_threshold, sia_e, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -161,8 +162,7 @@ for n, combination in enumerate(combinations):
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
         name_options['k'] = eigen_calving_k
-        name_options['threshold'] = thickness_calving_threshold
-    if calving in ('thickness_calving'):
+    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving'):
         name_options['threshold'] = thickness_calving_threshold
     name_options['ocean'] = ocean
     
@@ -225,7 +225,7 @@ for n, combination in enumerate(combinations):
                                                eigen_calving_k=eigen_calving_k,
                                                ocean_kill_file=pism_dataname)
 
-        exvars = "climatic_mass_balance_cumulative,tempsurf,diffusivity,temppabase,bmeltvelsurf_mag,mask,thk,topg,usurf,taud_mag,velsurf_mag,climatic_mass_balance,climatic_mass_balance_original,velbase_mag,tauc,taub_mag"
+        exvars = default_spatial_ts_vars()
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, start=start, end=end)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end)
         
