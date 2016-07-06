@@ -157,7 +157,7 @@ ssa_n = (3.25)
 ssa_e = (1.0)
 eigen_calving_k = (1e18)
 
-thickness_calving_threshold_vales = [300]
+thickness_calving_threshold_vales = [300, 400]
 sia_e_values = [1.25, 1.5, 3.0]
 ppq_values = [0.60]
 tefo_values = [0.020]
@@ -194,8 +194,7 @@ for n, combination in enumerate(combinations):
     name_options['calving'] = calving
     if calving in ('eigen_calving'):
         name_options['k'] = eigen_calving_k
-        name_options['threshold'] = thickness_calving_threshold
-    if calving in ('thickness_calving'):
+    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
         name_options['threshold'] = thickness_calving_threshold
     name_options['ocean'] = ocean
 
@@ -290,7 +289,7 @@ for n, combination in enumerate(combinations):
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
         
-        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> job.${batch}  2>&1'.format(batch=batch_system['job_id'])])
+            cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
 
         f.write(cmd)
         f.write('\n')
