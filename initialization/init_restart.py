@@ -94,7 +94,7 @@ version = options.version
 domain = options.domain
 pism_exec = generate_domain(domain)
 
-    
+
 infile = ''
 if domain.lower() in ('greenland_ext', 'gris_ext'):
     pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
@@ -102,6 +102,7 @@ else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
+save_times = [-125000, -25000, -20000, -15000, -11700, -1000, -500, -200, -100, -5]
 
     
 pism_config = 'init_config'
@@ -221,7 +222,8 @@ for n, combination in enumerate(combinations):
             sb_params_dict['ssa_n'] = ssa_n
             sb_params_dict['pseudo_plastic_q'] = ppq
             sb_params_dict['till_effective_fraction_overburden'] = tefo
-            sb_params_dict['topg_to_phi'] = ttphi
+            if start == paleo_start_year:
+                sb_params_dict['topg_to_phi'] = ttphi
             sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
 
             stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
@@ -236,11 +238,12 @@ for n, combination in enumerate(combinations):
                                                 start=paleo_start_year,
                                                 end=paleo_end_year,
                                                 odir=odir)
+            snap_shot_dict = generate_snap_shots(outfile, save_times, odir=odir)
 
             if start == paleo_start_year:
                 all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
             else:
-                all_params_dict = merge_dicts(general_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)                
+                all_params_dict = merge_dicts(general_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)                
             all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
 
             cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
