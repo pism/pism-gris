@@ -392,9 +392,6 @@ def generate_stress_balance(stress_balance, additional_params_dict):
         params_dict['part_redist'] = ''
         params_dict['sia_flow_law'] = 'gpbld3'
         params_dict['pseudo_plastic'] = ''
-        params_dict['pseudo_plastic_q'] = additional_params_dict['pseudo_plastic_q']
-        params_dict['till_effective_fraction_overburden'] = additional_params_dict['till_effective_fraction_overburden']
-        params_dict['topg_to_phi'] = additional_params_dict['topg_to_phi']
         params_dict['tauc_slippery_grounding_lines'] = ''
 
     return merge_dicts(additional_params_dict, params_dict)
