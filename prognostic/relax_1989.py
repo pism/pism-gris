@@ -65,6 +65,9 @@ parser.add_argument("--stress_balance", dest="stress_balance",
 parser.add_argument("--dataset_version", dest="version",
                     choices=['2'],
                     help="input data set version", default='2_1985')
+parser.add_argument("--hydrology", dest="hydrology",
+                    choices=['null', 'diffuse', 'routing', 'distributed'],
+                    help="Basal hydrology model.", default='diffuse')
 
 
 options = parser.parse_args()
@@ -86,6 +89,7 @@ climate = options.climate
 climate_file = options.climate_file
 forcing_type = options.forcing_type
 grid = options.grid
+hydro = options.hydro
 bed_type = options.bed_type
 ocean = options.ocean
 version = options.version
@@ -113,7 +117,6 @@ if not os.path.isfile(pism_config_nc):
 # set up relaxation simulation
 # ########################################################
 
-hydro = 'diffuse'
 
 ssa_n = (3.25)
 ssa_e = (1.0)
@@ -165,6 +168,8 @@ for n, combination in enumerate(combinations):
     if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving'):
         name_options['threshold'] = thickness_calving_threshold
     name_options['ocean'] = ocean
+    name_options['hydro'] = hydro
+    
     
     vversion = 'v' + str(version)
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
