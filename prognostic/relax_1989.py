@@ -51,7 +51,7 @@ parser.add_argument("--ocean", dest="ocean",
                              'given_mbp'],
                     help="ocean", default='given')
 parser.add_argument("-s", "--system", dest="system",
-                    choices=['pleiades', 'fish', 'pacman', 'debug'],
+                    choices=['pleiades', 'fish', 'pacman', 'debug', 'chinook'],
                     help="computer system to use.", default='pacman')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
