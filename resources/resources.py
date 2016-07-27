@@ -412,6 +412,8 @@ def generate_hydrology(hydro, **kwargs):
         params_dict['hydrology_null_diffuse_till_water'] = ''
     elif hydro in ('routing'):
         params_dict['hydrology'] = 'routing'
+    elif hydro in ('distributed'):
+        params_dict['hydrology'] = 'distributed'
     else:
         print('hydrology {} not recognized, exiting'.format(hydro))
         import sys
