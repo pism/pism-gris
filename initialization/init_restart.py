@@ -33,7 +33,7 @@ parser.add_argument("--calving", dest="calving",
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris_ext')
-parser.add_argument("--exstep", dest="exstep",
+parser.add_argument("--exstep", dest="exstep", type=int,
                     help="Writing interval for spatial time series", default=100)
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
