@@ -33,6 +33,8 @@ parser.add_argument("--calving", dest="calving",
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris_ext')
+parser.add_argument("--exstep", dest="exstep", type=float,
+                    help="Writing interval for spatial time series", default=100)
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
@@ -87,6 +89,7 @@ bed_type = options.bed_type
 calving = options.calving
 climate = options.climate
 forcing_type = options.forcing_type
+exstep = options.exstep
 grid = options.grid
 hydrology = options.hydrology
 regridfile = options.regridfile
@@ -143,7 +146,6 @@ topg_max_values = [700]
 combinations = list(itertools.product(ocean_melt_power_values, thickness_calving_threshold_values, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
-exstep = 100
 
 scripts = []
 scripts_post = []
