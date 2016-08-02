@@ -23,7 +23,7 @@ parser.add_argument("-n", '--n_procs', dest="n", type=int,
 parser.add_argument("-w", '--wall_time', dest="walltime",
                     help='''walltime. default: 12:00:00.''', default="12:00:00")
 parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
-                    help='''queue. default=t1standard.''', default='t1standard')
+                    help='''queue. default=long.''', default='long')
 parser.add_argument("--climate", dest="climate",
                     choices=['const', 'paleo'],
                     help="Climate", default='paleo')
@@ -50,7 +50,7 @@ parser.add_argument("--o_size", dest="osize",
                     help="output size type", default='2dbig')
 parser.add_argument("-s", "--system", dest="system",
                     choices=list_systems(),
-                    help="computer system to use.", default='pacman')
+                    help="computer system to use.", default='pleiades_broadwell')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
                     help="output size type", default='ctrl')
