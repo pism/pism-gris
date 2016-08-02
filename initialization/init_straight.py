@@ -29,7 +29,7 @@ parser.add_argument("--climate", dest="climate",
                     help="Climate", default='paleo')
 parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
-                    help="claving", default='thickness_calving')
+                    help="claving", default='vonmises_calving')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris_ext')
