@@ -79,6 +79,7 @@ def default_spatial_ts_vars():
               'temppabase',
               'tempsurf',
               'thk',
+              'tillwat',
               'topg',
               'usurf',
               'velbar',
@@ -496,7 +497,6 @@ def generate_ocean(ocean, **kwargs):
     '''
 
     params_dict = OrderedDict()
-    print ocean
     if ocean == 'paleo':
         params_dict['ocean'] = 'given,delta_SL,frac_SMB'
         if 'ocean_delta_SL_file' not in kwargs:
