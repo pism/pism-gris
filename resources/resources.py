@@ -474,7 +474,9 @@ def generate_climate(climate, **kwargs):
         if 'temp_lapse_rate' not in kwargs:
             params_dict['temp_lapse_rate'] = 0.0
         params_dict['surface'] = 'pdd'
-    elif climate in ('const', 'relax', 'given'):
+    elif climate in ('const'):
+        params_dict['surface'] = 'given'
+    elif climate in ('relax', 'given'):
         params_dict['surface'] = 'given'
     elif climate in ('flux'):
         params_dict['surface'] = 'given,forcing'
@@ -494,11 +496,12 @@ def generate_ocean(ocean, **kwargs):
     '''
 
     params_dict = OrderedDict()
-    if ocean in ('paleo'):
+    print ocean
+    if ocean == 'paleo':
         params_dict['ocean'] = 'given,delta_SL,frac_SMB'
         if 'ocean_delta_SL_file' not in kwargs:
             params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
-    elif ocean in ('paleo_const'):
+    elif ocean == 'paleo_const':
         params_dict['ocean'] = 'given,delta_SL'        
         if 'ocean_delta_SL_file' not in kwargs:
             params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
@@ -506,7 +509,7 @@ def generate_ocean(ocean, **kwargs):
         params_dict['ocean'] = 'given'
     elif ocean in ('given_mbp'):
         params_dict['ocean'] = 'given,delta_MBP'
-    elif ocean in ('const'):
+    elif ocean == 'const':
         params_dict['ocean'] = 'constant'
     else:
         print('ocean {} not recognized, exiting'.format(ocean))

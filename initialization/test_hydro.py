@@ -220,8 +220,8 @@ for n, combination in enumerate(combinations):
         sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
-        climate_params_dict = generate_climate(climate, atmosphere_searise_greenland_file=pism_dataname)
-        ocean_params_dict = generate_ocean(climate)
+        climate_params_dict = generate_climate(climate, surface_given_file=pism_dataname)
+        ocean_params_dict = generate_ocean('const')
         hydro_params_dict = generate_hydrology(hydrology, till_reference_void_ratio=till_reference_void_ratio)
         calving_params_dict = generate_calving(calving, ocean_kill_file=pism_dataname)
 
