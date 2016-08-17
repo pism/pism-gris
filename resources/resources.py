@@ -611,6 +611,8 @@ def make_batch_header(system, cores, walltime, queue):
                           'queue' : {
                               't1standard' : 24,
                               't1small' : 24,
+                              't2standard' : 24,
+                              't2small' : 24,
                               'debug' : 24}}
     mpido = 'mpiexec.hydra -n {cores}'.format(cores=cores)
     systems['pleiades'] = {'mpido' : mpido,
