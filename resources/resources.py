@@ -329,7 +329,7 @@ def generate_grid_description(grid_resolution, domain):
     grid_options['skip'] = ''
     grid_options['skip_max'] = skip_max
 
-    grid_dict = merge_dicts( horizontal_grid, vertical_grid)
+    grid_dict = merge_dicts(horizontal_grid, vertical_grid, grid_options)
 
     return grid_dict
 
