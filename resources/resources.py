@@ -267,7 +267,7 @@ def generate_snap_shots(outfile, times, odir=None):
     return params_dict
 
 
-def generate_grid_description(grid_resolution, domain):
+def generate_grid_description(grid_resolution, domain, restart=False):
     '''
     Generate grid description dict
 
@@ -331,7 +331,10 @@ def generate_grid_description(grid_resolution, domain):
 
     grid_dict = merge_dicts(horizontal_grid, vertical_grid, grid_options)
 
-    return grid_dict
+    if restart is True:
+        return grid_options
+    else:
+        return grid_dict
 
 
 def merge_dicts(*dict_args):
