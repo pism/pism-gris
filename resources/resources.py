@@ -306,15 +306,15 @@ def generate_grid_description(grid_resolution, domain):
         mz = 401
         mzb = 41
     elif (grid_resolution >= 1200) and (grid_resolution < 4500):
-        skip_max = 50
+        skip_max = 100
         mz = 201
         mzb = 21
     elif (grid_resolution >= 4500) and (grid_resolution < 18000):
-        skip_max = 20
+        skip_max = 50
         mz = 201
         mzb = 21
     else:
-        skip_max = 10
+        skip_max = 20
         mz = 101
         mzb = 11
 
