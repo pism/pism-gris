@@ -303,15 +303,15 @@ def generate_grid_description(grid_resolution, domain, restart=False):
 
     if grid_resolution < 1200:
         skip_max = 200
-        mz = 401
+        mz = 501
         mzb = 41
     elif (grid_resolution >= 1200) and (grid_resolution < 4500):
         skip_max = 100
-        mz = 201
+        mz = 251
         mzb = 21
     elif (grid_resolution >= 4500) and (grid_resolution < 18000):
         skip_max = 50
-        mz = 201
+        mz = 251
         mzb = 21
     else:
         skip_max = 20
@@ -319,7 +319,7 @@ def generate_grid_description(grid_resolution, domain, restart=False):
         mzb = 11
 
     vertical_grid = OrderedDict()
-    vertical_grid['Lz'] = 4000
+    vertical_grid['Lz'] = 5000
     vertical_grid['Lbz'] = 2000
     vertical_grid['z_spacing'] = 'equal'
     vertical_grid['Mz'] = mz
