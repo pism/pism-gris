@@ -722,3 +722,18 @@ cd $PBS_O_WORKDIR
 """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
 
     return header, systems[system]
+
+def make_batch_post_header(system):
+
+    if system in ('pleiades', 'pleiades_ivy', 'pleiades_broadwell'):
+
+        header = """#PBS -S /bin/bash
+#PBS -lselect=1:mem=94GB
+#PBS -lwalltime=8:00:00
+#PBS -q ldan
+
+module list
+
+cd $PBS_O_WORKDIR
+"""
+        return header

@@ -259,7 +259,12 @@ for n, combination in enumerate(combinations):
     script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
     scripts_post.append(script_post)
 
+    post_header = make_batch_post_header(system)
+
     with open(script_post, 'w') as f:
+
+        f.write(post_header)
+
         extra_file = spatial_ts_dict['extra_file']
         myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(paleo_start_year+exstep, paleo_end_year, exstep)])
         myoutfile = extra_file + '.nc'
@@ -274,4 +279,7 @@ for n, combination in enumerate(combinations):
 scripts = uniquify_list(scripts)
 scripts_post = uniquify_list(scripts_post)
 print '\n'.join([script for script in scripts])
-print('written')
+print('\nwritten\n')
+print '\n'.join([script for script in scripts_post])
+print('\nwritten\n')
+
