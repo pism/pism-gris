@@ -732,8 +732,10 @@ def make_batch_post_header(system):
 #PBS -lwalltime=8:00:00
 #PBS -q ldan
 
-module load nco/4.3.2 
 module list
+
+# nco, etc.
+export PATH=$HOME/local/bin:$PATH
 
 cd $PBS_O_WORKDIR
 
