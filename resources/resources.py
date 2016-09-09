@@ -734,9 +734,6 @@ def make_batch_post_header(system):
 
 module list
 
-# nco, etc.
-export PATH=$HOME/local/bin:$PATH
-
 cd $PBS_O_WORKDIR
 
 """
