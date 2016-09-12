@@ -108,10 +108,14 @@ else:
 pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
-if not os.path.isfile(pism_config_nc):
-    cmd = ['ncgen', '-o',
-           pism_config_nc, pism_config_cdl]
-    sub.call(cmd)
+# Anaconda libssl problem on chinook
+if system in ('chinook'):
+    ncgen = '/usr/bin/ncgen'
+else:
+    ncgen = 'ncgen'
+cmd = [ncgen, '-o',
+       pism_config_nc, pism_config_cdl]
+sub.call(cmd)
 if not os.path.isdir(odir):
     os.mkdir(odir)
 odir_tmp = '_'.join([odir, 'tmp'])
