@@ -62,6 +62,7 @@ def default_spatial_ts_vars():
               'dHdt',
               'diffusivity',
               'discharge_flux',
+              'eigen_calving_rate',
               'flux_divergence',
               'height_above_flotation',
               'ice_mass',
@@ -81,6 +82,7 @@ def default_spatial_ts_vars():
               'thk',
               'tillwat',
               'topg',
+              'topg_sl_adjusted',
               'usurf',
               'velbar',
               'velbase',
@@ -93,6 +95,7 @@ def default_spatial_ts_vars():
               'wvelsurf']
     
     return exvars
+
 
 def ismip6_spatial_ts_vars():
     '''
@@ -140,6 +143,7 @@ def ismip6_spatial_ts_vars():
               'wvelsurf']
     
     return exvars
+
 
 def init_spatial_ts_vars():
     '''
