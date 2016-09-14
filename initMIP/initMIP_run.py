@@ -38,8 +38,8 @@ parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
                     help="horizontal grid resolution", default=1200)
 parser.add_argument("--o_size", dest="osize",
-                    choices=['small', 'medium', 'big', '2dbig'],
-                    help="output size type", default='2dbig')
+                    choices=['small', 'medium', 'big', 'big_2d'],
+                    help="output size type", default='big_2d')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
                     help="output size type", default='no_bath')

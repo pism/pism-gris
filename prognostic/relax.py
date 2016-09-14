@@ -44,8 +44,8 @@ parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
                     help="horizontal grid resolution", default=9000)
 parser.add_argument("--o_size", dest="osize",
-                    choices=['small', 'medium', 'big', '2dbig'],
-                    help="output size type", default='2dbig')
+                    choices=['small', 'medium', 'big', 'big_2d'],
+                    help="output size type", default='big_2d')
 parser.add_argument("-s", "--system", dest="system",
                     choices=['pleiades', 'fish', 'pacman', 'debug'],
                     help="computer system to use.", default='pacman')
