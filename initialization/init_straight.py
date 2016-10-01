@@ -259,6 +259,7 @@ for n, combination in enumerate(combinations):
         myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -4 -L 3', myfiles, myoutfile, '\n'])
         f.write(cmd)
+        outfiles = [outfile]
         for myfile in outfiles:
             cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, myfile), os.path.join(odir, myfile), '\n'])
             f.write(cmd)
