@@ -246,6 +246,8 @@ for n, combination in enumerate(combinations):
 
         f.write(cmd)
         f.write('\n')
+        
+    post_header = make_batch_post_header(system)
 
     with open(script_post, 'w') as f:
 
