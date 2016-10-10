@@ -741,4 +741,20 @@ module list
 cd $PBS_O_WORKDIR
 
 """
+    elif system in ('chinook'):
+        header = """#!/bin/bash
+#PBS -q t2short
+#PBS -l walltime=12:00:00
+#PBS -l nodes=1:ppn=1
+#PBS -j oe
+
+module list
+
+cd $PBS_O_WORKDIR
+
+"""
+    else:
+        header = """#!/bin/bash
+
+"""
         return header
