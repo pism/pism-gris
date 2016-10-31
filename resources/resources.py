@@ -638,8 +638,8 @@ def make_batch_header(system, cores, walltime, queue):
                            'work_dir' : 'PBS_O_WORKDIR',
                            'job_id' : 'PBS_JOBID',
                            'queue' : {
-                               'long' : 12,
-                               'normal': 12}}
+                               'long' : 24,
+                               'normal': 24}}
     systems['pleiades_ivy'] = {'mpido' : mpido,
                            'submit' : 'qsub',
                            'work_dir' : 'PBS_O_WORKDIR',
