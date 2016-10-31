@@ -735,6 +735,21 @@ module list
 cd $PBS_O_WORKDIR
 
 """.format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
+    elif system in ('pleiades_ivy'):
+        
+        header = """#PBS -S /bin/bash
+#PBS -N cfd
+#PBS -l walltime={walltime}
+#PBS -m e
+#PBS -q {queue}
+#PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=ivy
+#PBS -j oe
+
+module list
+
+cd $PBS_O_WORKDIR
+
+""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
     else:
         header = """#!/bin/bash
 #PBS -q {queue}
@@ -752,7 +767,7 @@ cd $PBS_O_WORKDIR
 
 def make_batch_post_header(system):
 
-    if system in ('pleiades', 'pleiades_ivy', 'pleiades_broadwell'):
+    if system in ('pleiades', 'pleiades_ivy', 'pleiades_broadwell', 'pleiades_haswell'):
 
         header = """#PBS -S /bin/bash
 #PBS -lselect=1:mem=94GB
