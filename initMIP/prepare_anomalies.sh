@@ -1,12 +1,15 @@
 #!/bin/bash
 set -x -e
-N=4
 
 pism_grid=3000
 if [ $# -gt 0 ] ; then
   pism_grid="$1"
 fi
+if [ $# -gt 1 ] ; then
+  N="$2"
+fi
 
+cdo=/opt/local/bin/cdo
 method='con'
 pism_grid_file=g${pism_grid}m.nc
 create_greenland_ext_epsg3413_grid.py -g ${pism_grid} $pism_grid_file
@@ -58,8 +61,11 @@ ncks -O -v mapping,lat,lon,bheatflx,topg,thk,precipitation,ice_surface_temp,clim
 ncrename -O -d x1,x -d y1,y -v x1,x -v y1,y $PISMVERSION $PISMVERSION
 nc2cdo.py $PISMVERSION
 echo "done."
-
-EXTRAPOLATE=on cdo -P $N remap${method},$pism_grid_file $PISMVERSION smb_Greenland_${pism_grid}m.nc
+if [[ $N == 1 ]] ; then
+    EXTRAPOLATE=on $cdo remap${method},$pism_grid_file $PISMVERSION smb_Greenland_${pism_grid}m.nc
+else
+    EXTRAPOLATE=on $cdo -P $N remap${method},$pism_grid_file $PISMVERSION smb_Greenland_${pism_grid}m.nc
+fi    
 mpiexec -n $N fill_missing_petsc.py -v climatic_mass_balance,ice_surface_temp smb_Greenland_${pism_grid}m.nc tmp_smb_Greenland_${pism_grid}m.nc
 ncks -A -v climatic_mass_balance,ice_surface_temp tmp_smb_Greenland_${pism_grid}m.nc smb_Greenland_racmo_1960-1990_${pism_grid}m.nc
 ncks -A -v x,y,mapping ${pism_grid_file} smb_Greenland_racmo_1960-1990_${pism_grid}m.nc
@@ -68,8 +74,13 @@ bagrid=ba1kmgrid.nc
 create_greenland_bamber_grid.py -g 1000 $bagrid
 ncks -O -v dummy -x $bagrid $anomalyfile
 ncks -A -v DSMB $inanomalyfile $anomalyfile
+if [[ $N == 1 ]] ; then
+    EXTRAPOLATE=on $cdo remap${method},$pism_grid_file $anomalyfile $anomalyfile_epsg3431
+else
+    EXTRAPOLATE=on $cdo -P $N remap${method},$pism_grid_file $anomalyfile $anomalyfile_epsg3431
+fi
 
-cdo -P $N remap${method},$pism_grid_file $anomalyfile $anomalyfile_epsg3431
+ncks -a x,y,mapping $pism_grid_file $anomalyfile_epsg3431
 
 outfilepre=initMIP_climate_forcing_${pism_grid}m_100a
 nc2cdo.py pism_Greenland_ext_${pism_grid}m_mcb_jpl_v2.nc
