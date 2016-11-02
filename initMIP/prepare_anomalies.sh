@@ -7,11 +7,15 @@ if [ $# -gt 0 ] ; then
   pism_grid="$1"
 fi
 
+method='con'
 pism_grid_file=g${pism_grid}m.nc
 create_greenland_ext_epsg3413_grid.py -g ${pism_grid} $pism_grid_file
 nc2cdo.py $pism_grid_file
 
 pismsmbfile=smb_$pism_grid
+inanomalyfile=dsmb_01B13_ISMIP6_v2.nc
+anomalyfile=dsmb_01B13_ISMIP6_v3.nc
+anomalyfile_epsg3431=dsmb_${pism_grid}m.nc
 
 # get file; see page http://websrv.cs.umt.edu/isis/index.php/Present_Day_Greenland
 DATAVERSION=1.1
@@ -55,16 +59,24 @@ ncrename -O -d x1,x -d y1,y -v x1,x -v y1,y $PISMVERSION $PISMVERSION
 nc2cdo.py $PISMVERSION
 echo "done."
 
-EXTRAPOLATE=on cdo -P $N remapbil,$pism_grid_file $PISMVERSION smb_Greenland_${pism_grid}m.nc
+EXTRAPOLATE=on cdo -P $N remap${method},$pism_grid_file $PISMVERSION smb_Greenland_${pism_grid}m.nc
 mpiexec -n $N fill_missing_petsc.py -v climatic_mass_balance,ice_surface_temp smb_Greenland_${pism_grid}m.nc tmp_smb_Greenland_${pism_grid}m.nc
 ncks -A -v climatic_mass_balance,ice_surface_temp tmp_smb_Greenland_${pism_grid}m.nc smb_Greenland_racmo_1960-1990_${pism_grid}m.nc
 ncks -A -v x,y,mapping ${pism_grid_file} smb_Greenland_racmo_1960-1990_${pism_grid}m.nc
 
+bagrid=ba1kmgrid.nc
+create_greenland_bamber_grid.py -g 1000 $bagrid
+ncks -O -v dummy -x $bagrid $anomalyfile
+ncks -A -v DSMB $inanomalyfile $anomalyfile
+
+cdo -P $N remap${method},$pism_grid_file $anomalyfile $anomalyfile_epsg3431
+
 outfilepre=initMIP_climate_forcing_${pism_grid}m_100a
 nc2cdo.py pism_Greenland_ext_${pism_grid}m_mcb_jpl_v2.nc
-python create_anomalies.py --topo_file pism_Greenland_ext_${pism_grid}m_mcb_jpl_v2.nc --background_file smb_Greenland_racmo_1960-1990_${pism_grid}m.nc ${outfilepre}_asmb.nc
+python create_anomalies_from_file.py --topo_file pism_Greenland_ext_${pism_grid}m_mcb_jpl_v2.nc --anomaly_file $anomalyfile_epsg3431 --background_file smb_Greenland_racmo_1960-1990_${pism_grid}m.nc ${outfilepre}_asmb.nc
 ncks -A -v x,y,mapping ${pism_grid_file} ${outfilepre}_asmb.nc
-ncatted  -a units,ice_surface_temp,o,c,"Celsius" -a standard_name,ice_surface_temp,o,c,"air_temperature"  -a units,climatic_mass_balance,o,c,"kg m-2 year-1" -a standard_name,climatic_mass_balance,o,c,"land_ice_surface_specific_mass_balance" -a grid_mapping,climatic_mass_balance,o,c,"mapping" -a grid_mapping,ice_surface_temp,o,c,"mapping" ${outfilepre}_asmb.nc
+ncatted  -a units,ice_surface_temp,o,c,"Celsius" -a standard_name,ice_surface_temp,o,c,"air_temperature"  -a units,climatic_mass_balance,o,c,"kg m-2 year-1" -a _FillValue,climatic_mass_balance,d,, -a _FillValue,ice_surface_temp,d,, -a standard_name,climatic_mass_balance,o,c,"land_ice_surface_specific_mass_balance" -a grid_mapping,climatic_mass_balance,o,c,"mapping" -a grid_mapping,ice_surface_temp,o,c,"mapping" ${outfilepre}_asmb.nc
+ncap2 -O -s "where(climatic_mass_balance>1.e10) climatic_mass_balance=-10000.;" ${outfilepre}_asmb.nc ${outfilepre}_asmb.nc
 ncks -O -d time,0 ${outfilepre}_asmb.nc ${outfilepre}_ctrl.nc
 
 
