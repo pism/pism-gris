@@ -254,17 +254,7 @@ for n, combination in enumerate(combinations):
     
 scripts = uniquify_list(scripts)
 
-submit = 'submit_{domain}_g{grid}m_{climate}.sh'.format(domain=domain.lower(), grid=grid, climate=climate, bed_type=bed_type)
-try:
-    os.remove(submit)
-except OSError:
-    pass
+print '\n'.join([script for script in scripts])
+print('\nwritten\n')
 
-with open(submit, 'w') as f:
-
-    f.write('#!/bin/bash\n')
-    for k in range(len(scripts)):
-        f.write('JOBID=$({batch_submit} {script})\n'.format(batch_submit=batch_system['submit'], script=scripts[k]))
-
-print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
 

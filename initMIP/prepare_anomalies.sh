@@ -10,7 +10,7 @@ if [ $# -gt 1 ] ; then
 fi
 
 cdo=/opt/local/bin/cdo
-method='con'
+method='ycon'
 pism_grid_file=g${pism_grid}m.nc
 create_greenland_ext_epsg3413_grid.py -g ${pism_grid} $pism_grid_file
 nc2cdo.py $pism_grid_file
@@ -80,7 +80,8 @@ else
     EXTRAPOLATE=on $cdo -P $N remap${method},$pism_grid_file $anomalyfile $anomalyfile_epsg3431
 fi
 
-ncks -a x,y,mapping $pism_grid_file $anomalyfile_epsg3431
+ncks -A -v x,y,mapping $pism_grid_file $anomalyfile_epsg3431
+ncatted -a grid_mapping,DSMB,o,c,"mapping" $anomalyfile_epsg3431
 
 outfilepre=initMIP_climate_forcing_${pism_grid}m_100a
 nc2cdo.py pism_Greenland_ext_${pism_grid}m_mcb_jpl_v2.nc
