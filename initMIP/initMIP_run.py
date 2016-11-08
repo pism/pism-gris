@@ -209,7 +209,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['o'] = os.path.join(odir, outfile)
         general_params_dict['o_format'] = oformat
         general_params_dict['o_size'] = osize
-        general_params_dict['config_override'] = 'init_config.nc'
+        general_params_dict['config_override'] = pism_config_nc
         if bed_deformation is not None:
             general_params_dict['bed_def'] = bed_deformation
         if forcing_type in ('e_age'):
