@@ -30,8 +30,8 @@ parser.add_argument("-e", "--experiment", dest="experiment",
 parser.add_argument('--id', dest="id", type=str,
                     help='''Experiemnt ID''', default='1')
 parser.add_argument("-r", "--remap_method", dest="remap_method",
-                    choices=['con', 'bil'],
-                    help="Remapping method", default='con')
+                    choices=['ycon', 'bil'],
+                    help="Remapping method", default='ycon')
 parser.add_argument("-t", "--target_resolution", dest="target_resolution", type=int,
                     choices=[1000, 5000],
                     help="Horizontal grid resolution", default=5000)

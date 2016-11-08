@@ -111,7 +111,7 @@ else:
     
 infile = filename
 
-pism_config = 'init_config'
+pism_config = 'init_config_old'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
 # Anaconda libssl problem on chinook

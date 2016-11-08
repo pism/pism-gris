@@ -1,0 +1,37 @@
+netcdf pism_overrides {
+    variables:
+    byte pism_overrides;
+
+    pism_overrides:air_temp_all_precip_as_snow = 272.15;
+    pism_overrides:air_temp_all_precip_as_snow_doc = "Kelvin; threshold temperature below which all precipitation is snow";
+
+    pism_overrides:air_temp_all_precip_as_rain = 274.15;
+    pism_overrides:air_temp_all_precip_as_rain_doc = "Kelvin; threshold temperature above which all precipitation is rain; must exceed air_temp_all_precip_as_snow to avoid division by zero, because difference is in a denominator";
+
+    pism_overrides:pdd_refreeze_ice_melt = "no";
+    pism_overrides:pdd_refreeze_ice_melt_doc = "If set to 'yes', refreeze pdd_refreeze fraction of melted ice, otherwise all of the melted ice runs off.";
+
+    pism_overrides:institution = "University of Alaska Fairbanks";
+    pism_overrides:institution_doc = "Institution name. This string is written to output files as the 'institution' global attribute.";
+
+    pism_overrides:backup_interval = 20.0;
+    pism_overrides:backup_interval_doc = "hours; wall-clock time between automatic backups";
+    
+    pism_overrides:force_to_thickness_alpha = 0.001;
+    pism_overrides:force_to_thickness_alpha_doc = "yr-1; exponential coefficient in force-to-thickness mechanism";
+
+    pism_overrides:force_to_thickness_ice_free_alpha_factor = 100.0;
+    pism_overrides:force_to_thickness_ice_free_alpha_factor_doc = "; force_to_thickness_alpha is multiplied by this factor in areas that are ice-free according to the target ice thickness and force_to_thickness_ice_free_thickness_threshold";
+
+    pism_overrides:ocean_sub_shelf_heat_flux_into_ice = 50.0;
+    pism_overrides:ocean_sub_shelf_heat_flux_into_ice_doc = "W m-2; = J m-2 s-1; naively chosen default value for heat from ocean; see comments in @ref pism::POConstant::shelf_base_mass_flux().";
+
+    pism_overrides:climate_forcing_buffer_size = 13;
+    pism_overrides:climate_forcing_buffer_size_doc = "; number of 2D climate forcing records to keep in memory; = 5 years of monthly records";
+
+    pism_overrides:mask_icefree_thickness_standard_units = "meters";
+    pism_overrides:mask_icefree_thickness_standard_type = "scalar";
+    pism_overrides:mask_icefree_thickness_standard = 10.0;
+    pism_overrides:mask_icefree_thickness_standard_doc = "If ice is thinner than this standard then the mask is set to MASK_ICE_FREE_BEDROCK or MASK_ICE_FREE_OCEAN.";
+
+}
