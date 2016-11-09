@@ -142,7 +142,7 @@ ssa_e = (1.0)
 eigen_calving_k = 1e18
 
 thickness_calving_threshold_vales = [50]
-ppq_values = [0.33, 0.6]
+ppq_values = [0.33]
 tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]

@@ -1,0 +1,31 @@
+# initMIP 2016_11 submission
+# we use PISM revision ec1d1bc
+
+
+# EXP1 without relaxation
+    
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 4500 -e ctrl -n 84 -w 2:00:00 -q normal -d gris -b no_bath --o_size small --o_dir 2016_11_paleo 2016_07_paleo/gris_g4500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 4500 -e asmb -n 84 -w 2:00:00 -q normal -d gris -b no_bath --o_size small --o_dir 2016_11_paleo 2016_07_paleo/gris_g4500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 3000 -e ctrl -n 84 -w 5:00:00 -q normal -d gris -b no_bath --o_size small  --o_dir 2016_11_paleo 2016_07_paleo/gris_g3000m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 3000 -e asmb -n 84 -w 5:00:00 -q normal -d gris -b no_bath --o_size small --o_dir 2016_11_paleo 2016_07_paleo/gris_g3000m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 1500 -e ctrl -n 168 -w 10:00:00 -q long -d gris -b no_bath --o_size small --o_dir 2016_11_paleo 2016_07_paleo/gris_g1500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 1500 -e asmb -n 168 -w 10:00:00 -q long -d gris -b no_bath --o_size small --o_dir 2016_11_paleo 2016_07_paleo/gris_g1500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+# EXP2 with relaxation
+
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 4500 -e ctrl -n 84 -w 2:00:00 -q normal -d gris -b no_bath --o_size small --o_dir 2016_11_relax 2016_07_relax/gris_g4500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 4500 -e asmb -n 84 -w 2:00:00 -q normal -d gris -b no_bath --o_size small --o_dir 2016_11_relax 2016_07_relax/gris_g4500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 3000 -e ctrl -n 84 -w 5:00:00 -q normal -d gris -b no_bath --o_size small  --o_dir 2016_11_relax 2016_07_relax/gris_g3000m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 3000 -e asmb -n 84 -w 5:00:00 -q normal -d gris -b no_bath --o_size small --o_dir 2016_11_relax 2016_07_relax/gris_g3000m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 1500 -e ctrl -n 168 -w 10:00:00 -q long -d gris -b no_bath --o_size small --o_dir 2016_11_relax 2016_07_relax/gris_g1500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 1500 -e asmb -n 168 -w 10:00:00 -q long -d gris -b no_bath --o_size small --o_dir 2016_11_relax 2016_07_relax/gris_g1500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
