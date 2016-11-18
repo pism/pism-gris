@@ -18,6 +18,8 @@ grid_choices = [18000, 9000, 6000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900
 # set up the option parser
 parser = ArgumentParser()
 parser.description = "Generating scripts for model initialization."
+parser.add_argument("FILE", nargs=1,
+                    help="Input file to restart from", default=None)
 parser.add_argument("-n", '--n_procs', dest="n", type=int,
                     help='''number of cores/processors. default=140.''', default=140)
 parser.add_argument("-w", '--wall_time', dest="walltime",
@@ -97,15 +99,20 @@ version = options.version
 domain = options.domain
 pism_exec = generate_domain(domain)
 
+if options.FILE is None:
+    print('Missing input file')
+    import sys
+    sys.exit()
+else:
+    input_file = options.FILE[0]
 
-infile = ''
 if domain.lower() in ('greenland_ext', 'gris_ext'):
     pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
-save_times = [-125000, -25000, -20000, -15000, -12500, -11700, -1000, -500, -200, -100, -5]
+save_times = [-20000, -15000, -11700, -1000, -500, -200, -100, -5]
 
     
 pism_config = 'init_config'
@@ -150,9 +157,9 @@ tsstep = 'yearly'
 scripts = []
 scripts_post = []
 
-paleo_start_year = -125000
+paleo_start_year = -25000
 paleo_end_year = 0
-restart_step = 25000
+restart_step = 12500
 
 for n, combination in enumerate(combinations):
 
@@ -172,7 +179,7 @@ for n, combination in enumerate(combinations):
     
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
-    full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
+    full_outfile = '{domain}_g{grid}m_lgm_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
 
     outfiles = []
 
@@ -182,7 +189,7 @@ for n, combination in enumerate(combinations):
 
         experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
-        script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+        script = 'lgm_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
         scripts.append(script)
 
         for filename in (script):
@@ -205,6 +212,9 @@ for n, combination in enumerate(combinations):
             if start == paleo_start_year:
                 general_params_dict['bootstrap'] = ''
                 general_params_dict['i'] = pism_dataname
+                general_params_dict['regrid_file'] = input_file
+                general_params_dict['regrid_vars'] = regridvars
+                general_params_dict['regrid_special'] = ''
             else:
                 general_params_dict['i'] = regridfile
             general_params_dict['ys'] = start
