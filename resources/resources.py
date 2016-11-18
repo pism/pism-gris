@@ -71,6 +71,7 @@ def default_spatial_ts_vars():
               'lat_bnds',
               'lon',
               'lon_bnds',
+              'sea_level',
               'strain_rates',
               'surface_mass_balance_average',
               'taub_mag',

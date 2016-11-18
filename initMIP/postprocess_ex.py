@@ -152,10 +152,16 @@ if __name__ == "__main__":
     cdo_weights_file = os.path.join(tmp_dir, cdo_weights_filename)
     if (not os.path.isfile(cdo_weights_file)) or (override_weights_file is True):
         print('Generating CDO weights file {}'.format(cdo_weights_file))
-        cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
-                   'gen{method},{grid}'.format(method=remap_method, grid=target_grid_file),
-            source_grid_file,
-            cdo_weights_file]
+        if n_procs > 1:
+            cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
+                       'gen{method},{grid}'.format(method=remap_method, grid=target_grid_file),
+                       source_grid_file,
+                       cdo_weights_file]
+        else:
+            cdo_cmd = ['cdo',
+                       'gen{method},{grid}'.format(method=remap_method, grid=target_grid_file),
+                       source_grid_file,
+                       cdo_weights_file]            
         sub.call(cdo_cmd)
 
     # Remap to SeaRISE grid    
@@ -166,10 +172,16 @@ if __name__ == "__main__":
     except OSError:
         pass
     print('Remapping to SeaRISE grid')
-    cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
-               'remap,{},{}'.format(target_grid_file, cdo_weights_file),
-               tmp_file,
-               out_file]
+    if n_procs > 1:
+        cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
+                   'remap,{},{}'.format(target_grid_file, cdo_weights_file),
+                   tmp_file,
+                   out_file]
+    else:
+        cdo_cmd = ['cdo',
+                   'remap,{},{}'.format(target_grid_file, cdo_weights_file),
+                   tmp_file,
+                   out_file]
     sub.call(cdo_cmd)
 
     # Adjust the time axis

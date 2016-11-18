@@ -3,7 +3,10 @@
 
 
 # EXP1 without relaxation
-    
+# ###########################################
+
+# run scripts
+
 PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 4500 -e ctrl -n 84 -w 2:00:00 -q normal -d gris -b no_bath --o_size small --o_dir 2016_11_paleo 2016_07_paleo/gris_g4500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
 
 PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 4500 -e asmb -n 84 -w 2:00:00 -q normal -d gris -b no_bath --o_size small --o_dir 2016_11_paleo 2016_07_paleo/gris_g4500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
@@ -16,7 +19,41 @@ PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 15
 
 PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 1500 -e asmb -n 168 -w 10:00:00 -q long -d gris -b no_bath --o_size small --o_dir 2016_11_paleo 2016_07_paleo/gris_g1500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
 
+# postprocessing scripts
+
+# postprocess spatial time series
+
+./postprocess_ex.py -n 1 --id 1 -r ycon -t 5000 -w -e ctrl 2016_11_paleo/ex_gris_g4500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ex.py -n 1 --id 1 -r ycon -t 5000 -e asmb 2016_11_paleo/ex_gris_g4500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc 
+
+./postprocess_ex.py -n 1 --id 1 -r ycon -t 5000 -w -e ctrl 2016_11_paleo/ex_gris_g3000m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ex.py -n 1 --id 1 -r ycon -t 5000 -e asmb 2016_11_paleo/ex_gris_g3000m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc 
+
+./postprocess_ex.py -n 1 --id 1 -r ycon -t 5000 -w -e ctrl 2016_11_paleo/ex_gris_g1500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ex.py -n 1 --id 1 -r ycon -t 5000 -e asmb 2016_11_paleo/ex_gris_g1500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc
+
+# postprocess scalar time series
+
+./postprocess_ts.py  --id 1 -t 5000 -e ctrl 2016_11_paleo/ts_gris_g4500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ts.py  --id 1 -t 5000 -e asmb 2016_11_paleo/ts_gris_g4500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc 
+
+./postprocess_ts.py  --id 1 -t 5000 -e ctrl 2016_11_paleo/ts_gris_g3000m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ts.py  --id 1 -t 5000 -e asmb 2016_11_paleo/ts_gris_g3000m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc 
+
+./postprocess_ts.py  --id 1 -t 5000 -e ctrl 2016_11_paleo/ts_gris_g1500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ts.py  --id 1 -t 5000 -e asmb 2016_11_paleo/ts_gris_g1500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc 
+
+
 # EXP2 with relaxation
+# ###########################################
+
+# run scripts
 
 PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 4500 -e ctrl -n 84 -w 2:00:00 -q normal -d gris -b no_bath --o_size small --o_dir 2016_11_relax 2016_07_relax/gris_g4500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
 
@@ -29,3 +66,40 @@ PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 30
 PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 1500 -e ctrl -n 168 -w 10:00:00 -q long -d gris -b no_bath --o_size small --o_dir 2016_11_relax 2016_07_relax/gris_g1500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
 
 PISM_PREFIX=$HOME/pism-ec1d1bc/bin/ ./initMIP_run.py -s pleiades_broadwell -g 1500 -e asmb -n 168 -w 10:00:00 -q long -d gris -b no_bath --o_size small --o_dir 2016_11_relax 2016_07_relax/gris_g1500m_relax_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_50a.nc
+
+# postprocessing scripts
+
+# postprocess spatial time series
+
+./postprocess_ex.py -n 1 --id 2 -r ycon -t 5000 -w -e ctrl 2016_11_relax/ex_gris_g4500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ex.py -n 1 --id 2 -r ycon -t 5000 -e asmb 2016_11_relax/ex_gris_g4500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc 
+
+./postprocess_ex.py -n 1 --id 2 -r ycon -t 5000 -w -e ctrl 2016_11_relax/ex_gris_g3000m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ex.py -n 1 --id 2 -r ycon -t 5000 -e asmb 2016_11_relax/ex_gris_g3000m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc 
+
+./postprocess_ex.py -n 1 --id 2 -r ycon -t 5000 -w -e ctrl 2016_11_relax/ex_gris_g1500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ex.py -n 1 --id 2 -r ycon -t 5000 -e asmb 2016_11_relax/ex_gris_g1500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc 
+
+# postprocess scalar time series
+
+./postprocess_ts.py  --id 2 -t 5000 -e ctrl 2016_11_relax/ts_gris_g4500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ts.py  --id 2 -t 5000 -e asmb 2016_11_relax/ts_gris_g4500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc 
+
+./postprocess_ts.py  --id 2 -t 5000 -e ctrl 2016_11_relax/ts_gris_g3000m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ts.py  --id 2 -t 5000 -e asmb 2016_11_relax/ts_gris_g3000m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc 
+
+./postprocess_ts.py  --id 2 -t 5000 -e ctrl 2016_11_relax/ts_gris_g1500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_ctrl.nc
+
+./postprocess_ts.py  --id 2 -t 5000 -e asmb 2016_11_relax/ts_gris_g1500m_given_v2_no_bath_ppq_0.33_tefo_0.02_calving_ocean_kill_forcing_type_ctrl_hydro_diffuse_100a_asmb.nc 
+
+
+# Testing
+
+for exp in 151 152 301 302 451 452; do
+ncdiff -O /Volumes/Isunnguata_Sermia/data/pism-gris/initMIP/UAF/PISM${exp}/asmb_05/acabf_GIS_UAF_PISM${exp}_asmb.nc /Volumes/Isunnguata_Sermia/data/pism-gris/initMIP/UAF/PISM${exp}/ctrl_05/acabf_GIS_UAF_PISM${exp}_ctrl.nc ${exp}_asmb_ctrl.nc
+done
