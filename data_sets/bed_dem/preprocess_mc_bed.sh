@@ -38,9 +38,9 @@ PISMVERSION=pism_$DATANAME
 echo -n "creating bootstrapable $PISMVERSION from $DATANAME ... "
 # copy the vars we want, and preserve history and global attrs
 ncks -O -v mapping,lat,lon,bheatflx,topg,thk,presprcp,smb,airtemp2m $DATANAME $PISMVERSION
-# convert from water equiv to ice thickness change rate; assumes ice density 910.0 kg m-3
+# convert from m yr-1 to kg m-2 yr-1
 ncap2 -O -s "precipitation=presprcp*1000.0" $PISMVERSION $PISMVERSION
-ncatted -O -a units,precipitation,c,c,"kg m-2 yr-1" $PISMVERSION
+ncatted -O -a units,precipitation,o,c,"kg m-2 yr-1" $PISMVERSION
 ncatted -O -a long_name,precipitation,c,c,"mean annual precipitation rate" $PISMVERSION
 # delete incorrect standard_name attribute from bheatflx; there is no known standard_name
 ncatted -a standard_name,bheatflx,d,, $PISMVERSION
@@ -157,8 +157,8 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
         REMAP_EXTRAPOLATE=on cdo -P $NN -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
     fi
     mpiexec -np $NN fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
-    ncks -A -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp2_${GRID}m.nc $outfile
-    ncatted -a units,bheatflx,o,c,"W m-2" -a long_name,bed,o,c,"bed topography" -a standard_name,bed,o,c,"bedrock_altitude" -a units,bed,o,c,"meters" -a _FillValue,bed,o,f,-9999. $outfile
+    ncks -4 -A -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp2_${GRID}m.nc $outfile
+    ncatted -a units,bheatflx,o,c,"W m-2" -a long_name,bed,o,c,"bed topography" -a standard_name,bed,o,c,"bedrock_altitude" -a units,bed,o,c,"meters" -a _FillValue,bed,o,s,-9999 $outfile
     ncatted -a long_name,surface,o,c,"ice surface elevation" -a standard_name,surface,o,c,"surface_altitude" -a units,surface,o,c,"meters" $outfile
     ncatted -a long_name,errbed,o,c,"bed topography/ice thickness error" -a units,errbed,o,c,"meters" $outfile
     ncatted -a long_name,thickness,o,c,"ice thickness" -a standard_name,thickness,o,c,"land_ice_thickness" -a units,thickness,o,c,"meters" $outfile
@@ -166,7 +166,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     ncatted -a units,source,d,, -a flag_values,source,o,b,0,1,2,3,4,6 -a flag_meanings,source,o,c,"ocean gimpdem mass_conservation interpolation hydrodstatic_equilibrium kriging" $outfile
     ncatted -a Title,global,o,c,"BedMachine: Greenland dataset based on mass conservation" -a Author,global,o,c,"Mathieu Morlighem" -a version,global,o,c,"$ver" -a proj4,global,o,c,"+init=epsg:3413" $outfile
     ncatted -a _FillValue,,d,, -a missing_value,,d,, $outfile
-    ncatted -a _FillValue,errbed,o,f,-9999. $outfile
+    ncatted -a _FillValue,errbed,o,s,-9999 $outfile
     # remove regridding artifacts, give precedence to mask: we set thickness and
     # surface to 0 where mask has ocean
     ncap2 -O -s "where(thickness<0) thickness=0; ftt_mask[\$y,\$x]=1b; where(mask==0) {thickness=0.; surface=0.;};" $outfile $outfile
@@ -204,7 +204,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     ncatted -a _FillValue,buffer,d,, g${GRID}m_cresis_${var}_v${ver}_buffered.nc
     ncks -4 -A -v buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}.nc
     ncap2 -O -s "where(buffer!=0) bed=9999;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    ncatted -a _FillValue,bed,o,f,9999. g${GRID}m_cresis_${var}_v${ver}.nc
+    # ncatted -a _FillValue,bed,o,s,9999 g${GRID}m_cresis_${var}_v${ver}.nc
     mpiexec -np $NN  fill_missing_petsc.py -v bed -f g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
     ncks -O -v bed tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
     ncrename -O -v bed,bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
