@@ -36,7 +36,7 @@ parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris_ext')
 parser.add_argument("--exstep", dest="exstep", type=int,
-                    help="Writing interval for spatial time series", default=1)
+                    help="Writing interval for spatial time series", default=10)
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
@@ -48,6 +48,8 @@ parser.add_argument("--o_dir", dest="odir",
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', 'big_2d'],
                     help="output size type", default='big_2d')
+parser.add_argument("--start_year", dest="start_year", type=int,
+                    help="Start year", default=-12500)
 parser.add_argument("-s", "--system", dest="system",
                     choices=list_systems(),
                     help="computer system to use.", default='pleiades_broadwell')
@@ -111,8 +113,8 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
-regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
-save_times = [-1000, -500]
+regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk,tillphi'
+save_times = [-12000, -12000]
 
     
 pism_config = 'init_config'
@@ -157,8 +159,8 @@ tsstep = 'yearly'
 scripts = []
 scripts_post = []
 
-paleo_start_year = -11700
-paleo_end_year = 0
+paleo_start_year = options.start_year
+paleo_end_year = -11700
 
 for n, combination in enumerate(combinations):
 
@@ -177,7 +179,7 @@ for n, combination in enumerate(combinations):
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
-    full_exp_name =  '_'.join(['hc', climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    full_exp_name =  '_'.join(['hp_prep', climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
 
     outfiles = []
@@ -187,7 +189,7 @@ for n, combination in enumerate(combinations):
 
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
-    script = 'hc_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+    script = 'hc_prep_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
 
     for filename in (script):
@@ -207,7 +209,11 @@ for n, combination in enumerate(combinations):
         prefix = generate_prefix_str(pism_exec)
 
         general_params_dict = OrderedDict()
-        general_params_dict['i'] = input_file
+        general_params_dict['bootstrap'] = ''
+        general_params_dict['i'] = pism_dataname
+        general_params_dict['regrid_file'] = input_file
+        general_params_dict['regrid_vars'] = regridvars
+        general_params_dict['regrid_special'] = ''
         general_params_dict['ys'] = start
         general_params_dict['ye'] = end
         general_params_dict['o'] = os.path.join(odir, outfile)
@@ -220,7 +226,7 @@ for n, combination in enumerate(combinations):
         if forcing_type in ('e_age'):
             general_params_dict['e_age_coupling'] = ''
 
-        grid_params_dict = generate_grid_description(grid, domain, restart=True)
+        grid_params_dict = generate_grid_description(grid, domain)
 
         sb_params_dict = OrderedDict()
         sb_params_dict['sia_e'] = sia_e

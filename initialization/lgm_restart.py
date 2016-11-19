@@ -178,8 +178,8 @@ for n, combination in enumerate(combinations):
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
-    full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
-    full_outfile = '{domain}_g{grid}m_lgm_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
+    full_exp_name =  '_'.join(['lgm', climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
 
     outfiles = []
 
