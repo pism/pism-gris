@@ -8,12 +8,15 @@ if [ $# -gt 0 ] ; then
   NN="$1"
 fi
 
-infile=MCdataset-2015-04-27.nc
+infile_clean=MCdataset-2015-04-27.nc
 if [ -n "$2" ]; then
-    infile=$2
+    infile_clean=$2
 fi
-wget -nc ftp://sidads.colorado.edu/DATASETS/IDBMG4_BedMachineGr/$infile
+infile=float_$infile_clean
+wget -nc ftp://sidads.colorado.edu/DATASETS/IDBMG4_BedMachineGr/$infile_clean
 
+# ncap2 -O -s "x=double(x); y=double(y); bed=float(bed); thickness=float(thickness); surface=float(surface); errbed=float(errbed);" $infile_clean $infile
+infile=$infile_clean
 ver=2
 if [ -n "$3" ]; then
     ver=$3
@@ -138,7 +141,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     
     gdalwarp $CUT -overwrite -r average -s_srs "+proj=stere +ellps=WGS84 +datum=WGS84 +lon_0=-39 +lat_0=90 +lat_ts=71 +units=m" -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -dstnodata -9999 -of GTiff NETCDF:${ba13file}.nc:topg ${ba13file}_epsg3413_g${GRID}m.tif
     gdal_translate -co "FORMAT=NC4" -of netCDF ${ba13file}_epsg3413_g${GRID}m.tif ${ba13file}_epsg3413_g${GRID}m.nc
-    
+    ncatted -a standard_name,topg,d,,  ${ba13file}_epsg3413_g${GRID}m.nc
     ncks -A -v topg ${ba13file}_epsg3413_g${GRID}m.nc $outfile
     ncap2 -O -s "where(thickness==0) {bed=topg;}; where(bed==-9999) {bed=topg;};" $outfile $outfile
 
@@ -148,7 +151,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     ncap2 -O -s "where(bed==-9999) {bed=Band1;}; where(Band1<=-9990) {bed=-9999;};" $outfile $outfile
 
     ncks -O -v Band1,topg -x $outfile $outfile
-
+    
     ncks -4 -L 3 -O g${GRID}m_${var}_v${ver}.nc griddes_${GRID}m.nc
     nc2cdo.py --srs "+init=epsg:3413" griddes_${GRID}m.nc
     if [[ $NN == 1 ]] ; then
@@ -156,9 +159,12 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     else
         REMAP_EXTRAPOLATE=on cdo -P $NN -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
     fi
+    
     mpiexec -np $NN fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
     ncks -4 -A -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp2_${GRID}m.nc $outfile
-    ncatted -a units,bheatflx,o,c,"W m-2" -a long_name,bed,o,c,"bed topography" -a standard_name,bed,o,c,"bedrock_altitude" -a units,bed,o,c,"meters" -a _FillValue,bed,o,s,-9999 $outfile
+    cdo setmissval,-9999 -selvar,bed $outfile bedmiss_${GRID}m.nc
+    ncks -A -v bed bedmiss_${GRID}m.nc $outfile 
+    ncatted -a units,bheatflx,o,c,"W m-2" -a long_name,bed,o,c,"bed topography" -a standard_name,bed,o,c,"bedrock_altitude" -a units,bed,o,c,"meters" $outfile
     ncatted -a long_name,surface,o,c,"ice surface elevation" -a standard_name,surface,o,c,"surface_altitude" -a units,surface,o,c,"meters" $outfile
     ncatted -a long_name,errbed,o,c,"bed topography/ice thickness error" -a units,errbed,o,c,"meters" $outfile
     ncatted -a long_name,thickness,o,c,"ice thickness" -a standard_name,thickness,o,c,"land_ice_thickness" -a units,thickness,o,c,"meters" $outfile
@@ -169,11 +175,12 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     ncatted -a _FillValue,errbed,o,s,-9999 $outfile
     # remove regridding artifacts, give precedence to mask: we set thickness and
     # surface to 0 where mask has ocean
+
     ncap2 -O -s "where(thickness<0) thickness=0; ftt_mask[\$y,\$x]=1b; where(mask==0) {thickness=0.; surface=0.;};" $outfile $outfile
 
     ncks -h -O $outfile $outfile_ctrl
     ncks -h -O $outfile $outfile_nb
-    
+
     var=thickness
     gdalwarp -overwrite -dstnodata 0 -cutline  ../shape_files/gris-domain-ismip6.shp NETCDF:$outfile_nb:$var g${GRID}m_nb_${var}_v${ver}.tif
     gdal_translate -of netCDF -co "FORMAT=NC4" g${GRID}m_nb_${var}_v${ver}.tif g${GRID}m_nb_${var}_v${ver}.nc
@@ -185,7 +192,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     ncatted -a _FillValue,bed,d,, -a _FillValue,thickness,d,, $outfile_nb
     ncap2 -O -s "where(bed==-9999) {mask=0; surface=0; thickness=0;};"  $outfile_nb  $outfile_nb
     
-    # sh create_hot_spot.sh $outfile $outfile_hot
+    sh create_hot_spot.sh $outfile $outfile_hot
 
     # CReSIS bed
     gdalwarp -overwrite  -cutline ../shape_files/jib_cresis_channel_area_cutline.shp -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff jakobshavn_bedmap_3413_edit.tif g${GRID}m_cresis.tif

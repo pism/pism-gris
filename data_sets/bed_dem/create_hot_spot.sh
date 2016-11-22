@@ -66,7 +66,7 @@ GHFSPOT=0.970   # from Fahnstock et al 2001; in W m-2
 ncrename -v bheatflx,bheatflxSR $OUTFILE  # keep Shapiro & Ritzwoller
 
 # do equivalent of Matlab's:  [xx,yy] = meshgrid(x,y)
-ncap2 --64 -O -s 'zero=0.0*lat' $OUTFILE $OUTFILE # note lat=lat(x,y)
+ncap2 -O -s 'zero=0.0*lat' $OUTFILE $OUTFILE # note lat=lat(x,y)
 ncap2 -O -s 'xx=zero+x' $OUTFILE $OUTFILE
 ncap2 -O -s 'yy=zero+y' $OUTFILE $OUTFILE
 XIROT="xi=${COSTHETA}*(xx-${XSPOT})+${SINTHETA}*(yy+${NEGYSPOT})"
