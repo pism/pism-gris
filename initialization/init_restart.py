@@ -64,6 +64,8 @@ parser.add_argument("--hydrology", dest="hydrology",
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
+parser.add_argument("--topg_delta", dest="topg_delta_file",
+                    help="end of initialization detla=(topg-topg_initial) file", default=None)
 parser.add_argument("--dataset_version", dest="version",
                     choices=['2'],
                     help="input data set version", default='2')
@@ -91,6 +93,7 @@ forcing_type = options.forcing_type
 grid = options.grid
 hydrology = options.hydrology
 stress_balance = options.stress_balance
+topg_delta_file = options.topg_delta_file
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 
@@ -148,6 +151,7 @@ combinations = list(itertools.product(ocean_melt_power_values, thickness_calving
 tsstep = 'yearly'
 
 scripts = []
+scripts_combinded = []
 scripts_post = []
 
 paleo_start_year = -125000
@@ -173,92 +177,104 @@ for n, combination in enumerate(combinations):
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
+    
+    # All runs in one script file for coarse grids that fit into max walltime
+    script_combined = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
+    with open(script_combined, 'w') as f_combined:
 
-    outfiles = []
+        outfiles = []
 
-    for start in range(paleo_start_year, paleo_end_year, restart_step):
+        for start in range(paleo_start_year, paleo_end_year, restart_step):
 
-        end = start + restart_step
+            end = start + restart_step
 
-        experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
+            experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
-        script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
-        scripts.append(script)
+            script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+            scripts.append(script)
 
-        for filename in (script):
-            try:
-                os.remove(filename)
-            except OSError:
-                pass
+            for filename in (script):
+                try:
+                    os.remove(filename)
+                except OSError:
+                    pass
 
-        batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
+            batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
+            if (start == paleo_start_year):
+                f_combined.write(batch_header)
 
-        with open(script, 'w') as f:
+            with open(script, 'w') as f:
 
-            f.write(batch_header)
+                f.write(batch_header)
 
-            outfile = '{domain}_g{grid}m_straight_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+                outfile = '{domain}_g{grid}m_straight_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
-            prefix = generate_prefix_str(pism_exec)
+                prefix = generate_prefix_str(pism_exec)
 
-            general_params_dict = OrderedDict()
-            if start == paleo_start_year:
-                general_params_dict['bootstrap'] = ''
-                general_params_dict['i'] = pism_dataname
-            else:
-                general_params_dict['i'] = regridfile
-            general_params_dict['ys'] = start
-            general_params_dict['ye'] = end
-            general_params_dict['o'] = os.path.join(odir, outfile)
-            general_params_dict['o_format'] = oformat
-            general_params_dict['o_size'] = osize
-            general_params_dict['config_override'] = pism_config_nc
-            general_params_dict['age'] = ''
-            if bed_deformation not in ('off'):
-                general_params_dict['bed_def'] = bed_deformation
-            if forcing_type in ('e_age'):
-                general_params_dict['e_age_coupling'] = ''
+                general_params_dict = OrderedDict()
+                if start == paleo_start_year:
+                    general_params_dict['bootstrap'] = ''
+                    general_params_dict['i'] = pism_dataname
+                else:
+                    general_params_dict['i'] = regridfile
+                if (start == paleo_start_year) and (topg_delta_file is not None):
+                    general_params_dict['topg_delta_file'] = topg_delta_file
+                general_params_dict['ys'] = start
+                general_params_dict['ye'] = end
+                general_params_dict['o'] = os.path.join(odir, outfile)
+                general_params_dict['o_format'] = oformat
+                general_params_dict['o_size'] = osize
+                general_params_dict['config_override'] = pism_config_nc
+                general_params_dict['age'] = ''
+                if bed_deformation not in ('off'):
+                    general_params_dict['bed_def'] = bed_deformation
+                if forcing_type in ('e_age'):
+                    general_params_dict['e_age_coupling'] = ''
 
-            if start == paleo_start_year:
-                grid_params_dict = generate_grid_description(grid, domain)
-            else:
-                grid_params_dict = generate_grid_description(grid, domain, restart=True)
+                if start == paleo_start_year:
+                    grid_params_dict = generate_grid_description(grid, domain)
+                else:
+                    grid_params_dict = generate_grid_description(grid, domain, restart=True)
 
-            sb_params_dict = OrderedDict()
-            sb_params_dict['sia_e'] = sia_e
-            sb_params_dict['ssa_e'] = ssa_e
-            sb_params_dict['ssa_n'] = ssa_n
-            sb_params_dict['pseudo_plastic_q'] = ppq
-            sb_params_dict['till_effective_fraction_overburden'] = tefo
-            if start == paleo_start_year:
-                sb_params_dict['topg_to_phi'] = ttphi
-            sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
+                sb_params_dict = OrderedDict()
+                sb_params_dict['sia_e'] = sia_e
+                sb_params_dict['ssa_e'] = ssa_e
+                sb_params_dict['ssa_n'] = ssa_n
+                sb_params_dict['pseudo_plastic_q'] = ppq
+                sb_params_dict['till_effective_fraction_overburden'] = tefo
+                if start == paleo_start_year:
+                    sb_params_dict['topg_to_phi'] = ttphi
+                sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
 
-            stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
-            climate_params_dict = generate_climate(climate, atmosphere_searise_greenland_file=pism_dataname)
-            ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc', ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
-            hydro_params_dict = generate_hydrology(hydrology)
-            calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
+                stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
+                climate_params_dict = generate_climate(climate, atmosphere_searise_greenland_file=pism_dataname)
+                ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc', ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
+                hydro_params_dict = generate_hydrology(hydrology)
+                calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
-            exvars = init_spatial_ts_vars()
-            spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
-            scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
-                                                start=paleo_start_year,
-                                                end=paleo_end_year,
-                                                odir=odir)
-            snap_shot_dict = generate_snap_shots(outfile, save_times, odir=odir)
+                exvars = init_spatial_ts_vars()
+                spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
+                scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
+                                                    start=paleo_start_year,
+                                                    end=paleo_end_year,
+                                                    odir=odir)
+                snap_shot_dict = generate_snap_shots(outfile, save_times, odir=odir)
 
-            all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
-            all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+                all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
+                all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
 
-            cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
+                cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
 
-            f.write(cmd)
-            f.write('\n')
+                f.write(cmd)
+                f.write('\n')
 
-            regridfile = os.path.join(odir, outfile)
-            outfiles.append(outfile)
+                f_combined.write(cmd)
+                f_combined.write('\n\n')
+                
+                regridfile = os.path.join(odir, outfile)
+                outfiles.append(outfile)
 
+    scripts_combinded.append(script_combined)
 
     script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
     scripts_post.append(script_post)
@@ -281,8 +297,11 @@ for n, combination in enumerate(combinations):
 
     
 scripts = uniquify_list(scripts)
+scripts_combinded = uniquify_list(scripts_combinded)
 scripts_post = uniquify_list(scripts_post)
 print '\n'.join([script for script in scripts])
+print('\nwritten\n')
+print '\n'.join([script for script in scripts_combinded])
 print('\nwritten\n')
 print '\n'.join([script for script in scripts_post])
 print('\nwritten\n')
