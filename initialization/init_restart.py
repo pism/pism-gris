@@ -55,6 +55,8 @@ parser.add_argument("-b", "--bed_type", dest="bed_type",
 parser.add_argument("--bed_deformation", dest="bed_deformation",
                     choices=['off', 'lc', 'iso'],
                     help="Bed deformation model.", default='off')
+parser.add_argument("--frontal_melt", dest="frontal_melt", action="store_true",
+                    help="Turn on frontal melt", default=False)
 parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
@@ -90,6 +92,7 @@ calving = options.calving
 climate = options.climate
 exstep = options.exstep
 forcing_type = options.forcing_type
+frontal_melt = options.frontal_melt
 grid = options.grid
 hydrology = options.hydrology
 stress_balance = options.stress_balance
@@ -108,7 +111,7 @@ else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
-save_times = [-125000, -25000, -20000, -15000, -12500, -11700, -1000, -500, -200, -100, -5]
+save_times = [-25000, -20000, -15000, -12500, -11700, -1000, -500, -200, -100, -5]
 
     
 pism_config = 'init_config'
@@ -250,7 +253,7 @@ for n, combination in enumerate(combinations):
                 climate_params_dict = generate_climate(climate, atmosphere_searise_greenland_file=pism_dataname)
                 ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc', ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
                 hydro_params_dict = generate_hydrology(hydrology)
-                calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
+                calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname, frontal_melt=frontal_melt)
 
                 exvars = init_spatial_ts_vars()
                 spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
@@ -263,7 +266,11 @@ for n, combination in enumerate(combinations):
                 all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
                 all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
 
-                cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
+                if system in ('debug'):
+                    cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job.${batch}'.format(outdir=odir,batch=batch_system['job_id'])])
+                else:
+                    cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
+
 
                 f.write(cmd)
                 f.write('\n')

@@ -458,6 +458,8 @@ def generate_calving(calving, **kwargs):
         print('calving {} not recognized, exiting'.format(calving))
         import sys
         sys.exit(0)
+    if 'frontal_melt' in kwargs and kwargs['frontal_melt'] is True:
+        params_dict['calving'] = calving + ',frontal_melt'        
 
     return merge_dicts(params_dict, kwargs)
 
