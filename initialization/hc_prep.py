@@ -274,10 +274,10 @@ for n, combination in enumerate(combinations):
         myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(paleo_start_year+exstep, paleo_end_year, exstep)])
         myoutfile = extra_file + '.nc'
         myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
-        cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
+        cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
         for myfile in outfiles:
-            cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, myfile), os.path.join(odir, myfile), '\n'])
+            cmd = ' '.join(['ncks -O -4', os.path.join(odir, myfile), os.path.join(odir, myfile), '\n'])
             f.write(cmd)
 
     
