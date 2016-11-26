@@ -104,6 +104,42 @@ def default_spatial_ts_vars():
     return exvars
 
 
+def essential_spatial_ts_vars():
+    '''
+    Returns a list of essential extra vars
+    '''
+    
+    exvars = ['basal_mass_balance_average',
+              'beta',
+              'bmelt',
+              'dHdt',
+              'mask',
+              'lat',
+              'lat_bnds',
+              'lon',
+              'lon_bnds',
+              'surface_mass_balance_average',
+              'taub_mag',
+              'tauc',
+              'taud_mag',
+              'tempicethk_basal',
+              'temppabase',
+              'tempsurf',
+              'thk',
+              'tillwat',
+              'topg',
+              'topg_sl_adjusted',
+              'usurf',
+              'velbase',
+              'velbase_mag',
+              'velsurf',
+              'velsurf_mag',
+              'wvelbase',
+              'wvelsurf']
+    
+    return exvars
+
+
 def ismip6_spatial_ts_vars():
     '''
     Returns a list of commonly-used extra vars

@@ -36,7 +36,7 @@ parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris_ext')
 parser.add_argument("--exstep", dest="exstep", type=int,
-                    help="Writing interval for spatial time series", default=1)
+                    help="Writing interval for spatial time series", default='monthly')
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
@@ -158,7 +158,7 @@ scripts = []
 scripts_post = []
 
 paleo_start_year = -11700
-paleo_end_year = 0
+paleo_end_year = -11400
 
 for n, combination in enumerate(combinations):
 
@@ -236,7 +236,7 @@ for n, combination in enumerate(combinations):
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
-        exvars = init_spatial_ts_vars()
+        exvars = essential_spatial_ts_vars()
         spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
                                             start=paleo_start_year,
