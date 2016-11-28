@@ -435,8 +435,6 @@ def generate_stress_balance(stress_balance, additional_params_dict):
     params_dict['stress_balance'] = stress_balance
     if stress_balance in ('ssa+sia'):
         params_dict['options_left'] = ''
-        params_dict['ssafd_pc_type'] = 'asm'
-        params_dict['ssafd_sub_pc_type'] = 'jacobi'
         params_dict['cfbc'] = ''
         params_dict['kill_icebergs'] = ''
         params_dict['part_grid'] = ''
@@ -495,8 +493,9 @@ def generate_calving(calving, **kwargs):
         import sys
         sys.exit(0)
     if 'frontal_melt' in kwargs and kwargs['frontal_melt'] is True:
-        params_dict['calving'] = calving + ',frontal_melt'        
-
+        params_dict['calving'] += ',frontal_melt'
+        # need to delete the entry
+        del kwargs['frontal_melt']
     return merge_dicts(params_dict, kwargs)
 
 
