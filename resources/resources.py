@@ -552,6 +552,10 @@ def generate_ocean(ocean, **kwargs):
         params_dict['ocean'] = 'given,delta_SL,frac_SMB'
         if 'ocean_delta_SL_file' not in kwargs:
             params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
+    elif ocean == 'paleo_mbp':
+        params_dict['ocean'] = 'given,delta_SL,frac_SMB,delta_MBP'
+        if 'ocean_delta_SL_file' not in kwargs:
+            params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
     elif ocean == 'paleo_const':
         params_dict['ocean'] = 'given,delta_SL'        
         if 'ocean_delta_SL_file' not in kwargs:

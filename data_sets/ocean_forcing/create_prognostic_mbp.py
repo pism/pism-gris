@@ -111,7 +111,7 @@ time_bnds_var[:, 1] = bnds_interval_since_refdate[1::]
 
 var = "delta_MBP"
 if (var not in nc.variables.keys()):
-    mbp_var = nc.createVariable(var, 'f', dimensions=(time_dim), zlib=True, complevel=3)
+    mbp_var = nc.createVariable(var, 'f', dimensions=(time_dim))
 else:
     mbp_var = nc.variables[var]
 

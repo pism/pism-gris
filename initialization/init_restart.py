@@ -30,6 +30,9 @@ parser.add_argument("--climate", dest="climate",
 parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
                     help="claving", default='vonmises_calving')
+parser.add_argument("--ocean", dest="ocean",
+                    choices=['paleo', 'paleo_mbp'],
+                    help="Ocean coupler", default='paleo')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris_ext')
@@ -95,6 +98,7 @@ forcing_type = options.forcing_type
 frontal_melt = options.frontal_melt
 grid = options.grid
 hydrology = options.hydrology
+ocean = options.ocean
 stress_balance = options.stress_balance
 topg_delta_file = options.topg_delta_file
 vertical_velocity_approximation = options.vertical_velocity_approximation
@@ -251,7 +255,7 @@ for n, combination in enumerate(combinations):
 
                 stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
                 climate_params_dict = generate_climate(climate, atmosphere_searise_greenland_file=pism_dataname)
-                ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc', ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
+                ocean_params_dict = generate_ocean(ocean, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc', ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power), ocean_delta_MBP_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
                 hydro_params_dict = generate_hydrology(hydrology)
                 calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname, frontal_melt=frontal_melt)
 
