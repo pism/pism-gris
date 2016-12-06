@@ -159,7 +159,7 @@ scripts = []
 scripts_post = []
 
 paleo_start_year = -11700
-paleo_end_year = -10000
+paleo_end_year = -11400
 
 for n, combination in enumerate(combinations):
 
