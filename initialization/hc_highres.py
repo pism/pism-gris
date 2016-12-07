@@ -188,7 +188,7 @@ for n, combination in enumerate(combinations):
 
     experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
-    script = 'hc_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+    script = 'hia_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
 
     for filename in (script):
@@ -256,7 +256,7 @@ for n, combination in enumerate(combinations):
         outfiles.append(outfile)
 
 
-    script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
+    script_post = 'hia_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
     scripts_post.append(script_post)
 
     post_header = make_batch_post_header(system)
