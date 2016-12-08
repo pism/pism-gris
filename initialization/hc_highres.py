@@ -178,7 +178,7 @@ for n, combination in enumerate(combinations):
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
-    full_exp_name =  '_'.join(['hc', climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    full_exp_name =  '_'.join(['hia', climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
 
     outfiles = []
@@ -203,7 +203,7 @@ for n, combination in enumerate(combinations):
 
         f.write(batch_header)
 
-        outfile = '{domain}_g{grid}m_straight_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+        outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
         prefix = generate_prefix_str(pism_exec)
 
@@ -267,7 +267,6 @@ for n, combination in enumerate(combinations):
 
         extra_file = spatial_ts_dict['extra_file']
         myfiles = ' '.join(['{}_{:.3f}.nc'.format(extra_file, k) for k in np.arange(paleo_start_year+exstep, paleo_end_year, exstep)])
-        print myfiles
         myoutfile = extra_file + '.nc'
         myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])

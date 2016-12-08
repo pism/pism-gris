@@ -4,7 +4,7 @@ resources
 
 Provides:
   - general resources such as grid constructors, calving, hydrology, etc.
-    for the Greenland Ice Sheet (and sub-regions thereof
+    for the Greenland Ice Sheet and sub-regions thereof
 
 """
 
@@ -36,7 +36,13 @@ def generate_domain(domain):
     
     if domain.lower() in ('greenland', 'gris', 'gris_ext'):
         pism_exec = 'pismr'
-    elif domain.lower() in ('jakobshavn'):
+    elif domain.lower() in ('hia'):
+        x_min = -652200
+        x_max = -232600
+        y_min = -1263900
+        y_max = -943500
+        pism_exec = '''pismo -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)        
+    elif domain.lower() in ('jakobshavn', 'jib'):
         x_min = -280000
         x_max = 320000
         y_min = -2410000

@@ -13,6 +13,7 @@ for lat in 78 79 80; do
     outfile=ocean_forcing_latitudinal_${lat}n.nc
     ncks -4 -L 3 -C -O -v x,y,mask,polar_stereographic $infile $outfile
     python ocean_forcing.py --lat_1 ${lat} $outfile
+    ncatted -a grid_mapping,mask,o,c,"polar_stereographic" -a grid_mapping,shelfbmassflux,o,c,"polar_stereographic" -a grid_mapping,shelfbtemp,o,c,"polar_stereographic" $outfile
 done
 
 
