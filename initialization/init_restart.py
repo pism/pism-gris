@@ -145,15 +145,27 @@ ssa_e = (1.0)
 
 eigen_calving_k = 1e18
 
-ocean_melt_power_values = [1, 2]
-thickness_calving_threshold_vales = [50, 100]
+fice_values = [4, 5, 6]
+fsnow_values = [3, 4, 5]
+ocean_melt_power_values = [1]
+thickness_calving_threshold_vales = [100]
 ppq_values = [0.33]
 tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(ocean_melt_power_values, thickness_calving_threshold_vales, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+combinations = list(itertools.product(fice_values,
+                                      fsnow_values,
+                                      ocean_melt_power_values,
+                                      thickness_calving_threshold_vales,
+                                      ppq_values,
+                                      tefo_values,
+                                      phi_min_values,
+                                      phi_max_values,
+                                      topg_min_values,
+                                      topg_max_values))
+
 
 tsstep = 'yearly'
 
@@ -167,13 +179,13 @@ restart_step = 25000
 
 for n, combination in enumerate(combinations):
 
-    ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
-    name_options['ppq'] = ppq
-    name_options['tefo'] = tefo
+    name_options['fice'] = fice
+    name_options['fsnow'] = fsnow
     name_options['bed_deformation'] = bed_deformation
     name_options['calving'] = calving
     if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
@@ -254,10 +266,21 @@ for n, combination in enumerate(combinations):
                 sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
 
                 stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
-                climate_params_dict = generate_climate(climate, atmosphere_searise_greenland_file=pism_dataname)
-                ocean_params_dict = generate_ocean(ocean, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc', ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power), ocean_delta_MBP_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
+                ice_density = 910.
+                climate_params_dict = generate_climate(climate,
+                                                       **{'surface.pdd.factor_ice': (fice / ice_density),
+                                                          'surface.pdd.factor_snow':(fsnow / ice_density),
+                                                          'atmosphere_searise_greenland_file':pism_dataname})
+                ocean_params_dict = generate_ocean(ocean,
+                                                   ocean_given_file='ocean_forcing_latitudinal_ctrl.nc',
+                                                   ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power),
+                                                   ocean_delta_MBP_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
                 hydro_params_dict = generate_hydrology(hydrology)
-                calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname, frontal_melt=frontal_melt)
+                calving_params_dict = generate_calving(calving,
+                                                       thickness_calving_threshold=thickness_calving_threshold,
+                                                       eigen_calving_k=eigen_calving_k,
+                                                       ocean_kill_file=pism_dataname,
+                                                       frontal_melt=frontal_melt)
 
                 exvars = init_spatial_ts_vars()
                 spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
