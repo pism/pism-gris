@@ -48,7 +48,7 @@ parser.add_argument("--o_dir", dest="odir",
                     help="output directory. Default: current directory", default='foo')
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', 'big_2d'],
-                    help="output size type", default='big_2d')
+                    help="output size type", default='small')
 parser.add_argument("-s", "--system", dest="system",
                     choices=list_systems(),
                     help="computer system to use.", default='pleiades_broadwell')
@@ -145,7 +145,7 @@ ssa_e = (1.0)
 
 eigen_calving_k = 1e18
 
-fice_values = [4, 5, 6]
+fice_values = [4, 5, 6, 7, 8]
 fsnow_values = [3, 4, 5]
 ocean_melt_power_values = [1]
 thickness_calving_threshold_vales = [100]
@@ -325,9 +325,12 @@ for n, combination in enumerate(combinations):
         myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
-        for myfile in outfiles:
-            cmd = ' '.join(['ncks -O -4', os.path.join(odir, myfile), os.path.join(odir, myfile), '\n'])
-            f.write(cmd)
+        ts_file = 'ts_' + full_exp_name
+        myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(paleo_start_year, paleo_end_year, restart_step)])
+        myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, paleo_start_year, paleo_end_year)])
+        myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
+        cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
+        f.write(cmd)
 
     
 scripts = uniquify_list(scripts)
