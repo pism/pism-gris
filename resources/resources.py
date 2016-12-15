@@ -525,6 +525,7 @@ def generate_climate(climate, **kwargs):
         if 'atmosphere_delta_T_file' not in kwargs:
             params_dict['atmosphere_delta_T_file'] = 'pism_dT.nc'
         params_dict['surface'] = 'pdd'
+        params_dict['pdd_std_dev_method'] = 'quadratic'  # Wake and Marshall (2015)
     elif climate in ('pdd'):
         params_dict['atmosphere'] = 'given'
         if 'atmosphere_given_file' not in kwargs:
