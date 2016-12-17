@@ -211,6 +211,7 @@ def init_spatial_ts_vars():
               'diffusivity',
               'discharge_flux',
               'eigen_calving_rate',
+              'ice_mass',
               'mask',
               'lat',
               'lat_bnds',
