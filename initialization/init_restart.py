@@ -115,7 +115,7 @@ else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
-save_times = [-25000, -20000, -15000, -12500, -11700, -1000, -500, -200, -100, -5]
+save_times = [-25000, -20000, -15000, -12500, -11700]
 
     
 pism_config = 'init_config'
