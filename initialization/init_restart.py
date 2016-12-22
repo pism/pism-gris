@@ -113,7 +113,7 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
     pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
-
+precip_file = 'DMI-HIRHAM5_GL2_ERAI_1980_2014_PR_TM_EPSG3413_{}m.nc'.format(grid)
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 save_times = [-25000, -20000, -15000, -12500, -11700]
 
@@ -269,8 +269,8 @@ for n, combination in enumerate(combinations):
                 ice_density = 910.
                 climate_params_dict = generate_climate(climate,
                                                        **{'surface.pdd.factor_ice': (fice / ice_density),
-                                                          'surface.pdd.factor_snow':(fsnow / ice_density),
-                                                          'atmosphere_searise_greenland_file':pism_dataname})
+                                                          'surface.pdd.factor_snow': (fsnow / ice_density),
+                                                          'atmosphere_searise_greenland_file': precip_file})
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file='ocean_forcing_latitudinal_ctrl.nc',
                                                    ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power),
