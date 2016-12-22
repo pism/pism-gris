@@ -334,10 +334,10 @@ for n, combination in enumerate(combinations):
         myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
         # f.write(cmd)
-        ts_file = 'ts_' + full_exp_name
+        ts_file = os.path.join(odir, 'ts_' + full_exp_name)
         myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(paleo_start_year, paleo_end_year, restart_step)])
-        myoutfile = '_'.join(['{}_{}_{}.nc'.format(os.path.join(odir, ts_file), paleo_start_year, paleo_end_year)])
-        myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
+        myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, paleo_start_year, paleo_end_year)])
+        myoutfile = os.path.split(myoutfile)[-1]
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
 
