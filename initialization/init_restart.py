@@ -204,7 +204,7 @@ for n, combination in enumerate(combinations):
     
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
-    full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
+    full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
     
     # All runs in one script file for coarse grids that fit into max walltime
     script_combined = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
@@ -334,7 +334,7 @@ for n, combination in enumerate(combinations):
         myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
         # f.write(cmd)
-        ts_file = os.path.join(odir, 'ts_' + full_exp_name)
+        ts_file = os.path.join(odir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(paleo_start_year, paleo_end_year, restart_step)])
         myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, paleo_start_year, paleo_end_year)])
         myoutfile = os.path.split(myoutfile)[-1]
