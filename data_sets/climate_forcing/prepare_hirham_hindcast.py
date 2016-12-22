@@ -333,7 +333,7 @@ cdo.timmean(input=pr_merged_file_daily_mean, output=pr_merged_file_time_mean)
 # logger.info('add topo file {} to {}'.format(topo_file, pr_merged_file_time_mean))
 # nco.ncks(input=topo_file, output=pr_merged_file_time_mean, append=True)
     
-for grid_spacing in (18000, 9000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900, 600, 450, 300, 150):
+for grid_spacing in (18000, 9000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900, 600, 450, 300):
     grid_file = 'epsg3413_griddes_{}m.nc'.format(grid_spacing)
     logger.info('generating grid description {}'.format(grid_file))
     create_epsg3413_grid(grid_file, grid_spacing)
