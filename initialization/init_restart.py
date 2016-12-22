@@ -66,6 +66,9 @@ parser.add_argument("--forcing_type", dest="forcing_type",
 parser.add_argument("--hydrology", dest="hydrology",
                     choices=['null', 'diffuse', 'routing'],
                     help="Basal hydrology model.", default='diffuse')
+parser.add_argument("--precip", dest="precip",
+                    choices=['racmo', 'hirham'],
+                    help="Precipitation model", default='racmo')
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
@@ -99,6 +102,7 @@ frontal_melt = options.frontal_melt
 grid = options.grid
 hydrology = options.hydrology
 ocean = options.ocean
+precip = options.precip
 stress_balance = options.stress_balance
 topg_delta_file = options.topg_delta_file
 vertical_velocity_approximation = options.vertical_velocity_approximation
@@ -113,7 +117,12 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
     pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
-precip_file = 'DMI-HIRHAM5_GL2_ERAI_1980_2014_PR_TM_EPSG3413_{}m.nc'.format(grid)
+if precip in ('racmo'):
+    precip_file = pism_dataname
+elif precip in ('hirham'):
+    precip_file = 'DMI-HIRHAM5_GL2_ERAI_1980_2014_PR_TM_EPSG3413_{}m.nc'.format(grid)
+else:
+    print('Precip model {} not support. How did we get here?'.format(precip))
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 save_times = [-25000, -20000, -15000, -12500, -11700]
 

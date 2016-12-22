@@ -314,13 +314,15 @@ for pr_file in PR_files:
 daily_mean = 'DM'
 time_mean = 'TM'
 pr_merged_file_daily_mean = 'DMI-HIRHAM5_GL2_ERAI_1980_2014_PR_{}.nc'.format(daily_mean)
-logger.info('merge files')
-tmpfile = cdo.merge(input=' '.join(pr_files))
-logger.info('removing height dimension')
-nco.ncwa(input=tmpfile, output=pr_merged_file_daily_mean, average='height')
 
-logger.info('adjusting time axis')
-adjust_time_axis(pr_merged_file_daily_mean, '1980-1-1', '2015-1-1', 'days', '1980-1-1', 'daily')
+# logger.info('merge files')
+# tmpfile = cdo.merge(input=' '.join(pr_files))
+
+# logger.info('removing height dimension')
+# nco.ncwa(input=tmpfile, output=pr_merged_file_daily_mean, average='height')
+
+# logger.info('adjusting time axis')
+# adjust_time_axis(pr_merged_file_daily_mean, '1980-1-1', '2015-1-1', 'days', '1980-1-1', 'daily')
 
 opt = [c.Atted(mode="o", att_name="units", var_name="time", value="days since 1980-01-01 03:00:00")]
 nco.ncatted(input=pr_merged_file_daily_mean, options=opt)
@@ -337,10 +339,15 @@ for grid_spacing in (18000, 9000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900,
     create_epsg3413_grid(grid_file, grid_spacing)
     epsg3414_pr_merged_file_time_mean = 'DMI-HIRHAM5_GL2_ERAI_1980_2014_PR_{}_EPSG3413_{}m.nc'.format(time_mean, grid_spacing)
     logger.info('Remapping {} to {}'.format(pr_merged_file_time_mean, epsg3414_pr_merged_file_time_mean))
-    tmpfile = cdo.remapycon('{} -selvar,pr -setgrid,{}'.format(grid_file, rotated_grid_file), input=pr_merged_file_time_mean)
+    tmpfile = cdo.remapycon('{} -selvar,pr -setgrid,{}'.format(grid_file, rotated_grid_file),
+                            input=pr_merged_file_time_mean,
+                            options='-f nc4')
     cdo.setmisstoc(0, input=tmpfile, output=epsg3414_pr_merged_file_time_mean)
+    nco.ncks(input=grid_file, output=epsg3414_pr_merged_file_time_mean, append=True)
     opt = [c.Atted(mode="d", att_name="_FillValue", var_name="pr"),
-           c.Atted(mode="d", att_name="missing_value", var_name="pr")]
+           c.Atted(mode="d", att_name="missing_value", var_name="pr"),
+           c.Atted(mode="o", att_name="grid_mapping", var_name="pr", value="mapping")]
     nco.ncatted(input=epsg3414_pr_merged_file_time_mean, options=opt)
     rDict={ 'pr':'precipitation'}   
     nco.ncrename(input=epsg3414_pr_merged_file_time_mean, options=[ c.Rename("variable",rDict)])
+    
