@@ -524,7 +524,7 @@ def generate_climate(climate, **kwargs):
             params_dict['atmosphere_delta_T_file'] = 'pism_dT.nc'
         params_dict['surface'] = 'pdd'
         params_dict['pdd_std_dev_method'] = 'quadratic'  # Wake and Marshall (2015)
-    if climate in ('paleo_const'):
+    elif climate in ('paleo_const'):
         params_dict['atmosphere'] = 'searise_greenland'
         params_dict['surface'] = 'given'
     elif climate in ('pdd'):
