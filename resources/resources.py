@@ -526,7 +526,7 @@ def generate_climate(climate, **kwargs):
         params_dict['pdd_std_dev_method'] = 'quadratic'  # Wake and Marshall (2015)
     if climate in ('paleo_const'):
         params_dict['atmosphere'] = 'searise_greenland'
-        params_dict['surface'] = 'give'
+        params_dict['surface'] = 'given'
     elif climate in ('pdd'):
         params_dict['atmosphere'] = 'given'
         if 'atmosphere_given_file' not in kwargs:
