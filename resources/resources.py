@@ -115,8 +115,7 @@ def essential_spatial_ts_vars():
     Returns a list of essential extra vars
     '''
     
-    exvars = ['basal_mass_balance_average',
-              'beta',
+    exvars = ['beta',
               'bmelt',
               'dHdt',
               'mask',
@@ -128,8 +127,6 @@ def essential_spatial_ts_vars():
               'taub_mag',
               'tauc',
               'taud_mag',
-              'tempicethk_basal',
-              'temppabase',
               'tempsurf',
               'thk',
               'tillwat',
@@ -527,6 +524,9 @@ def generate_climate(climate, **kwargs):
             params_dict['atmosphere_delta_T_file'] = 'pism_dT.nc'
         params_dict['surface'] = 'pdd'
         params_dict['pdd_std_dev_method'] = 'quadratic'  # Wake and Marshall (2015)
+    if climate in ('paleo_const'):
+        params_dict['atmosphere'] = 'searise_greenland'
+        params_dict['surface'] = 'give'
     elif climate in ('pdd'):
         params_dict['atmosphere'] = 'given'
         if 'atmosphere_given_file' not in kwargs:
