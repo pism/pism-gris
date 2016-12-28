@@ -33,6 +33,9 @@ parser.add_argument("--calving", dest="calving",
 parser.add_argument("--ocean", dest="ocean",
                     choices=['paleo', 'paleo_mbp'],
                     help="Ocean coupler", default='paleo')
+parser.add_argument("--ocean_melt", dest="ocean_melt",
+                    choices=['x', 'latitudinal'],
+                    help="Ocean melt type", default='x')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris_ext')
@@ -102,6 +105,7 @@ frontal_melt = options.frontal_melt
 grid = options.grid
 hydrology = options.hydrology
 ocean = options.ocean
+ocean_melt = options.ocean_melt
 precip = options.precip
 stress_balance = options.stress_balance
 topg_delta_file = options.topg_delta_file
@@ -123,6 +127,13 @@ elif precip in ('hirham'):
     precip_file = 'DMI-HIRHAM5_GL2_ERAI_1980_2014_PR_TM_EPSG3413_{}m.nc'.format(grid)
 else:
     print('Precip model {} not support. How did we get here?'.format(precip))
+
+if ocean_melt in ('x'):
+    ocean_file = 'ocean_forcing_latitudinal_ctrl.nc'
+else:
+    ocean_file = 'ocean_forcing_latitudinal_80n.nc'
+    
+
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 save_times = [-25000, -20000, -15000, -12500, -11700]
 
@@ -281,7 +292,7 @@ for n, combination in enumerate(combinations):
                                                           'surface.pdd.factor_snow': (fsnow / ice_density),
                                                           'atmosphere_searise_greenland_file': precip_file})
                 ocean_params_dict = generate_ocean(ocean,
-                                                   ocean_given_file='ocean_forcing_latitudinal_ctrl.nc',
+                                                   ocean_given_file=ocean_file,
                                                    ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power),
                                                    ocean_delta_MBP_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
                 hydro_params_dict = generate_hydrology(hydrology)
