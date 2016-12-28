@@ -34,8 +34,8 @@ parser.add_argument("--ocean", dest="ocean",
                     choices=['paleo', 'paleo_mbp'],
                     help="Ocean coupler", default='paleo')
 parser.add_argument("--ocean_melt", dest="ocean_melt",
-                    choices=['x', 'latitudinal'],
-                    help="Ocean melt type", default='x')
+                    choices=['x', '10myr_latitudinal', '20myr_latitudinal'],
+                    help="Ocean melt type", default='20myr_latitudinal')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris_ext')
@@ -130,6 +130,8 @@ else:
 
 if ocean_melt in ('x'):
     ocean_file = 'ocean_forcing_latitudinal_ctrl.nc'
+elif ocean_melt in ('20myr_latitudinal'):
+    ocean_file = 'ocean_forcing_latitudinal_20myr_80n.nc'    
 else:
     ocean_file = 'ocean_forcing_latitudinal_80n.nc'
     

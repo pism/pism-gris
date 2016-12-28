@@ -25,7 +25,7 @@ nc = NC(infile, 'a')
 temp = nc.variables['delta_T'][:]
     
 def def_var(nc, name, units):
-    var = nc.createVariable(name, 'f', dimensions=('time'), zlib=True, complevel=3)
+    var = nc.createVariable(name, 'f', dimensions=('time'))
     var.units = units
     return var
 
