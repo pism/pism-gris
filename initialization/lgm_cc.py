@@ -28,7 +28,7 @@ parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
                     help='''queue. default=long.''', default='long')
 parser.add_argument("--climate", dest="climate",
                     choices=['paleo_const'],
-                    help="Climate", default='paleo_const')
+                    help="Climate", default='paleo')
 parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
                     help="claving", default='vonmises_calving')
@@ -279,7 +279,11 @@ for n, combination in enumerate(combinations):
                 stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
                 ice_density = 910.
                 climate_params_dict = generate_climate(climate,
-                                                       surface_given_file=input_file)
+                                                       **{'surface.pdd.factor_ice': (fice / ice_density),
+                                                          'surface.pdd.factor_snow': (fsnow / ice_density),
+                                                          'atmosphere_searise_greenland_file': precip_file,
+                                                          'atmosphere_paleo_precip_file': 'pism_dT_lgm.nc'
+                                                          'atmosphere_delta_T_file': 'pism_dT_lgm.nc'})
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=input_file,
                                                    ocean_delta_SL_file='pism_dSL_lgm.nc',
