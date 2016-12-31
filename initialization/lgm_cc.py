@@ -282,7 +282,7 @@ for n, combination in enumerate(combinations):
                                                        **{'surface.pdd.factor_ice': (fice / ice_density),
                                                           'surface.pdd.factor_snow': (fsnow / ice_density),
                                                           'atmosphere_searise_greenland_file': precip_file,
-                                                          'atmosphere_paleo_precip_file': 'pism_dT_lgm.nc'
+                                                          'atmosphere_paleo_precip_file': 'pism_dT_lgm.nc',
                                                           'atmosphere_delta_T_file': 'pism_dT_lgm.nc'})
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=input_file,
