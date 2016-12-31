@@ -34,7 +34,7 @@ parser.add_argument("--calving", dest="calving",
                     help="claving", default='vonmises_calving')
 parser.add_argument("--ocean", dest="ocean",
                     choices=['paleo', 'paleo_mbp', 'given'],
-                    help="Ocean coupler", default='given')
+                    help="Ocean coupler", default='paleo_const')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris_ext')
@@ -282,6 +282,7 @@ for n, combination in enumerate(combinations):
                                                        surface_given_file=input_file)
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=input_file,
+                                                   ocean_delta_SL_file='pism_dSL_lgm.nc',
                                                    ocean_frac_mass_flux_file=input_file,
                                                    ocean_delta_MBP_file=input_file)
                 hydro_params_dict = generate_hydrology(hydrology)

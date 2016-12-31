@@ -295,6 +295,7 @@ for n, combination in enumerate(combinations):
                                                           'atmosphere_searise_greenland_file': precip_file})
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=ocean_file,
+                                                   ocean_delta_SL_file='pism_dSL.nc',
                                                    ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power),
                                                    ocean_delta_MBP_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
                 hydro_params_dict = generate_hydrology(hydrology)

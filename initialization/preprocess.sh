@@ -102,6 +102,10 @@ ncatted -O -a calendar,time,c,c,"365_day" $SLSERIES
 echo "done."
 echo
 
+# extract LGM sea-level
+ncks -O -d time $SLSERIES pism_dSL_lgm.nc
+ncap -O -s 'defdim("nb2", 2); time_bnds[\$time,nb2]= -50000,50000; time@bounds="time_bnds"' pism_dSL_lgm.nc pism_dSL_lgm.nc
+
 # get old Bamber topograpy
 DATAVERSION=0.93
 DATAURL=http://websrv.cs.umt.edu/isis/images/8/86/
