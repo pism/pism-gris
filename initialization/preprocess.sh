@@ -75,7 +75,7 @@ ncatted -O -a units,delta_T,m,c,"Kelvin" $TEMPSERIES
 echo "done."
 echo
 
-ncks -O -d time,1000 $TEMPSERIES pism_dT_lgm.nc
+ncks -O -d time,1050 $TEMPSERIES pism_dT_lgm.nc
 ncap2 -O -s 'defdim("nb2", 2); time_bnds[$time,$nb2]={-50000,50000}; time@bounds="time_bnds"' pism_dT_lgm.nc pism_dT_lgm.nc
 
 # extract paleo-climate time series into files suitable for option
@@ -106,7 +106,7 @@ echo "done."
 echo
 
 # extract LGM sea-level
-ncks -O -d time,100 $SLSERIES pism_dSL_lgm.nc
+ncks -O -d time,105 $SLSERIES pism_dSL_lgm.nc
 ncap2 -O -s 'defdim("nb2", 2); time_bnds[$time,$nb2]={-50000,50000}; time@bounds="time_bnds"' pism_dSL_lgm.nc pism_dSL_lgm.nc
 
 # get old Bamber topograpy

@@ -137,7 +137,7 @@ else:
     
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
-save_times = [-25000, -20000, -15000, -12500, -11700]
+save_times = [-20000, -15000, -12500, -11700]
 
     
 pism_config = 'init_config'
@@ -311,7 +311,7 @@ for n, combination in enumerate(combinations):
                                                     start=paleo_start_year,
                                                     end=paleo_end_year,
                                                     odir=odir)
-                snap_shot_dict = generate_snap_shots(outfile, save_times, odir=odir)
+                snap_shot_dict = generate_snap_shots(full_outfile, save_times, odir=odir)
 
                 all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
                 all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
