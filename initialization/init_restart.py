@@ -169,7 +169,7 @@ eigen_calving_k = 1e18
 
 fice_values = [4, 5, 6, 7, 8, 10, 12]
 fsnow_values = [3, 4, 5]
-backpressure_max_values = [0.3, 0.6]
+backpressure_max_values = [0.3, 0.5]
 ocean_melt_power_values = [1]
 thickness_calving_threshold_vales = [100]
 ppq_values = [0.6]
