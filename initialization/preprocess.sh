@@ -79,15 +79,17 @@ ncks -O -d time,1050 $TEMPSERIES pism_dT_lgm.nc
 ncap2 -O -s 'defdim("nb2", 2); time_bnds[$time,$nb2]={-50000,50000}; time@bounds="time_bnds"' pism_dT_lgm.nc pism_dT_lgm.nc
 
 # extract paleo-climate time series into files suitable for option
-# -ocean ...,frac_SMB
-for n in 1 2 3; do
-    OSMBSERIES=pism_fSMB_n_$n.nc
-    echo -n "creating paleo-temperature file $OSMBSERIES from $DATANAME ... "
-    ncks -O $TEMPSERIES $OSMBSERIES
-    python create_paleo_ocean_melt.py -n $n $OSMBSERIES
+# -ocean ...,frac_SMB and MBP
+for b in 0.3 0.5; do
+    for n in 1; do
+        OSMBSERIES=pism_ocean_modifiers_b_${b}_n_${n}.nc
+        echo -n "creating paleo-temperature file $OSMBSERIES from $TEMPSERIES ..."
+        echo
+        ncks -O $TEMPSERIES $OSMBSERIES
+        python ../data_sets/ocean_forcing/create_paleo_ocean_melt.py -b $b -n $n $OSMBSERIES
+    done
 done
 
-exit 
 # extract paleo-climate time series into files suitable for option
 # -ocean ...,delta_SL
 SLSERIES=pism_dSL.nc

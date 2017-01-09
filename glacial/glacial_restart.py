@@ -18,6 +18,8 @@ grid_choices = [18000, 9000, 6000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900
 # set up the option parser
 parser = ArgumentParser()
 parser.description = "Generating scripts for model initialization."
+parser.add_argument("FILE", nargs=1,
+                    help="Input file to restart from", default=None)
 parser.add_argument("-n", '--n_procs', dest="n", type=int,
                     help='''number of cores/processors. default=140.''', default=140)
 parser.add_argument("-w", '--wall_time', dest="walltime",
@@ -25,20 +27,20 @@ parser.add_argument("-w", '--wall_time', dest="walltime",
 parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
                     help='''queue. default=long.''', default='long')
 parser.add_argument("--climate", dest="climate",
-                    choices=['const', 'paleo', 'abrupt_glacial'],
-                    help="Climate", default='paleo')
+                    choices=['abrupt_glacial'],
+                    help="Climate", default='abrupt_glacial')
 parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
                     help="claving", default='vonmises_calving')
 parser.add_argument("--ocean", dest="ocean",
                     choices=['paleo', 'paleo_mbp'],
-                    help="Ocean coupler", default='paleo')
+                    help="Ocean coupler", default='abrupt_glacial')
 parser.add_argument("--ocean_melt", dest="ocean_melt",
                     choices=['x', '10myr_latitudinal', '20myr_latitudinal'],
                     help="Ocean melt type", default='20myr_latitudinal')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
-                    help="sets the modeling domain", default='gris_ext')
+                    help="sets the modeling domain", default='gris')
 parser.add_argument("--exstep", dest="exstep", type=int,
                     help="Writing interval for spatial time series", default=100)
 parser.add_argument("-f", "--o_format", dest="oformat",
@@ -115,8 +117,13 @@ version = options.version
 domain = options.domain
 pism_exec = generate_domain(domain)
 
+if options.FILE is None:
+    print('Missing input file')
+    import sys
+    sys.exit()
+else:
+    input_file = options.FILE[0]
 
-infile = ''
 if domain.lower() in ('greenland_ext', 'gris_ext'):
     pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 else:
@@ -137,7 +144,6 @@ else:
     
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
-save_times = [-20000, -15000, -12500, -11700]
 
     
 pism_config = 'init_config'
@@ -197,9 +203,9 @@ scripts = []
 scripts_combinded = []
 scripts_post = []
 
-paleo_start_year = -125000
-paleo_end_year = 0
-restart_step = 25000
+paleo_start_year = 0
+paleo_end_year = 10000
+restart_step = 2500
 
 for n, combination in enumerate(combinations):
 
@@ -259,6 +265,9 @@ for n, combination in enumerate(combinations):
                 if start == paleo_start_year:
                     general_params_dict['bootstrap'] = ''
                     general_params_dict['i'] = pism_dataname
+                    general_params_dict['regrid_file'] = input_file
+                    general_params_dict['regrid_vars'] = regridvars
+                    general_params_dict['regrid_special'] = ''
                 else:
                     general_params_dict['i'] = regridfile
                 if (start == paleo_start_year) and (topg_delta_file is not None):
@@ -269,7 +278,6 @@ for n, combination in enumerate(combinations):
                 general_params_dict['o_format'] = oformat
                 general_params_dict['o_size'] = osize
                 general_params_dict['config_override'] = pism_config_nc
-                general_params_dict['age'] = ''
                 if bed_deformation not in ('off'):
                     general_params_dict['bed_def'] = bed_deformation
                 if forcing_type in ('e_age'):
@@ -314,9 +322,8 @@ for n, combination in enumerate(combinations):
                                                     start=paleo_start_year,
                                                     end=paleo_end_year,
                                                     odir=odir)
-                snap_shot_dict = generate_snap_shots(full_outfile, save_times, odir=odir)
 
-                all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
+                all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
                 all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
 
                 if system in ('debug'):

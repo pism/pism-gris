@@ -10,6 +10,8 @@ from argparse import ArgumentParser
 parser = ArgumentParser()
 parser.description = "Create delta mass flux fractions from GRIP record."
 parser.add_argument("FILE", nargs='*')
+parser.add_argument("-b",dest="backpressure_max", type=float,
+                    help="Maximum backpressure fraction",default=0.3)
 parser.add_argument("-n",dest="n", type=float,
                     help="power-law exponent",default=2)
 
@@ -17,6 +19,7 @@ parser.add_argument("-n",dest="n", type=float,
 options = parser.parse_args()
 args = options.FILE
 n = options.n
+backpressure_max = options.backpressure_max
 
 infile = args[0]
 
@@ -53,7 +56,7 @@ frac_var[:] = frac
 
 x1 = 0
 x2 = 10.
-y1 = 0.6
+y1 = backpressure_max
 y2 = 0.1
 
 a = (y2-y1)/(np.power(x2,n)-np.power(x1,n))
