@@ -307,8 +307,8 @@ for n, combination in enumerate(combinations):
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=ocean_file,
                                                    ocean_delta_SL_file='pism_abrupt_glacial_climate_forcing.nc',
-                                                   ocean_frac_mass_flux_file='pism_ocean_modifier_b_{}_n_{}.nc'.format(backpressure_max, ocean_melt_power),
-                                                   ocean_delta_MBP_file='pism_ocean_modifier_b_{}_n_{}.nc'.format(backpressure_max, ocean_melt_power))
+                                                   ocean_frac_mass_flux_file='pism_abrupt_glacial_climate_forcing.nc',
+                                                   ocean_delta_MBP_file='pism_abrupt_glacial_climate_forcing.nc')
                 hydro_params_dict = generate_hydrology(hydrology)
                 calving_params_dict = generate_calving(calving,
                                                        thickness_calving_threshold=thickness_calving_threshold,
