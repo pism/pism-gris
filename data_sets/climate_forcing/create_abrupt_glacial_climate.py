@@ -75,7 +75,7 @@ temp[0:501] = np.linspace(T_a, T_e, 501)
 dT_var[:] = temp
 
 var = 'delta_SL'
-dSL_var = def_var(nc, var, "1")
+dSL_var = def_var(nc, var, "m")
 SL_a = 0.
 SL_e = -100.
 
