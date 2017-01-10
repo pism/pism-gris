@@ -375,7 +375,11 @@ def generate_grid_description(grid_resolution, domain, restart=False):
         mzb = 11
 
     vertical_grid = OrderedDict()
-    vertical_grid['Lz'] = 5000
+    ## This sould be a temporary hack to restart from an older simulation
+    if domain.lower == 'gris':
+        vertical_grid['Lz'] = 4000
+    else:
+        vertical_grid['Lz'] = 5000
     vertical_grid['Lbz'] = 2000
     vertical_grid['z_spacing'] = 'equal'
     vertical_grid['Mz'] = mz
