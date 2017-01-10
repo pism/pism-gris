@@ -233,8 +233,9 @@ for n, combination in enumerate(combinations):
     with open(script_combined, 'w') as f_combined:
 
         outfiles = []
-
+        job_no = 0
         for start in range(paleo_start_year, paleo_end_year, restart_step):
+            job_no += 1
 
             end = start + restart_step
 
@@ -327,9 +328,9 @@ for n, combination in enumerate(combinations):
                 all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
 
                 if system in ('debug'):
-                    cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job.${batch}'.format(outdir=odir,batch=batch_system['job_id'])])
+                    cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job_{job_no}.${batch}'.format(outdir=odir, job_no=job_no, batch=batch_system['job_id'])])
                 else:
-                    cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
+                    cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job_{job_no}.${batch}  2>&1'.format(outdir=odir, job_no=job_no, batch=batch_system['job_id'])])
 
 
                 f.write(cmd)

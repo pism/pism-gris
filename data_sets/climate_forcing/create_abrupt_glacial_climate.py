@@ -55,7 +55,7 @@ bnds_var_name = "time_bnds"
 time_var = nc.createVariable(time_var_name, 'd', dimensions=(time_dim))
 time_var[:] = time_interval_since_refdate
 time_var.bounds = bnds_var_name
-time_var.units = 'days since 1-1-1'
+time_var.units = 'years since 1-1-1'
 time_var.calendar = '365_day'
 time_var.standard_name = time_var_name
 time_var.axis = "T"
