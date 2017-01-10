@@ -376,7 +376,7 @@ def generate_grid_description(grid_resolution, domain, restart=False):
 
     vertical_grid = OrderedDict()
     ## This sould be a temporary hack to restart from an older simulation
-    if domain.lower == 'gris':
+    if domain.lower() == 'gris':
         vertical_grid['Lz'] = 4000
     else:
         vertical_grid['Lz'] = 5000
