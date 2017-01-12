@@ -272,9 +272,7 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None,
     else:
         times = step
         
-    params_dict['extra_times'] = times
-    params_dict['extra_append'] = ''
-        
+    params_dict['extra_times'] = times        
   
     return params_dict
 
