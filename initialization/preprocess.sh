@@ -80,7 +80,7 @@ ncap2 -O -s 'defdim("nb2", 2); time_bnds[$time,$nb2]={-50000,50000}; time@bounds
 
 # extract paleo-climate time series into files suitable for option
 # -ocean ...,frac_SMB and MBP
-for b in 0.3 0.5; do
+for b in 0.25 0.5; do
     for n in 1; do
         OSMBSERIES=pism_ocean_modifiers_b_${b}_n_${n}.nc
         echo -n "creating paleo-temperature file $OSMBSERIES from $TEMPSERIES ..."
