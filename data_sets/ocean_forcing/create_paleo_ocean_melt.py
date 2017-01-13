@@ -42,7 +42,7 @@ a = (psi_max - psi_min) / (np.power(T_max, n) - np.power(T_min, n))
 b = psi_min - a * np.power(T_min, n)
 
 psi = np.zeros_like(temp)
-psi = a * (temp + T_min)**n + b
+psi = a * (temp)**n + b
 psi[temp<T_min] = psi_min
 
 var = "frac_mass_flux"
@@ -62,7 +62,7 @@ psi_max = 0.05
 a = (psi_max - psi_min) / (np.power(T_max, n) - np.power(T_min, n))
 b = psi_min - a * np.power(T_min, n)
 psi = np.zeros_like(temp)
-psi = a * (temp - T_min)**n + b
+psi = a * (temp)**n + b
 psi[temp<T_min] = psi_min
 psi[temp>T_max] = psi_max
 
