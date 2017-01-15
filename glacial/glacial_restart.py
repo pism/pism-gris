@@ -33,14 +33,14 @@ parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
                     help="claving", default='vonmises_calving')
 parser.add_argument("--ocean", dest="ocean",
-                    choices=['paleo', 'paleo_mbp'],
+                    choices=['abrupt_glacial', 'abrupt_glacial_mbp'],
                     help="Ocean coupler", default='abrupt_glacial')
 parser.add_argument("--ocean_melt", dest="ocean_melt",
                     choices=['x', '10myr_latitudinal', '20myr_latitudinal'],
                     help="Ocean melt type", default='20myr_latitudinal')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
-                    help="sets the modeling domain", default='gris')
+                    help="sets the modeling domain", default='gris_ext')
 parser.add_argument("--exstep", dest="exstep", type=int,
                     help="Writing interval for spatial time series", default=100)
 parser.add_argument("-f", "--o_format", dest="oformat",

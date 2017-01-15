@@ -159,9 +159,10 @@ eigen_calving_k = 1e18
 
 fice_values = [8]
 fsnow_values = [3, 4, 5]
+backpressure_max_values = [0.25, 0.5]
 ocean_melt_power_values = [1]
 thickness_calving_threshold_vales = [100]
-ppq_values = [0.33]
+ppq_values = [0.6]
 tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]
@@ -169,6 +170,7 @@ topg_min_values = [-700]
 topg_max_values = [700]
 combinations = list(itertools.product(fice_values,
                                       fsnow_values,
+                                      backpressure_max_values,
                                       ocean_melt_power_values,
                                       thickness_calving_threshold_vales,
                                       ppq_values,
@@ -191,7 +193,7 @@ restart_step = 1000
 
 for n, combination in enumerate(combinations):
 
-    fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    fice, fsnow, backpressure_max, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -203,6 +205,8 @@ for n, combination in enumerate(combinations):
     if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
         name_options['threshold'] = thickness_calving_threshold
     name_options['ocean_n'] = ocean_melt_power
+    if ocean == 'paleo_mbp':
+        name_options['ocean_mbp'] = backpressure_max
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
@@ -238,7 +242,7 @@ for n, combination in enumerate(combinations):
 
                 f.write(batch_header)
 
-                outfile = '{domain}_g{grid}m_straight_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+                outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
                 prefix = generate_prefix_str(pism_exec)
 
@@ -287,8 +291,8 @@ for n, combination in enumerate(combinations):
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=input_file,
                                                    ocean_delta_SL_file='pism_dSL_lgm.nc',
-                                                   ocean_frac_mass_flux_file=input_file,
-                                                   ocean_delta_MBP_file=input_file)
+                                                   ocean_frac_mass_flux_file='pism_ocean_modifiers_b_{}_n_{}.nc'.format(backpressure_max, ocean_melt_power),
+                                                   ocean_delta_MBP_file='pism_ocean_modifiers_b_{}_n_{}.nc'.format(backpressure_max, ocean_melt_power))
                 hydro_params_dict = generate_hydrology(hydrology)
                 calving_params_dict = generate_calving(calving,
                                                        thickness_calving_threshold=thickness_calving_threshold,
