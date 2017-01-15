@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2015 Andy Aschwanden
+# Copyright (C) 2016-17 Andy Aschwanden
 
 import itertools
 from collections import OrderedDict
@@ -258,7 +258,7 @@ for n, combination in enumerate(combinations):
 
                 f.write(batch_header)
 
-                outfile = '{domain}_g{grid}m_straight_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+                outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
                 prefix = generate_prefix_str(pism_exec)
 
@@ -331,7 +331,6 @@ for n, combination in enumerate(combinations):
                     cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job_{job_no}.${batch}'.format(outdir=odir, job_no=job_no, batch=batch_system['job_id'])])
                 else:
                     cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job_{job_no}.${batch}  2>&1'.format(outdir=odir, job_no=job_no, batch=batch_system['job_id'])])
-
 
                 f.write(cmd)
                 f.write('\n')

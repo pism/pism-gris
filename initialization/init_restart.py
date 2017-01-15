@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2015 Andy Aschwanden
+# Copyright (C) 2015-17 Andy Aschwanden
 
 import itertools
 from collections import OrderedDict
@@ -253,7 +253,7 @@ for n, combination in enumerate(combinations):
 
                 f.write(batch_header)
 
-                outfile = '{domain}_g{grid}m_straight_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+                outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
                 prefix = generate_prefix_str(pism_exec)
 
