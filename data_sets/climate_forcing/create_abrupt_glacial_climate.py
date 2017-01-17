@@ -83,17 +83,17 @@ SL = np.zeros_like(time_interval_since_refdate) + SL_e
 SL[0:501] = np.linspace(SL_a, SL_e, 501)
 dSL_var[:] = SL
 
-x1 = 0
-x2 = 10.
-y1 = 0.01
-y2 = 1.
+T_max = 0
+T_min = -10
+psi_min = 0.01
+psi_max = 1.
 
-a = (y2-y1)/(np.power(x2,n)-np.power(x1,n))
-b = y1 - a*np.power(x1, n)
+a = (psi_max - psi_min) / (np.power(T_max, n) - np.power(T_min, n))
+b = psi_min - a * np.power(T_min, n)
 
-frac = np.zeros_like(temp)
-frac = a*(temp+x2)**n + b
-frac[temp<-x2] = y1
+psi = np.zeros_like(temp)
+psi = a * (temp)**n + b
+psi[temp<T_min] = psi_min
 
 var = "frac_mass_flux"
 if (var not in nc.variables.keys()):
@@ -101,9 +101,27 @@ if (var not in nc.variables.keys()):
 else:
     frac_var = nc.variables[var]
 
-frac_var[:] = frac
+frac_var[:] = psi
 
+T_max = 0
+T_min = -10
+psi_min = backpressure_max
+psi_max = 0.05
 
+a = (psi_max - psi_min) / (np.power(T_max, n) - np.power(T_min, n))
+b = psi_min - a * np.power(T_min, n)
+psi = np.zeros_like(temp)
+psi = a * (temp)**n + b
+psi[temp<T_min] = psi_min
+psi[temp>T_max] = psi_max
+
+var = "delta_MBP"
+if (var not in nc.variables.keys()):
+    frac_var = def_var(nc, var, "1")
+else:
+    frac_var = nc.variables[var]
+
+frac_var[:] = psi
 
 # writing global attributes
 script_command = ' '.join([time.ctime(), ':', __file__.split('/')[-1],
