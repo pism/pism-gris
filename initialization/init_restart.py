@@ -142,7 +142,7 @@ regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 save_times = [-20000, -15000, -12500, -11700]
 
 if options.no_refreeze:
-    pism_config = 'init_config_refreeze'
+    pism_config = 'init_config_norefreeze'
 else:
     pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
