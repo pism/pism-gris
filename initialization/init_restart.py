@@ -69,6 +69,8 @@ parser.add_argument("--forcing_type", dest="forcing_type",
 parser.add_argument("--hydrology", dest="hydrology",
                     choices=['null', 'diffuse', 'routing'],
                     help="Basal hydrology model.", default='diffuse')
+parser.add_argument("--no_refreeze", dest="no_refreeze", action="store_true",
+                    help="Turn off refreeze", default=False)
 parser.add_argument("--precip", dest="precip",
                     choices=['racmo', 'hirham'],
                     help="Precipitation model", default='racmo')
@@ -139,8 +141,10 @@ else:
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 save_times = [-20000, -15000, -12500, -11700]
 
-    
-pism_config = 'init_config'
+if options.no_refreeze:
+    pism_config = 'init_config_refreeze'
+else:
+    pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
 # Anaconda libssl problem on chinook
