@@ -63,6 +63,8 @@ parser.add_argument("--bed_deformation", dest="bed_deformation",
                     help="Bed deformation model.", default='off')
 parser.add_argument("--frontal_melt", dest="frontal_melt", action="store_true",
                     help="Turn on frontal melt", default=False)
+parser.add_argument("--stable_gl", dest="float_kill_calve_near_grounding_line", action="store_false",
+                    help="Turn on frontal melt", default=True)
 parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
@@ -102,6 +104,7 @@ bed_type = options.bed_type
 calving = options.calving
 climate = options.climate
 exstep = options.exstep
+float_kill_calve_near_grounding_line = options.float_kill_calve_near_grounding_line
 forcing_type = options.forcing_type
 frontal_melt = options.frontal_melt
 grid = options.grid
@@ -311,6 +314,7 @@ for n, combination in enumerate(combinations):
                 calving_params_dict = generate_calving(calving,
                                                        thickness_calving_threshold=thickness_calving_threshold,
                                                        eigen_calving_k=eigen_calving_k,
+                                                       float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
                                                        ocean_kill_file=pism_dataname,
                                                        frontal_melt=frontal_melt)
 
