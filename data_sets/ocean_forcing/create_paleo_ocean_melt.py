@@ -74,5 +74,12 @@ else:
 
 frac_var[:] = psi
 
+var = "frac_MBP"
+if (var not in nc.variables.keys()):
+    frac_var = def_var(nc, var, "1")
+else:
+    frac_var = nc.variables[var]
+
+frac_var[:] = psi
 
 nc.close()
