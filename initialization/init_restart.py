@@ -64,7 +64,7 @@ parser.add_argument("--bed_deformation", dest="bed_deformation",
 parser.add_argument("--frontal_melt", dest="frontal_melt", action="store_true",
                     help="Turn on frontal melt", default=False)
 parser.add_argument("--stable_gl", dest="float_kill_calve_near_grounding_line", action="store_false",
-                    help="Turn on frontal melt", default=True)
+                    help="Stable grounding line", default=True)
 parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
