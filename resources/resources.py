@@ -110,6 +110,45 @@ def default_spatial_ts_vars():
     return exvars
 
 
+def glacial_spatial_ts_vars():
+    '''
+    Returns a list of commonly-used extra vars
+    '''
+    
+    exvars = ['basal_mass_balance_average',
+              'bmelt',
+              'cell_area',
+              'dHdt',
+              'discharge_flux',
+              'eigen_calving_rate',
+              'height_above_flotation',
+              'ice_mass',
+              'mask',
+              'lat',
+              'lat_bnds',
+              'lon',
+              'lon_bnds',
+              'saccum_average',
+              'smelt_average',
+              'srunoff_average',              
+              'sea_level',
+              'surface_mass_balance_average',
+              'temppabase',
+              'tempsurf',
+              'thk',
+              'topg',
+              'topg_sl_adjusted',
+              'usurf',
+              'velbase',
+              'velbase_mag',
+              'velsurf',
+              'velsurf_mag',
+              'vonmises_calving_rate',
+              'vonmises_stress']
+    
+    return exvars
+
+
 def essential_spatial_ts_vars():
     '''
     Returns a list of essential extra vars

@@ -67,20 +67,24 @@ time_bnds_var[:, 1] = bnds_interval_since_refdate[1::]
 
 var = 'delta_T'
 dT_var = def_var(nc, var, "K")
-T_a = 0.
-T_e = -15.
+T_0 = 0.
+T_1 = -15.
+T_2 = 5.
 
-temp = np.zeros_like(time_interval_since_refdate) + T_e
-temp[0:501] = np.linspace(T_a, T_e, 501)
+temp = np.zeros_like(time_interval_since_refdate) + T_2
+temp[0:500] = np.linspace(T_0, T_1, 500)
+temp[500:2000] = T_1
+temp[2000:2450] = np.linspace(T_1, T_2, 450) 
 dT_var[:] = temp
 
 var = 'delta_SL'
 dSL_var = def_var(nc, var, "m")
-SL_a = 0.
-SL_e = -100.
+SL_0 = 0.
+SL_1 = -100.
+SL_1 = 0.
 
-SL = np.zeros_like(time_interval_since_refdate) + SL_e
-SL[0:501] = np.linspace(SL_a, SL_e, 501)
+SL = np.zeros_like(time_interval_since_refdate) + SL_1
+SL[0:501] = np.linspace(SL_0, SL_1, 501)
 dSL_var[:] = SL
 
 T_max = 0
@@ -116,6 +120,14 @@ psi[temp<T_min] = psi_min
 psi[temp>T_max] = psi_max
 
 var = "delta_MBP"
+if (var not in nc.variables.keys()):
+    frac_var = def_var(nc, var, "1")
+else:
+    frac_var = nc.variables[var]
+
+frac_var[:] = psi
+
+var = "frac_MBP"
 if (var not in nc.variables.keys()):
     frac_var = def_var(nc, var, "1")
 else:

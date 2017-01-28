@@ -173,9 +173,9 @@ ssa_e = (1.0)
 
 eigen_calving_k = 1e18
 
-fice_values = [4, 5, 6, 7, 8, 10, 12]
-fsnow_values = [3, 4, 5]
-backpressure_max_values = [0.3, 0.6]
+fice_values = [8]
+fsnow_values = [3]
+backpressure_max_values = [0.25, 0.5]
 ocean_melt_power_values = [1]
 thickness_calving_threshold_vales = [100]
 ppq_values = [0.6]
@@ -204,7 +204,7 @@ scripts_combinded = []
 scripts_post = []
 
 paleo_start_year = 0
-paleo_end_year = 15000
+paleo_end_year = 25000
 restart_step = 2500
 
 for n, combination in enumerate(combinations):
@@ -241,7 +241,7 @@ for n, combination in enumerate(combinations):
 
             experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
-            script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+            script = 'glacial_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
             scripts.append(script)
 
             for filename in (script):
@@ -317,7 +317,7 @@ for n, combination in enumerate(combinations):
                                                        ocean_kill_file=pism_dataname,
                                                        frontal_melt=frontal_melt)
 
-                exvars = init_spatial_ts_vars()
+                exvars = glacial_spatial_ts_vars()
                 spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
                 scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
                                                     start=paleo_start_year,
