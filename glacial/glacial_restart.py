@@ -220,7 +220,7 @@ for n, combination in enumerate(combinations):
     name_options['calving'] = calving
     if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
         name_options['threshold'] = thickness_calving_threshold
-    if ocean == 'paleo_mbp':
+    if ocean == 'abrupt_glacial_mbp':
         name_options['ocean_mbp'] = backpressure_max
     name_options['forcing_type'] = forcing_type
     
