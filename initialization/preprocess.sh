@@ -87,6 +87,8 @@ for b in 0.25 0.5; do
         echo
         ncks -O $TEMPSERIES $OSMBSERIES
         python ../data_sets/ocean_forcing/create_paleo_ocean_melt.py -b $b -n $n $OSMBSERIES
+        ncks -O -d time,1050 $OSMSERIES pism_ocean_modifiers_b_${b}_n_${n}_lgm.nc
+        ncap2 -O -s 'defdim("nb2", 2); time_bnds[$time,$nb2]={-50000,50000}; time@bounds="time_bnds"' pism_ocean_modifiers_b_${b}_n_${n}_lgm.nc pism_ocean_modifiers_b_${b}_n_${n}_lgm.nc
     done
 done
 
