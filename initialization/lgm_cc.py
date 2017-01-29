@@ -158,7 +158,7 @@ ssa_e = (1.0)
 eigen_calving_k = 1e18
 
 fice_values = [8]
-fsnow_values = [3, 4, 5]
+fsnow_values = [3]
 backpressure_max_values = [0.25, 0.5]
 ocean_melt_power_values = [1]
 thickness_calving_threshold_vales = [100]
@@ -204,7 +204,6 @@ for n, combination in enumerate(combinations):
     name_options['calving'] = calving
     if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
         name_options['threshold'] = thickness_calving_threshold
-    name_options['ocean_n'] = ocean_melt_power
     if ocean == 'paleo_mbp':
         name_options['ocean_mbp'] = backpressure_max
     name_options['forcing_type'] = forcing_type
