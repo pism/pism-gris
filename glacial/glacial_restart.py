@@ -321,7 +321,7 @@ for n, combination in enumerate(combinations):
                     calving_params_dict = generate_calving(calving,
                                                            thickness_calving_threshold=thickness_calving_threshold,
                                                            eigen_calving_k=eigen_calving_k,
-                                                           ocean_kill_file=regrid_file,
+                                                           ocean_kill_file=regridfile,
                                                            frontal_melt=frontal_melt)
 
                 exvars = glacial_spatial_ts_vars()
