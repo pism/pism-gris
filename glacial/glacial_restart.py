@@ -311,11 +311,18 @@ for n, combination in enumerate(combinations):
                                                    ocean_frac_mass_flux_file='pism_abrupt_glacial_climate_forcing.nc',
                                                    ocean_delta_MBP_file='pism_abrupt_glacial_climate_forcing.nc')
                 hydro_params_dict = generate_hydrology(hydrology)
-                calving_params_dict = generate_calving(calving,
-                                                       thickness_calving_threshold=thickness_calving_threshold,
-                                                       eigen_calving_k=eigen_calving_k,
-                                                       ocean_kill_file=pism_dataname,
-                                                       frontal_melt=frontal_melt)
+                if start == paleo_start_year:
+                    calving_params_dict = generate_calving(calving,
+                                                           thickness_calving_threshold=thickness_calving_threshold,
+                                                           eigen_calving_k=eigen_calving_k,
+                                                           ocean_kill_file=input_file,
+                                                           frontal_melt=frontal_melt)
+                else:
+                    calving_params_dict = generate_calving(calving,
+                                                           thickness_calving_threshold=thickness_calving_threshold,
+                                                           eigen_calving_k=eigen_calving_k,
+                                                           ocean_kill_file=regrid_file,
+                                                           frontal_melt=frontal_melt)
 
                 exvars = glacial_spatial_ts_vars()
                 spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
