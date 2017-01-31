@@ -74,8 +74,8 @@ parser.add_argument("--hydrology", dest="hydrology",
 parser.add_argument("--precip", dest="precip",
                     choices=['racmo', 'hirham'],
                     help="Precipitation model", default='racmo')
-parser.add_argument("--stable_gl", dest="float_kill_calve_near_grounding_line", action="store_false",
-                    help="Stable grounding line", default=True)
+parser.add_argument("--stable_gl", dest="float_kill_calve_near_grounding_line", action="store_true",
+                    help="Stable grounding line", default=False)
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
