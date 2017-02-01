@@ -14,7 +14,7 @@ parser.add_argument("FILE", nargs='*')
 parser.add_argument("-b",dest="backpressure_max", type=float,
                     help="Maximum backpressure fraction",default=0.3)
 parser.add_argument("-n",dest="n", type=float,
-                    help="power-law exponent",default=2)
+                    help="power-law exponent",default=1)
 
 
 options = parser.parse_args()
@@ -81,10 +81,12 @@ var = 'delta_SL'
 dSL_var = def_var(nc, var, "m")
 SL_0 = 0.
 SL_1 = -100.
-SL_1 = 0.
+SL_2 = 0.
 
-SL = np.zeros_like(time_interval_since_refdate) + SL_1
-SL[0:501] = np.linspace(SL_0, SL_1, 501)
+SL = np.zeros_like(time_interval_since_refdate) + SL_0
+SL[100:1500] = np.linspace(SL_0, SL_1, 1400)
+SL[1500:2100] = SL_1
+SL[2100:2550] = np.linspace(SL_1, SL_2, 450) 
 dSL_var[:] = SL
 
 T_max = 0
