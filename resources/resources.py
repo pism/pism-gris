@@ -37,16 +37,16 @@ def generate_domain(domain):
     if domain.lower() in ('greenland', 'gris', 'gris_ext'):
         pism_exec = 'pismr'
     elif domain.lower() in ('hia'):
-        x_min = -652200
-        x_max = -232600
-        y_min = -1263900
-        y_max = -943500
+        x_min = -652200.
+        x_max = -232600.
+        y_min = -1263900.
+        y_max = -943500.
         pism_exec = '''pismo -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)        
     elif domain.lower() in ('jakobshavn', 'jib'):
-        x_min = -280000
-        x_max = 320000
-        y_min = -2410000
-        y_max = -2020000
+        x_min = -280000.
+        x_max = 320000.
+        y_min = -2410000.
+        y_max = -2020000.
         pism_exec = '''pismo -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
     else:
         print('Domain {} not recognized, exiting'.format(domain))

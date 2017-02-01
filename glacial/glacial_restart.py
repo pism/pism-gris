@@ -207,7 +207,7 @@ scripts_combinded = []
 scripts_post = []
 
 paleo_start_year = 0
-paleo_end_year = 25000
+paleo_end_year = 27500
 restart_step = 2500
 
 for n, combination in enumerate(combinations):
