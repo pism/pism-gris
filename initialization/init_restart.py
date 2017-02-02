@@ -172,8 +172,7 @@ sia_e = (3.0)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
-eigen_calving_k = 1e18
-
+eigen_calving_k_values = [1e15, 1e16, 1e17, 1e18]
 fice_values = [4, 6, 8, 10, 12]
 fsnow_values = [3, 4, 5]
 backpressure_max_values = [0.25, 0.5]
@@ -185,7 +184,8 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(fice_values,
+combinations = list(itertools.product(eigen_calving_k_values,
+                                      fice_values,
                                       fsnow_values,
                                       backpressure_max_values,
                                       ocean_melt_power_values,
@@ -210,7 +210,7 @@ restart_step = 25000
 
 for n, combination in enumerate(combinations):
 
-    fice, fsnow, backpressure_max, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    eigen_calving_k, fice, fsnow, backpressure_max, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -221,6 +221,8 @@ for n, combination in enumerate(combinations):
     name_options['calving'] = calving
     if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
         name_options['threshold'] = thickness_calving_threshold
+    if calving in ('eigen_calving', 'hybrid_calving'):
+        name_options['k'] = eigen_calving_k
     if ocean == 'paleo_mbp':
         name_options['ocean_mbp'] = backpressure_max
     name_options['forcing_type'] = forcing_type
