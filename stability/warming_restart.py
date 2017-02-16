@@ -162,6 +162,14 @@ cmd = [ncgen, '-o',
 sub.call(cmd)
 if not os.path.isdir(odir):
     os.mkdir(odir)
+
+state_dir = 'state'
+scalar_dir = 'scalar'
+spatial_dir = 'spatial'
+snap_dir = 'snap'
+for tsdir in (scalar_dir, spatial_dir, snap_dir, state_dir):
+    if not os.path.isdir(os.path.join(odir, tsdir)):
+        os.mkdir(os.path.join(odir, tsdir))
 odir_tmp = '_'.join([odir, 'tmp'])
 if not os.path.isdir(odir_tmp):
     os.mkdir(odir_tmp)
@@ -226,14 +234,13 @@ for n, combination in enumerate(combinations):
         name_options['threshold'] = thickness_calving_threshold
     if calving in ('eigen_calving', 'hybrid_calving'):
         name_options['k'] = eigen_calving_k
-    name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
     climate_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=T_max)
     # All runs in one script file for coarse grids that fit into max walltime
-    script_combined = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
+    script_combined = 'warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
     with open(script_combined, 'w') as f_combined:
 
         outfiles = []
@@ -245,7 +252,7 @@ for n, combination in enumerate(combinations):
 
             experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
-            script = 'glacial_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+            script = 'warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
             scripts.append(script)
 
             for filename in (script):
@@ -279,7 +286,7 @@ for n, combination in enumerate(combinations):
                     general_params_dict['topg_delta_file'] = topg_delta_file
                 general_params_dict['ys'] = start
                 general_params_dict['ye'] = end
-                general_params_dict['o'] = os.path.join(odir, outfile)
+                general_params_dict['o'] = os.path.join(odir, state_dir, outfile)
                 general_params_dict['o_format'] = oformat
                 general_params_dict['o_size'] = osize
                 general_params_dict['config_override'] = pism_config_nc
@@ -337,7 +344,7 @@ for n, combination in enumerate(combinations):
                 scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
                                                     start=simulation_start_year,
                                                     end=simulation_end_year,
-                                                    odir=odir)
+                                                    odir=os.path.join(odir, scalar_dir))
 
                 all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
                 all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
@@ -358,7 +365,7 @@ for n, combination in enumerate(combinations):
 
     scripts_combinded.append(script_combined)
 
-    script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
+    script_post = 'warm_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
     scripts_post.append(script_post)
 
     post_header = make_batch_post_header(system)
@@ -370,10 +377,10 @@ for n, combination in enumerate(combinations):
         extra_file = spatial_ts_dict['extra_file']
         myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(simulation_start_year+exstep, simulation_end_year, exstep)])
         myoutfile = extra_file + '.nc'
-        myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
+        myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
-        ts_file = os.path.join(odir, 'ts_{domain}_g{grid}m_straight_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
+        ts_file = os.path.join(odir, spatial_dir, 'ts_{domain}_g{grid}m_straight_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])
         myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
         myoutfile = os.path.split(myoutfile)[-1]
