@@ -27,7 +27,7 @@ parser.add_argument("-w", '--wall_time', dest="walltime",
 parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
                     help='''queue. default=long.''', default='long')
 parser.add_argument("--climate", dest="climate",
-                    choices=['warming'],
+                    choices=['warming', 'warming_precip'],
                     help="Climate", default='warming')
 parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
@@ -358,7 +358,7 @@ for n, combination in enumerate(combinations):
                 f_combined.write(cmd)
                 f_combined.write('\n\n')
                 
-                regridfile = os.path.join(odir, outfile)
+                regridfile = os.path.join(odir, state_dir, outfile)
                 outfiles.append(outfile)
 
     scripts_combinded.append(script_combined)
