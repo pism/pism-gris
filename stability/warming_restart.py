@@ -40,7 +40,7 @@ parser.add_argument("--ocean_melt", dest="ocean_melt",
                     help="Ocean melt type", default='20myr_latitudinal')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
-                    help="sets the modeling domain", default='gris_ext')
+                    help="sets the modeling domain", default='gris')
 parser.add_argument("--exstep", dest="exstep", type=int,
                     help="Writing interval for spatial time series", default=100)
 parser.add_argument("-f", "--o_format", dest="oformat",
@@ -320,9 +320,7 @@ for n, combination in enumerate(combinations):
                                                           'atmosphere_delta_T_file': climate_file})
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=ocean_file,
-                                                   ocean_delta_SL_file='pism_warming_climate_forcing.nc',
-                                                   ocean_frac_mass_flux_file='pism_warming_climate_forcing.nc',
-                                                   ocean_delta_MBP_file='pism_warming_climate_forcing.nc')
+                                                   ocean_frac_mass_flux_file=climate_file)
                 hydro_params_dict = generate_hydrology(hydrology)
                 if start == simulation_start_year:
                     calving_params_dict = generate_calving(calving,
