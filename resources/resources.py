@@ -574,6 +574,14 @@ def generate_climate(climate, **kwargs):
             params_dict['atmosphere_delta_T_file'] = 'pism_abrupt_glacial_climate_forcing.nc'
         params_dict['surface'] = 'pdd'
         params_dict['pdd_std_dev_method'] = 'quadratic'  # Wake and Marshall (2015)
+    elif climate in ('warming'):
+        params_dict['atmosphere'] = 'searise_greenland,delta_T,paleo_precip'
+        if 'atmosphere_paleo_precip_file' not in kwargs:
+            params_dict['atmosphere_paleo_precip_file'] = 'pism_warmingl_climate_forcing.nc'
+        if 'atmosphere_delta_T_file' not in kwargs:
+            params_dict['atmosphere_delta_T_file'] = 'pism_warming_climate_forcing.nc'
+        params_dict['surface'] = 'pdd'
+        params_dict['pdd_std_dev_method'] = 'quadratic'  # Wake and Marshall (2015)
     elif climate in ('paleo_const'):
         params_dict['atmosphere'] = 'searise_greenland'
         params_dict['surface'] = 'given'
@@ -627,6 +635,8 @@ def generate_ocean(ocean, **kwargs):
         params_dict['ocean'] = 'given,delta_SL,frac_SMB,delta_MBP'
         if 'ocean_delta_SL_file' not in kwargs:
             params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
+    elif ocean == 'warming':
+        params_dict['ocean'] = 'given,frac_SMB'
     elif ocean == 'paleo_const':
         params_dict['ocean'] = 'given,delta_SL'        
     elif ocean == 'paleo_const_mbp':
