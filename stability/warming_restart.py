@@ -182,7 +182,7 @@ sia_e = (3.0)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
-T_max_values = [1]
+T_max_values = [1, 5, 10]
 eigen_calving_k_values = [1e15, 1e18]
 fice_values = [8]
 fsnow_values = [3]
@@ -215,8 +215,8 @@ scripts_combinded = []
 scripts_post = []
 
 simulation_start_year = 0
-simulation_end_year = 5000
-restart_step = 1000
+simulation_end_year = 10000
+restart_step = 2500
 
 for n, combination in enumerate(combinations):
 
