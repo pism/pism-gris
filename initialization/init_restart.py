@@ -73,6 +73,8 @@ parser.add_argument("--hydrology", dest="hydrology",
                     help="Basal hydrology model.", default='diffuse')
 parser.add_argument("--no_refreeze", dest="no_refreeze", action="store_true",
                     help="Turn off refreeze", default=False)
+parser.add_argument("-p", "--params", dest="params_list",
+                    help="Comma-separated list with params for sensitivity", default=None)
 parser.add_argument("--precip", dest="precip",
                     choices=['racmo', 'hirham'],
                     help="Precipitation model", default='racmo')
@@ -117,6 +119,21 @@ topg_delta_file = options.topg_delta_file
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 
+# Check which parameters are used for sensitivity study
+params_list = options.params_list
+do_eigen_calving_k = False
+do_fice = False
+do_fsnow = False
+if params_list is not None:
+    params = params_list.split(',')
+    if 'eigen_calving_k' in params:
+        do_eigen_calving_k = True
+    if 'fice' in params:
+        do_fice = True
+    if 'fsnow' in params:
+        do_fsnow = True    
+
+
 domain = options.domain
 pism_exec = generate_domain(domain)
 
@@ -160,6 +177,13 @@ cmd = [ncgen, '-o',
 sub.call(cmd)
 if not os.path.isdir(odir):
     os.mkdir(odir)
+state_dir = 'state'
+scalar_dir = 'scalar'
+spatial_dir = 'spatial'
+snap_dir = 'snap'
+for tsdir in (scalar_dir, spatial_dir, snap_dir, state_dir):
+    if not os.path.isdir(os.path.join(odir, tsdir)):
+        os.mkdir(os.path.join(odir, tsdir))
 odir_tmp = '_'.join([odir, 'tmp'])
 if not os.path.isdir(odir_tmp):
     os.mkdir(odir_tmp)
@@ -172,9 +196,18 @@ sia_e = (3.0)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
-eigen_calving_k_values = [1e15, 1e16, 1e17, 1e18]
-fice_values = [4, 6, 8, 10, 12]
-fsnow_values = [3, 4, 5]
+if do_eigen_calving_k:
+    eigen_calving_k_values = [1e15, 1e16, 1e17, 1e18]
+else:
+    eigen_calving_k_values = [1e18]
+if do_fice:
+    fice_values = [4, 6, 8, 10, 12]
+else:
+    fice_values = [8]
+if do_fsnow:
+    fsnow_values = [3, 4, 5]
+else:
+    fsnow_values = [3]
 backpressure_max_values = [0.25, 0.5]
 ocean_melt_power_values = [1]
 thickness_calving_threshold_vales = [100]
@@ -204,8 +237,8 @@ scripts = []
 scripts_combinded = []
 scripts_post = []
 
-paleo_start_year = -125000
-paleo_end_year = 0
+simulation_start_year = -125000
+simulation_end_year = 0
 restart_step = 25000
 
 for n, combination in enumerate(combinations):
@@ -238,7 +271,7 @@ for n, combination in enumerate(combinations):
         outfiles = []
 
         job_no = 0
-        for start in range(paleo_start_year, paleo_end_year, restart_step):
+        for start in range(simulation_start_year, simulation_end_year, restart_step):
             job_no += 1
 
             end = start + restart_step
@@ -255,7 +288,7 @@ for n, combination in enumerate(combinations):
                     pass
 
             batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
-            if (start == paleo_start_year):
+            if (start == simulation_start_year):
                 f_combined.write(batch_header)
 
             with open(script, 'w') as f:
@@ -267,12 +300,12 @@ for n, combination in enumerate(combinations):
                 prefix = generate_prefix_str(pism_exec)
 
                 general_params_dict = OrderedDict()
-                if start == paleo_start_year:
+                if start == simulation_start_year:
                     general_params_dict['bootstrap'] = ''
                     general_params_dict['i'] = pism_dataname
                 else:
                     general_params_dict['i'] = regridfile
-                if (start == paleo_start_year) and (topg_delta_file is not None):
+                if (start == simulation_start_year) and (topg_delta_file is not None):
                     general_params_dict['topg_delta_file'] = topg_delta_file
                 general_params_dict['ys'] = start
                 general_params_dict['ye'] = end
@@ -286,7 +319,7 @@ for n, combination in enumerate(combinations):
                 if forcing_type in ('e_age'):
                     general_params_dict['e_age_coupling'] = ''
 
-                if start == paleo_start_year:
+                if start == simulation_start_year:
                     grid_params_dict = generate_grid_description(grid, domain)
                 else:
                     grid_params_dict = generate_grid_description(grid, domain, restart=True)
@@ -297,7 +330,7 @@ for n, combination in enumerate(combinations):
                 sb_params_dict['ssa_n'] = ssa_n
                 sb_params_dict['pseudo_plastic_q'] = ppq
                 sb_params_dict['till_effective_fraction_overburden'] = tefo
-                if start == paleo_start_year:
+                if start == simulation_start_year:
                     sb_params_dict['topg_to_phi'] = ttphi
                 sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
 
@@ -323,12 +356,21 @@ for n, combination in enumerate(combinations):
                 exvars = init_spatial_ts_vars()
                 spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
                 scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
-                                                    start=paleo_start_year,
-                                                    end=paleo_end_year,
-                                                    odir=odir)
-                snap_shot_dict = generate_snap_shots(full_outfile, save_times, odir=odir)
+                                                    start=simulation_start_year,
+                                                    end=simulation_end_year,
+                                                    odir=os.path.join(odir, scalar_dir))
+                snap_shot_dict = generate_snap_shots(full_outfile, save_times, odir=os.path.join(odir, snap_dir))
 
-                all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
+                all_params_dict = merge_dicts(general_params_dict,
+                                              grid_params_dict,
+                                              stress_balance_params_dict,
+                                              climate_params_dict,
+                                              ocean_params_dict,
+                                              hydro_params_dict,
+                                              calving_params_dict,
+                                              spatial_ts_dict,
+                                              scalar_ts_dict,
+                                              snap_shot_dict)
                 all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
 
                 if system in ('debug'):
@@ -357,14 +399,14 @@ for n, combination in enumerate(combinations):
         f.write(post_header)
 
         extra_file = spatial_ts_dict['extra_file']
-        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(paleo_start_year+exstep, paleo_end_year, exstep)])
+        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(simulation_start_year+exstep, simulation_end_year, exstep)])
         myoutfile = extra_file + '.nc'
-        myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
+        myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
-        ts_file = os.path.join(odir, 'ts_{domain}_g{grid}m_straight_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
-        myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(paleo_start_year, paleo_end_year, restart_step)])
-        myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, paleo_start_year, paleo_end_year)])
+        ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
+        myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])
+        myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
         myoutfile = os.path.split(myoutfile)[-1]
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
