@@ -30,13 +30,13 @@ parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris')
 parser.add_argument("--exstep", dest="exstep", type=int,
-                    help="Writing interval for spatial time series", default=10)
+                    help="Writing interval for spatial time series", default=25)
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
-                    help="horizontal grid resolution", default=9000)
+                    help="horizontal grid resolution", default=1500)
 parser.add_argument("--o_dir", dest="odir",
                     help="output directory. Default: current directory", default='foo')
 parser.add_argument("--o_size", dest="osize",
