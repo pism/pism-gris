@@ -269,7 +269,8 @@ for n, combination in enumerate(combinations):
         
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate,
-                                               surface_given_file=pism_dataname)
+                                               surface_given_file=pism_dataname,
+                                               force_to_thickness_file=pism_dataname)
         ocean_params_dict = generate_ocean(ocean)
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving,
