@@ -89,11 +89,11 @@ parser.add_argument("--dataset_version", dest="version",
 parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity_approximation",
                     choices=['centered', 'upstream'],
                     help="How to approximate vertical velocities", default='upstream')
-parser.add_argument("--start_year", dest="start_year",
+parser.add_argument("--start_year", dest="start_year", type=int,
                     help="Simulation start year", default=0)
-parser.add_argument("--end_year", dest="end_year",
+parser.add_argument("--end_year", dest="end_year", type=int,
                     help="Simulation end year", default=10000)
-parser.add_argument("--step", dest="step",
+parser.add_argument("--step", dest="step", type=int,
                     help="Step in years for restarting", default=25000)
 
 
