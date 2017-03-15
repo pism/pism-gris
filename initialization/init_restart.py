@@ -266,6 +266,9 @@ for n, combination in enumerate(combinations):
     
     # All runs in one script file for coarse grids that fit into max walltime
     script_combined = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
+    script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
+    scripts_post.append(script_post)
+
     with open(script_combined, 'w') as f_combined:
 
         outfiles = []
@@ -383,7 +386,10 @@ for n, combination in enumerate(combinations):
 
                 f_combined.write(cmd)
                 f_combined.write('\n\n')
-                
+                f_combined.write('\n')
+                f_combined.write('{} {}\n'.format(batch_system['submit'], script_post))
+                f_combined.write('\n')
+
                 regridfile = os.path.join(odir, outfile)
                 outfiles.append(outfile)
 

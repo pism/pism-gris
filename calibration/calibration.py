@@ -220,6 +220,8 @@ for n, combination in enumerate(combinations):
     # All runs in one script file for coarse grids that fit into max walltime
     script = 'calib_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
     scripts.append(script)
+    script_post = 'calib_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
+    scripts_post.append(script_post)
 
     for filename in (script):
         try:
@@ -296,10 +298,9 @@ for n, combination in enumerate(combinations):
             cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir, batch=batch_system['job_id'])])
         f.write(cmd)
         f.write('\n')
-
-
-    script_post = 'calib_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
-    scripts_post.append(script_post)
+        f.write('\n')
+        f.write('{} {}\n'.format(batch_system['submit'], script_post))
+        f.write('\n')
 
     post_header = make_batch_post_header(system)
 

@@ -36,6 +36,8 @@ def generate_domain(domain):
     
     if domain.lower() in ('greenland', 'gris', 'gris_ext'):
         pism_exec = 'pismr'
+    elif domain.lower() in ('og'):
+        pism_exec = 'pismr'
     elif domain.lower() in ('hia'):
         x_min = -652200.
         x_max = -232600.
@@ -368,23 +370,39 @@ def generate_grid_description(grid_resolution, domain, restart=False):
     Returns: OrderedDict
     '''
 
-    if domain.lower() in ('greenland_ext', 'gris_ext'):
-        mx_max = 15120
-        my_max = 19680
-    else:
-        mx_max = 10560
-        my_max = 18240
-
-
-    resolution_max = 150
+    if domain.lower() in ('greenland_ext', 'gris_ext', 'greenland', 'gris'):
     
-    accepted_resolutions = (150, 300, 450, 600, 900, 1200, 1500, 1800, 2400, 3000, 3600, 4500, 6000, 9000, 18000, 36000)
+        if domain.lower() in ('greenland_ext', 'gris_ext'):
+            mx_max = 15120
+            my_max = 19680
+        else:
+            mx_max = 10560
+            my_max = 18240
 
-    try:
-        grid_resolution in accepted_resolutions
-        pass
-    except:
-        print('grid resolution {}m not recognized'.format(grid_resolution))
+        resolution_max = 150
+
+        accepted_resolutions = (150, 300, 450, 600, 900, 1200, 1500, 1800, 2400, 3000, 3600, 4500, 6000, 9000, 18000, 36000)
+
+        try:
+            grid_resolution in accepted_resolutions
+            pass
+        except:
+            print('grid resolution {}m not recognized'.format(grid_resolution))
+
+    elif domain.lower() in ('og'):
+
+        mx_max = 2501
+        my_max = 501
+
+        resolution_max = 100
+
+        accepted_resolutions = (100, 200, 250, 500, 1000, 2000, 5000)
+
+        try:
+            grid_resolution in accepted_resolutions
+            pass
+        except:
+            print('grid resolution {}m not recognized'.format(grid_resolution))
 
     grid_div = (grid_resolution / resolution_max)
               
