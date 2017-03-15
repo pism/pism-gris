@@ -38,7 +38,7 @@ else:
 
 # Domain extend
 x_min, x_max = 0, 250e3
-y_min, y_max = -25e3, 25e3
+y_min, y_max = -50e3, 50e3
 
 # Number of grid points
 nx = (x_max - x_min) / grid_spacing + 1
@@ -64,10 +64,12 @@ Ze = np.real(Ze) + z0
 # That works because outside the area of the ellipsoid the sqrt is purely imaginary (hence the 'real' command).
 # Rotating this around the y-axis is not really complicated, per se. Rotation around an angle alpha would give you the following:
 
-alpha= 0.75
+alpha = 0.75
+beta = 1.
 Xp = np.cos(np.deg2rad(alpha)) * X - np.sin(np.deg2rad(alpha)) * Ze
 Yp = Y
 Zp = np.sin(np.deg2rad(alpha)) * X + np.cos(np.deg2rad(alpha)) * Ze
+Zsurf = np.sin(np.deg2rad(beta)) * X - 750
 
 # The only problem is now that Xp, Yp is no longer a regular grid, so you need to interpolate back onto the original grid:
 
@@ -76,6 +78,10 @@ Zpi = griddata(np.ndarray.flatten(Xp), np.ndarray.flatten(Yp), np.ndarray.flatte
 Zpi.masked = False
 Zpi[:, 0] = Zpi[:, 1]
 Zpi[:, -1] = Zpi[:, -2]
+
+thk = Zsurf - Zpi
+thk[X<50e3] = 0.
+thk[thk<0] = 0.
 
 nc = NC(nc_outfile, 'w', format=fileformat)
 
@@ -109,9 +115,31 @@ var_out.units = "meters"
 var_out.standard_name = 'bedrock_altitude'
 var_out[:] = Zpi
 
-#nc.close()
+var = 'usurf'
+var_out = nc.createVariable(
+    var,
+    'f',
+    dimensions=(
+        "y",
+        "x"))
+var_out.units = "meters"
+var_out.standard_name = 'surface_altitude'
+var_out[:] = Zsurf
+
+var = 'thk'
+var_out = nc.createVariable(
+    var,
+    'f',
+    dimensions=(
+        "y",
+        "x"))
+var_out.units = "meters"
+var_out.standard_name = 'land_ice_thickness'
+var_out[:] = thk
+
+nc.close()
 
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')
-# ax.plot_surface(X, Y, Zpi)
+# ax.plot_surface(X, Y, Zsurf)
 # plt.show()

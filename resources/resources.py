@@ -37,7 +37,7 @@ def generate_domain(domain):
     if domain.lower() in ('greenland', 'gris', 'gris_ext'):
         pism_exec = 'pismr'
     elif domain.lower() in ('og'):
-        pism_exec = 'pismr'
+        pism_exec = 'pismo'
     elif domain.lower() in ('hia'):
         x_min = -652200.
         x_max = -232600.
@@ -389,10 +389,27 @@ def generate_grid_description(grid_resolution, domain, restart=False):
         except:
             print('grid resolution {}m not recognized'.format(grid_resolution))
 
+        if grid_resolution < 1200:
+            skip_max = 200
+            mz = 501
+            mzb = 41
+        elif (grid_resolution >= 1200) and (grid_resolution < 4500):
+            skip_max = 100
+            mz = 251
+            mzb = 21
+        elif (grid_resolution >= 4500) and (grid_resolution < 18000):
+            skip_max = 50
+            mz = 251
+            mzb = 21
+        else:
+            skip_max = 20
+            mz = 101
+            mzb = 11
+            
     elif domain.lower() in ('og'):
 
         mx_max = 2501
-        my_max = 501
+        my_max = 1001
 
         resolution_max = 100
 
@@ -404,6 +421,10 @@ def generate_grid_description(grid_resolution, domain, restart=False):
         except:
             print('grid resolution {}m not recognized'.format(grid_resolution))
 
+        skip_max = 200
+        mz = 501
+        mzb = 0
+
     grid_div = (grid_resolution / resolution_max)
               
     mx = mx_max / grid_div
@@ -412,23 +433,6 @@ def generate_grid_description(grid_resolution, domain, restart=False):
     horizontal_grid = OrderedDict()
     horizontal_grid['Mx'] = mx
     horizontal_grid['My'] = my
-
-    if grid_resolution < 1200:
-        skip_max = 200
-        mz = 501
-        mzb = 41
-    elif (grid_resolution >= 1200) and (grid_resolution < 4500):
-        skip_max = 100
-        mz = 251
-        mzb = 21
-    elif (grid_resolution >= 4500) and (grid_resolution < 18000):
-        skip_max = 50
-        mz = 251
-        mzb = 21
-    else:
-        skip_max = 20
-        mz = 101
-        mzb = 11
 
     vertical_grid = OrderedDict()
     ## This sould be a temporary hack to restart from an older simulation
@@ -550,6 +554,8 @@ def generate_calving(calving, **kwargs):
     params_dict = OrderedDict()
     if calving in ('ocean_kill'):
         params_dict['calving'] = calving
+    elif calving in ('thickness_calving'):
+        params_dict['calving'] = calving
     elif calving in ('eigen_calving', 'vonmises_calving'):
         params_dict['calving'] = '{},thickness_calving'.format(calving)
     elif calving in ('hybrid_calving'):
@@ -627,6 +633,8 @@ def generate_climate(climate, **kwargs):
         params_dict['surface'] = 'given'
     elif climate in ('flux'):
         params_dict['surface'] = 'given,forcing'
+    elif climate in ('elevation'):
+        params_dict['surface'] = 'elevation'
     else:
         print('climate {} not recognized, exiting'.format(climate))
         import sys

@@ -89,6 +89,12 @@ parser.add_argument("--dataset_version", dest="version",
 parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity_approximation",
                     choices=['centered', 'upstream'],
                     help="How to approximate vertical velocities", default='upstream')
+parser.add_argument("--start_year", dest="start_year",
+                    help="Simulation start year", default=0)
+parser.add_argument("--end_year", dest="end_year",
+                    help="Simulation end year", default=10000)
+parser.add_argument("--step", dest="step",
+                    help="Step in years for restarting", default=25000)
 
 
 options = parser.parse_args()
@@ -246,9 +252,9 @@ scripts = []
 scripts_combinded = []
 scripts_post = []
 
-simulation_start_year = 0
-simulation_end_year = 10000
-restart_step = 2500
+simulation_start_year = options.start_year
+simulation_end_year = options.end_year
+restart_step = options.step
 
 for n, combination in enumerate(combinations):
 
