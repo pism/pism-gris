@@ -28,8 +28,9 @@ parser.add_argument("--climate", dest="climate",
                     choices=['const', 'paleo', 'abrupt_glacial'],
                     help="Climate", default='paleo')
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
-                    help="claving", default='vonmises_calving')
+                    choices=['float_kill', 'ocean_kill', 'eigen_calving',
+                             'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
+                    help="calving mechanism", default='vonmises_calving')
 parser.add_argument("--ocean", dest="ocean",
                     choices=['paleo', 'paleo_mbp'],
                     help="Ocean coupler", default='paleo')

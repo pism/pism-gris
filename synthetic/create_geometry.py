@@ -37,15 +37,24 @@ else:
     sys.exit(0)
 
 # Domain extend
-x_min, x_max = 0, 250e3
-y_min, y_max = -50e3, 50e3
+x0, x1 = 0., 260.e3
+y0, y1 = -50.e3, 50.e3
 
+# Shift to cell centers
+x0 += grid_spacing / 2
+y0 += grid_spacing / 2
+x1 -= grid_spacing / 2
+y1 -= grid_spacing / 2
+
+dx = dy = grid_spacing  # m
 # Number of grid points
-nx = (x_max - x_min) / grid_spacing + 1
-ny = (y_max - y_min) / grid_spacing + 1
+M = int((x1 - x0) / dx) + 1
+N = int((y1 - y0) / dy) + 1
 
-x = np.linspace(x_min, x_max, nx)
-y = np.linspace(y_min, y_max, ny)
+x = np.linspace(x0, x1, M)
+y = np.linspace(y0, y1, N)
+X, Y = np.meshgrid(x, y)
+
 
 # Ellipsoid center
 x0 = 125e3
@@ -55,17 +64,16 @@ z0 = -1000
 # Ellipsoid parameters
 a = 100e3
 b = 5e3
-c = 750
+c = 800
 
-[X,Y] = np.meshgrid(x,y);
 Ze = -c * np.sqrt(1-((np.array(X, dtype=np.complex) - x0) / a)**2 - ((np.array(Y, dtype=np.complex) -y0)/ b)**2);
 Ze = np.real(Ze) + z0
 
 # That works because outside the area of the ellipsoid the sqrt is purely imaginary (hence the 'real' command).
 # Rotating this around the y-axis is not really complicated, per se. Rotation around an angle alpha would give you the following:
 
-alpha = 0.75
-beta = 1.
+alpha = 0.5
+beta = 0.7
 Xp = np.cos(np.deg2rad(alpha)) * X - np.sin(np.deg2rad(alpha)) * Ze
 Yp = Y
 Zp = np.sin(np.deg2rad(alpha)) * X + np.cos(np.deg2rad(alpha)) * Ze

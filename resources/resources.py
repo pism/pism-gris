@@ -408,7 +408,7 @@ def generate_grid_description(grid_resolution, domain, restart=False):
             
     elif domain.lower() in ('og'):
 
-        mx_max = 2501
+        mx_max = 2601
         my_max = 1001
 
         resolution_max = 100
@@ -422,7 +422,7 @@ def generate_grid_description(grid_resolution, domain, restart=False):
             print('grid resolution {}m not recognized'.format(grid_resolution))
 
         skip_max = 200
-        mz = 501
+        mz = 401
         mzb = 0
 
     grid_div = (grid_resolution / resolution_max)
@@ -436,7 +436,7 @@ def generate_grid_description(grid_resolution, domain, restart=False):
 
     vertical_grid = OrderedDict()
     ## This sould be a temporary hack to restart from an older simulation
-    if domain.lower() == 'gris':
+    if domain.lower() in ('gris', 'og'):
         vertical_grid['Lz'] = 4000
     else:
         vertical_grid['Lz'] = 5000
