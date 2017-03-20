@@ -94,7 +94,7 @@ parser.add_argument("--start_year", dest="start_year", type=int,
 parser.add_argument("--end_year", dest="end_year", type=int,
                     help="Simulation end year", default=10000)
 parser.add_argument("--step", dest="step", type=int,
-                    help="Step in years for restarting", default=25000)
+                    help="Step in years for restarting", default=2500)
 
 
 options = parser.parse_args()
@@ -208,7 +208,7 @@ ssa_n = (3.25)
 ssa_e = (1.0)
 
 if do_T_max:
-    T_max_values = [1, 5, 10]
+    T_max_values = [0, 1, 5, 10]
 else:
     T_max_values = [1]
 
