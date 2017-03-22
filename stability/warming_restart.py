@@ -203,7 +203,7 @@ if not os.path.isdir(odir_tmp):
 # set up model initialization
 # ########################################################
 
-sia_e = (3.0)
+sia_e = (1.25)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
@@ -375,7 +375,7 @@ for n, combination in enumerate(combinations):
                                                            ocean_kill_file=regridfile,
                                                            frontal_melt=frontal_melt)
 
-                exvars = glacial_spatial_ts_vars()
+                exvars = default_spatial_ts_vars()
                 spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
                 scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
                                                     start=simulation_start_year,

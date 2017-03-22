@@ -37,7 +37,7 @@ def generate_domain(domain):
     if domain.lower() in ('greenland', 'gris', 'gris_ext'):
         pism_exec = 'pismr'
     elif domain.lower() in ('og'):
-        pism_exec = 'pismo'
+        pism_exec = 'pismo -no_model_strip 0'
     elif domain.lower() in ('hia'):
         x_min = -652200.
         x_max = -232600.
@@ -85,7 +85,6 @@ def default_spatial_ts_vars():
               'smelt_average',
               'srunoff',
               'srunoff_average',              
-              'sea_level',
               'strain_rates',
               'surface_mass_balance_average',
               'taub_mag',
@@ -97,7 +96,6 @@ def default_spatial_ts_vars():
               'thk',
               'tillwat',
               'topg',
-              'topg_sl_adjusted',
               'usurf',
               'velbar',
               'velbase',
