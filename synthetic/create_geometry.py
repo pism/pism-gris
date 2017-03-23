@@ -155,7 +155,7 @@ var_out = nc.createVariable(
 var_out.units = ""
 var_out.flag_meanings = "normal special_treatment"
 var_out.long_name = "mask: zeros (modeling domain) and ones (no-model buffer near grid edges)"
-var_out.units = flag_values = 0., 1.
+var_out.flag_values = 0., 1.
 var_out.pism_intent = "model_state"
 no_model_mask = np.zeros_like(thk)
 no_model_mask[X>=258e3] = 1
