@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2016 Andy Aschwanden
+# Copyright (C) 2016, 2017 Andy Aschwanden
 
 import numpy as np
 import pylab as plt
@@ -174,7 +174,7 @@ var_out.long_name = "mask: zeros (modeling domain) and ones (no-model buffer nea
 var_out.flag_values = 0., 1.
 var_out.pism_intent = "model_state"
 no_model_mask = np.zeros_like(thk)
-# no_model_mask[X>=258e3] = 1
+no_model_mask[X>=256e3] = 1
 var_out[:] = no_model_mask
 
 nc.close()
