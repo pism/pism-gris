@@ -238,7 +238,7 @@ for n, combination in enumerate(combinations):
         
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate,
-                                               climatic_mass_balance='-2,2,200,1500,2000',
+                                               climatic_mass_balance='-2.5,2.5,200,1500,2000',
                                                ice_surface_temp='2,-20,200,2000')
         ocean_params_dict = generate_ocean(ocean)
         hydro_params_dict = generate_hydrology(hydrology)
@@ -283,12 +283,6 @@ for n, combination in enumerate(combinations):
         myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(simulation_start_year+exstep, simulation_end_year, exstep)])
         myoutfile = extra_file + '.nc'
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
-        cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
-        f.write(cmd)
-        ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
-        myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year) for k in range(simulation_start_year, simulation_end_year)])
-        myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
-        myoutfile = os.path.split(myoutfile)[-1]
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
 
