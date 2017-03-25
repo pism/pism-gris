@@ -87,13 +87,14 @@ Zpi.masked = False
 Zpi[:, 0] = Zpi[:, 1]
 Zpi[:, -1] = Zpi[:, -2]
 
-a_s = 25
-Zs = np.real(np.sqrt(a_s*(np.array(X - 50e3, dtype=np.complex)))) 
-Xsp = np.cos(np.deg2rad(alpha)) * (X - 50e3) - np.sin(np.deg2rad(alpha)) * Zs
+a_s = 20
+x_s = 60e3
+Zs = np.real(np.sqrt(a_s*(np.array(X - x_s, dtype=np.complex)))) 
+Xsp = np.cos(np.deg2rad(alpha)) * (X - x_s) - np.sin(np.deg2rad(alpha)) * Zs
 Ysp = Y
-Zsp = np.sin(np.deg2rad(alpha)) * (X - 50e3) + np.cos(np.deg2rad(alpha)) * Zs
+Zsp = np.sin(np.deg2rad(alpha)) * (X - x_s) + np.cos(np.deg2rad(alpha)) * Zs
 # The only problem is now that Xp, Yp is no longer a regular grid, so you need to interpolate back onto the original grid:
-Zspi = griddata(np.ndarray.flatten(Xsp), np.ndarray.flatten(Ysp), np.ndarray.flatten(Zsp), X - 50e3, Y, interp='linear') - 500
+Zspi = griddata(np.ndarray.flatten(Xsp), np.ndarray.flatten(Ysp), np.ndarray.flatten(Zsp), X - x_s, Y, interp='linear') - 500
 # Remove mask
 Zspi.masked = False
 Zspi[:, 0] = Zspi[:, 1]
@@ -115,7 +116,7 @@ if has_sidewalls:
     Zpi[np.logical_and((X<xcu), (Y>ycu-radius))] = wall_elevation
 
 thk = Zspi - Zpi
-thk[X<50e3] = 0.
+thk[X<x_s] = 0.
 thk[thk<0] = 0.
 
 nc = NC(nc_outfile, 'w', format=fileformat)
