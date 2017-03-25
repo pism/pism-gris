@@ -60,14 +60,14 @@ X, Y = np.meshgrid(x, y)
 
 
 # Ellipsoid center
-xe = 125e3
+xe = 150e3
 ye = 0
 ze = -1000
 
 # Ellipsoid parameters
 a = 100e3
-b = 5e3
-c = 800
+b = 7.5e3
+c = 750
 
 Ze = -c * np.sqrt(1-((np.array(X, dtype=np.complex) - xe) / a)**2 - ((np.array(Y, dtype=np.complex) -ye)/ b)**2);
 Ze = np.real(Ze) + ze
@@ -75,20 +75,31 @@ Ze = np.real(Ze) + ze
 # That works because outside the area of the ellipsoid the sqrt is purely imaginary (hence the 'real' command).
 # Rotating this around the y-axis is not really complicated, per se. Rotation around an angle alpha would give you the following:
 
-alpha = 0.5
-beta = 0.7
+alpha = 0.5  # angle of ellipsoid
+beta = 0.75  # angle of surface plane
 Xp = np.cos(np.deg2rad(alpha)) * X - np.sin(np.deg2rad(alpha)) * Ze
 Yp = Y
 Zp = np.sin(np.deg2rad(alpha)) * X + np.cos(np.deg2rad(alpha)) * Ze
-Zsurf = np.sin(np.deg2rad(beta)) * X - 500
-
 # The only problem is now that Xp, Yp is no longer a regular grid, so you need to interpolate back onto the original grid:
-
 Zpi = griddata(np.ndarray.flatten(Xp), np.ndarray.flatten(Yp), np.ndarray.flatten(Zp), X, Y, interp='linear')
 # Remove mask
 Zpi.masked = False
 Zpi[:, 0] = Zpi[:, 1]
 Zpi[:, -1] = Zpi[:, -2]
+
+a_s = 25
+Zs = np.real(np.sqrt(a_s*(np.array(X - 50e3, dtype=np.complex)))) 
+Xsp = np.cos(np.deg2rad(alpha)) * (X - 50e3) - np.sin(np.deg2rad(alpha)) * Zs
+Ysp = Y
+Zsp = np.sin(np.deg2rad(alpha)) * (X - 50e3) + np.cos(np.deg2rad(alpha)) * Zs
+# The only problem is now that Xp, Yp is no longer a regular grid, so you need to interpolate back onto the original grid:
+Zspi = griddata(np.ndarray.flatten(Xsp), np.ndarray.flatten(Ysp), np.ndarray.flatten(Zsp), X - 50e3, Y, interp='linear') - 500
+# Remove mask
+Zspi.masked = False
+Zspi[:, 0] = Zspi[:, 1]
+Zspi[:, -1] = Zspi[:, -2]
+# Zsurf = np.sin(np.deg2rad(beta)) * X + 750
+
 
 radius = 25e3
 xcl, ycl = 50e3, y0
@@ -103,7 +114,7 @@ if has_sidewalls:
     Zpi[np.logical_and((X<xcl), (Y<ycl+radius))] = wall_elevation
     Zpi[np.logical_and((X<xcu), (Y>ycu-radius))] = wall_elevation
 
-thk = Zsurf - Zpi
+thk = Zspi - Zpi
 thk[X<50e3] = 0.
 thk[thk<0] = 0.
 
@@ -148,7 +159,7 @@ var_out = nc.createVariable(
         "x"))
 var_out.units = "meters"
 var_out.standard_name = 'surface_altitude'
-var_out[:] = Zsurf
+var_out[:] = Zspi
 
 var = 'thk'
 var_out = nc.createVariable(
