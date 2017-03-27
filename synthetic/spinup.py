@@ -239,7 +239,7 @@ for n, combination in enumerate(combinations):
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate,
                                                climatic_mass_balance='-2.5,2.5,200,1500,2000',
-                                               ice_surface_temp='2,-20,200,2000')
+                                               ice_surface_temp='-5,-20,0,2000')
         ocean_params_dict = generate_ocean(ocean)
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving,
