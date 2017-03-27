@@ -256,6 +256,14 @@ simulation_start_year = options.start_year
 simulation_end_year = options.end_year
 restart_step = options.step
 
+if restart_step > (simulation_end_year - simulation_start_year):
+    print('Error:')
+    print('restart_step > (simulation_end_year - simulation_start_year): {} > {}'.format(restart_step, simulation_end_year - simulation_start_year))
+    print('Try again')
+    import sys
+    sys.exit(0)
+    
+
 for n, combination in enumerate(combinations):
 
     T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination

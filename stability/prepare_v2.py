@@ -333,8 +333,6 @@ for n, combination in enumerate(combinations):
             f.write('\n\n')
 
 
-    scripts_combinded.append(script)
-
     script_post = 'prep_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
     scripts_post.append(script_post)
 
