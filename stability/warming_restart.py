@@ -210,7 +210,7 @@ ssa_e = (1.0)
 if do_T_max:
     T_max_values = [0, 1, 5, 10]
 else:
-    T_max_values = [1]
+    T_max_values = [0]
 
 if do_eigen_calving_k:
     eigen_calving_k_values = [1e15, 1e18]
