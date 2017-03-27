@@ -81,8 +81,6 @@ parser.add_argument("--stable_gl", dest="float_kill_calve_near_grounding_line", 
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
-parser.add_argument("--topg_delta", dest="topg_delta_file",
-                    help="end of initialization detla=(topg-topg_initial) file", default=None)
 parser.add_argument("--dataset_version", dest="version",
                     choices=['2'],
                     help="input data set version", default='2')
@@ -119,7 +117,6 @@ ocean = options.ocean
 ocean_melt = options.ocean_melt
 precip = options.precip
 stress_balance = options.stress_balance
-topg_delta_file = options.topg_delta_file
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 
@@ -263,7 +260,6 @@ for n, combination in enumerate(combinations):
             general_params_dict['regrid_file'] = input_file
             general_params_dict['regrid_vars'] = regridvars
             general_params_dict['regrid_special'] = ''
-            general_params_dict['topg_delta_file'] = topg_delta_file
             general_params_dict['ys'] = start
             general_params_dict['ye'] = end
             general_params_dict['o'] = os.path.join(odir, state_dir, outfile)
