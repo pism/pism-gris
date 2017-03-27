@@ -229,8 +229,8 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     # Add a buffer on each side such that we get nice grids up to a grid spacing
     # of 36 km.
 
-    buffer_e=40650
-    buffer_n=22000
+    # buffer_e=40650
+    # buffer_n=22000
     e0=$(($e0 - $buffer_e))
     n0=$(($n0 - $buffer_n))
     e1=$(($e1 + $buffer_e))
