@@ -351,11 +351,8 @@ for n, combination in enumerate(combinations):
 
     
 scripts = uniquify_list(scripts)
-scripts_combinded = uniquify_list(scripts_combinded)
 scripts_post = uniquify_list(scripts_post)
 print '\n'.join([script for script in scripts])
-print('\nwritten\n')
-print '\n'.join([script for script in scripts_combinded])
 print('\nwritten\n')
 print '\n'.join([script for script in scripts_post])
 print('\nwritten\n')
