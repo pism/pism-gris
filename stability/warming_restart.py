@@ -73,9 +73,6 @@ parser.add_argument("--hydrology", dest="hydrology",
                     help="Basal hydrology model.", default='diffuse')
 parser.add_argument("-p", "--params", dest="params_list",
                     help="Comma-separated list with params for sensitivity", default=None)
-parser.add_argument("--precip", dest="precip",
-                    choices=['racmo', 'hirham'],
-                    help="Precipitation model", default='racmo')
 parser.add_argument("--stable_gl", dest="float_kill_calve_near_grounding_line", action="store_true",
                     help="Stable grounding line", default=False)
 parser.add_argument("--stress_balance", dest="stress_balance",
@@ -119,7 +116,6 @@ grid = options.grid
 hydrology = options.hydrology
 ocean = options.ocean
 ocean_melt = options.ocean_melt
-precip = options.precip
 stress_balance = options.stress_balance
 topg_delta_file = options.topg_delta_file
 vertical_velocity_approximation = options.vertical_velocity_approximation
@@ -156,12 +152,8 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
     pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
-if precip in ('racmo'):
-    precip_file = pism_dataname
-elif precip in ('hirham'):
-    precip_file = 'DMI-HIRHAM5_GL2_ERAI_1980_2014_PR_TM_EPSG3413_{}m.nc'.format(grid)
-else:
-    print('Precip model {} not support. How did we get here?'.format(precip))
+
+climate_file = 'DMI-HIRHAM5_GL2_ERAI_2001_2014_TM_EPSG3413_{}m.nc'.format(grid)
 
 if ocean_melt in ('x'):
     ocean_file = 'ocean_forcing_latitudinal_ctrl.nc'
@@ -217,7 +209,7 @@ if do_eigen_calving_k:
 else:
     eigen_calving_k_values = [1e18]
 if do_fice:    
-    fice_values = [8, 10, 12, 14]
+    fice_values = [4, 6, 8, 10, 12]
 else:
     fice_values = [8]
 if do_fsnow:
@@ -284,7 +276,7 @@ for n, combination in enumerate(combinations):
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
-    climate_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=T_max)
+    climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=T_max)
     # All runs in one script file for coarse grids that fit into max walltime
     script_combined = 'warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
     with open(script_combined, 'w') as f_combined:
@@ -361,12 +353,15 @@ for n, combination in enumerate(combinations):
                 climate_params_dict = generate_climate(climate,
                                                        **{'surface.pdd.factor_ice': (fice / ice_density),
                                                           'surface.pdd.factor_snow': (fsnow / ice_density),
-                                                          'atmosphere_searise_greenland_file': precip_file,
-                                                          'atmosphere_paleo_precip_file': climate_file,
-                                                          'atmosphere_delta_T_file': climate_file})
+                                                          'atmosphere_given_file': climate_file,
+                                                          'temp_lapse_rate': 6,
+                                                          'atmosphere_lapse_rate_file': climate_file,
+                                                          # 'pdd_sd_file': climate_file,
+                                                          'atmosphere_paleo_precip_file': climate_modifier_file,
+                                                          'atmosphere_delta_T_file': climate_modifier_file})
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=ocean_file,
-                                                   ocean_frac_mass_flux_file=climate_file)
+                                                   ocean_frac_mass_flux_file=climate_modifier_file)
                 hydro_params_dict = generate_hydrology(hydrology)
                 if start == simulation_start_year:
                     calving_params_dict = generate_calving(calving,
