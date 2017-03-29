@@ -9,10 +9,15 @@ end="2108-01-01"
 GRID=3000
 
 infile=../bed_dem/pism_Greenland_ext_${GRID}m_mcb_jpl_v2.nc
+bmelt0=285
 for lat in 78 79 80; do
     outfile=ocean_forcing_latitudinal_20myr_${lat}n.nc
     ncks -6 -C -O -v x,y,mask,polar_stereographic $infile $outfile
     python ocean_forcing.py --bmelt_1 20 --lat_1 ${lat} $outfile
+    ncatted -a grid_mapping,mask,o,c,"polar_stereographic" -a grid_mapping,shelfbmassflux,o,c,"polar_stereographic" -a grid_mapping,shelfbtemp,o,c,"polar_stereographic" $outfile
+    outfile=ocean_forcing_latitudinal_${bmelt0}myr_lat_69_20myr_${lat}n.nc
+    ncks -6 -C -O -v x,y,mask,polar_stereographic $infile $outfile
+    python ocean_forcing.py --bmelt_0 $bmelt0 --bmelt_1 20 --lat_1 ${lat} $outfile
     ncatted -a grid_mapping,mask,o,c,"polar_stereographic" -a grid_mapping,shelfbmassflux,o,c,"polar_stereographic" -a grid_mapping,shelfbtemp,o,c,"polar_stereographic" $outfile
 done
 

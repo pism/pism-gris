@@ -352,13 +352,22 @@ def prepare_tas(dry=False):
 
         opt = [c.Atted(mode="o", att_name="units", var_name="time", value="days since 1980-01-01 03:00:00")]
         nco.ncatted(input=tas_merged_file_daily_mean, options=opt)
+        
         logger.info('calculate time mean')
         cdo.timmean(input=tas_merged_file_daily_mean, output=tas_merged_file_time_mean)
         
         logger.info('renaming variable')
         rDict={ 'tas':'air_temp'}
         nco.ncrename(input=tas_merged_file_time_mean, options=[ c.Rename("variable",rDict)])
+
+        logger.info('calculate time mean')
+        tmpfile = cdo.timmean(input=tas_merged_file_daily_mean)
         
+        logger.info('renaming variable')
+        rDict={ 'tas':'air_temp_mean_annual'}
+        nco.ncrename(input=tmpfile, options=[ c.Rename("variable",rDict)])
+        nco.ncks(input=tmpfile, output=tas_merged_file_time_mean, append=True)
+
         logger.info('calculate standard deviation')
         tmpfile = cdo.timstd(input=tas_merged_file_daily_mean)
         logger.info('renaming variable')
@@ -427,7 +436,7 @@ rotated_grid_file = 'rotated_grid.txt'
 
 dry = True
 pr_merged_file_time_mean = prepare_pr(dry=dry)
-tas_merged_file_time_mean = prepare_tas(dry=dry)
+tas_merged_file_time_mean = prepare_tas(dry=False)
 smb_merged_file_time_mean = prepare_smb(dry=dry)
 
 merged_file_time_mean = 'DMI-HIRHAM5_GL2_ERAI_2001_2014_{}.nc'.format(time_mean)

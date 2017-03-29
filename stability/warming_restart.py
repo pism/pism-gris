@@ -92,6 +92,8 @@ parser.add_argument("--end_year", dest="end_year", type=int,
                     help="Simulation end year", default=10000)
 parser.add_argument("--step", dest="step", type=int,
                     help="Step in years for restarting", default=2500)
+parser.add_argument("--test_climate_models", dest="test_climate_models", action="store_true",
+                    help="Turn off ice dynamics and mass transport to test climate models", default=False)
 
 
 options = parser.parse_args()
@@ -118,6 +120,7 @@ ocean = options.ocean
 ocean_melt = options.ocean_melt
 stress_balance = options.stress_balance
 topg_delta_file = options.topg_delta_file
+test_climate_models = options.test_climate_models
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 
@@ -158,7 +161,7 @@ climate_file = 'DMI-HIRHAM5_GL2_ERAI_2001_2014_TM_EPSG3413_{}m.nc'.format(grid)
 if ocean_melt in ('x'):
     ocean_file = 'ocean_forcing_latitudinal_ctrl.nc'
 elif ocean_melt in ('20myr_latitudinal'):
-    ocean_file = 'ocean_forcing_latitudinal_20myr_80n.nc'    
+    ocean_file = 'ocean_forcing_latitudinal_285myr_lat_69_20myr_80n.nc'    
 else:
     ocean_file = 'ocean_forcing_latitudinal_80n.nc'
     
@@ -272,6 +275,8 @@ for n, combination in enumerate(combinations):
         name_options['threshold'] = thickness_calving_threshold
     if calving in ('eigen_calving', 'hybrid_calving'):
         name_options['k'] = eigen_calving_k
+    if test_climate_models == True:
+        name_options['test_climate'] = 'on'
     
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
@@ -328,6 +333,10 @@ for n, combination in enumerate(combinations):
                 general_params_dict['o_format'] = oformat
                 general_params_dict['o_size'] = osize
                 general_params_dict['config_override'] = pism_config_nc
+                if test_climate_models == True:
+                    general_params_dict['test_climate_models'] = ''
+                    general_params_dict['no_mass'] = ''
+                    
                 if bed_deformation not in ('off'):
                     general_params_dict['bed_def'] = bed_deformation
                 if forcing_type in ('e_age'):
@@ -354,6 +363,7 @@ for n, combination in enumerate(combinations):
                                                        **{'surface.pdd.factor_ice': (fice / ice_density),
                                                           'surface.pdd.factor_snow': (fsnow / ice_density),
                                                           'atmosphere_given_file': climate_file,
+                                                          'atmosphere_yearly_cycle_file': climate_file,
                                                           'temp_lapse_rate': 6,
                                                           'atmosphere_lapse_rate_file': climate_file,
                                                           # 'pdd_sd_file': climate_file,
