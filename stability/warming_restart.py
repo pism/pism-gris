@@ -130,6 +130,7 @@ do_T_max = False
 do_eigen_calving_k = False
 do_fice = False
 do_fsnow = False
+do_lapse = False
 if params_list is not None:
     params = params_list.split(',')
     if 'T_max' in params:
@@ -140,6 +141,8 @@ if params_list is not None:
         do_fice = True
     if 'fsnow' in params:
         do_fsnow = True    
+    if 'lapse' in params:
+        do_lapse = True    
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -206,7 +209,10 @@ if do_T_max:
     T_max_values = [0, 1, 5, 10]
 else:
     T_max_values = [0]
-
+if do_lapse:
+    lapse_rate_values = [0, 6]
+else:
+    lapse_rate_values = [6]
 if do_eigen_calving_k:
     eigen_calving_k_values = [1e15, 1e18]
 else:
@@ -218,7 +224,7 @@ else:
 if do_fsnow:
     fsnow_values = [3, 4, 5]
 else:
-    fsnow_values = [3]
+    fsnow_values = [4]
 ocean_melt_power_values = [1]
 thickness_calving_threshold_vales = [100]
 ppq_values = [0.6]
@@ -227,7 +233,8 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(T_max_values,
+combinations = list(itertools.product(lapse_rate_values,
+                                      T_max_values,
                                       eigen_calving_k_values,
                                       fice_values,
                                       fsnow_values,
@@ -261,11 +268,12 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
+    name_options['lapse'] = lapse_rate
     name_options['tm'] = T_max
     name_options['fice'] = fice
     name_options['fsnow'] = fsnow
@@ -363,10 +371,11 @@ for n, combination in enumerate(combinations):
                                                        **{'surface.pdd.factor_ice': (fice / ice_density),
                                                           'surface.pdd.factor_snow': (fsnow / ice_density),
                                                           'atmosphere_given_file': climate_file,
+                                                          'atmosphere_given_file': climate_file,
                                                           'atmosphere_yearly_cycle_file': climate_file,
-                                                          'temp_lapse_rate': 6,
+                                                          'temp_lapse_rate': lapse_rate,
                                                           'atmosphere_lapse_rate_file': climate_file,
-                                                          # 'pdd_sd_file': climate_file,
+                                                          'pdd_sd_file': climate_file,
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
                 ocean_params_dict = generate_ocean(ocean,

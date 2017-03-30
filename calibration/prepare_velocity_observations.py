@@ -42,3 +42,5 @@ profile_basedir = '../../data_sets/flux-gates'
 profile_file = '.'.join(['-'.join([profile_basename, profile_type, ''.join([str(profile_spacing), 'm'])]), 'shp'])
 profile_file_wd = os.path.join(profile_basedir, profile_file)
 print profile_file_wd
+cmd = ['python' 'extract_profiles.py', ]
+sub.call(cmd)

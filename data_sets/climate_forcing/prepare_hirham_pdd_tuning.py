@@ -382,6 +382,12 @@ def prepare_tas(dry=False):
         nco.ncrename(input=tmpfile, options=[ c.Rename("variable",rDict)])
         nco.ncks(input=tmpfile, output=tas_merged_file_time_mean, append=True)
 
+        opt = [c.Atted(mode="d", att_name="standard_name", var_name="air_temp_mean_annual"),
+               c.Atted(mode="d", att_name="standard_name", var_name="air_temp_mean_july"),
+               c.Atted(mode="d", att_name="standard_name", var_name="air_temp_sd")]
+        nco.ncatted(input=tas_merged_file_time_mean, options=opt)
+
+        
     return tas_merged_file_time_mean
 
 def prepare_smb(dry=False):
@@ -436,7 +442,7 @@ rotated_grid_file = 'rotated_grid.txt'
 
 dry = True
 pr_merged_file_time_mean = prepare_pr(dry=dry)
-tas_merged_file_time_mean = prepare_tas(dry=False)
+tas_merged_file_time_mean = prepare_tas(dry=dry)
 smb_merged_file_time_mean = prepare_smb(dry=dry)
 
 merged_file_time_mean = 'DMI-HIRHAM5_GL2_ERAI_2001_2014_{}.nc'.format(time_mean)
@@ -464,8 +470,7 @@ opt = [c.Atted(mode="o", att_name="units", var_name="usurf", value="m"),
 nco.ncatted(input=merged_file_time_mean, options=opt)
 
 
-# for grid_spacing in (18000, 9000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900, 600):
-for grid_spacing in [9000]:
+for grid_spacing in (18000, 9000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900, 600):
     grid_file = 'epsg3413_griddes_{}m.nc'.format(grid_spacing)
     logger.info('generating grid description {}'.format(grid_file))
     create_epsg3413_grid(grid_file, grid_spacing)
@@ -484,6 +489,9 @@ for grid_spacing in [9000]:
            c.Atted(mode="o", att_name="grid_mapping", var_name="air_temp", value="mapping"),
            c.Atted(mode="d", att_name="_FillValue", var_name="climatic_mass_balance"),
            c.Atted(mode="d", att_name="missing_value", var_name="climatic_mass_balance"),
-           c.Atted(mode="o", att_name="grid_mapping", var_name="climatic_mass_balance", value="mapping")]
+           c.Atted(mode="o", att_name="grid_mapping", var_name="climatic_mass_balance", value="mapping"),
+           c.Atted(mode="o", att_name="grid_mapping", var_name="air_temp_mean_july", value="mapping"),
+           c.Atted(mode="o", att_name="grid_mapping", var_name="air_temp_mean_annual", value="mapping"),
+           c.Atted(mode="o", att_name="grid_mapping", var_name="air_temp_sd", value="mapping")]
     nco.ncatted(input=epsg3413_merged_file_time_mean, options=opt)
     
