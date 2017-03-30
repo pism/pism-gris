@@ -82,13 +82,8 @@ dT_var[:] = temp
 var = 'delta_SL'
 dSL_var = def_var(nc, var, "m")
 SL_0 = 0.
-SL_1 = -100.
-SL_2 = 0.
 
 SL = np.zeros_like(time_interval_since_refdate) + SL_0
-SL[100:1500] = np.linspace(SL_0, SL_1, 1400)
-SL[1500:2100] = SL_1
-SL[2100:2550] = np.linspace(SL_1, SL_2, 450) 
 dSL_var[:] = SL
 
 T_max = 0
