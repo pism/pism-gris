@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./warming_restart.py -s debug -n 4 -g 4500 --end_year 4 --step 4 --exstep 1 --test_climate_models --params fsnow,fice,lapse --o_dir 2017_03_tune_pdd_sd --o_format netcdf3 g4500m_tune_pdd.nc
+./warming_restart.py -s debug -n 4 -g 4500 --end_year 4 --step 4 --exstep 1 --test_climate_models --params fsnow,fice,lapse --o_dir 2017_03_tune_pdd_cycle --o_format netcdf3 g4500m_tune_pdd.nc
 
 for file in warm_gris_g4500m_warming_v2_ctrl_lapse_0_tm_0_fice_*_fsnow_*_bed_deformation_off_calving_vonmises_calving_threshold_100_test_climate_on.sh; do
     sh $file
@@ -34,12 +34,12 @@ n1=$(($n1 - $GRID / 2))
 climate_ext=DMI-HIRHAM5_GL2_ERAI_2001_2014_TM_EPSG3413_${GRID}m.nc
 climate_sm=DMI-HIRHAM5_GL2_ERAI_2001_2014_TM_EPSG3413_${GRID}m_sm.nc
 climate_melt=DMI-HIRHAM5_GL2_ERAI_2001_2014_TM_EPSG3413_${GRID}m_melt.nc
-ncap2 -6 -O -s "where(climatic_mass_balance>0) climatic_mass_balance=-2e9;" $climate_sm $climate_melt
+ncap2 -6 -O -s "where(climatic_mass_balance>-910) climatic_mass_balance=-2e9;" $climate_sm $climate_melt
 ncatted -a _FillValue,climatic_mass_balance,o,d,-2e9 $climate_melt
 ncks -A -v mask pism_Greenland_4500m_mcb_jpl_v2_ctrl.nc $climate_melt
 ncap2 -6 -O -s "where(mask!=2) climatic_mass_balance=-2e9;" $climate_melt $climate_melt
 
-dir=2017_03_tune_pdd_sd
+dir=2017_03_tune_pdd_cycle
 rmsd_dir=cmb_rmsd
 mkdir -p $dir/$rmsd_dir
 cd  $dir/state/

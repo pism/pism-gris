@@ -231,6 +231,7 @@ for n, combination in enumerate(combinations):
         sb_params_dict['sia_e'] = sia_e
         sb_params_dict['ssa_e'] = ssa_e
         sb_params_dict['ssa_n'] = ssa_n
+        sb_params_dict['ssa_dirichlet_bc'] = ''
         sb_params_dict['pseudo_plastic_q'] = ppq
         sb_params_dict['till_effective_fraction_overburden'] = tefo
         sb_params_dict['topg_to_phi'] = ttphi
