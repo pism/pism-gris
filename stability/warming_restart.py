@@ -159,7 +159,7 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
 else:
     pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
-climate_file = 'DMI-HIRHAM5_GL2_ERAI_2001_2014_TM_EPSG3413_{}m.nc'.format(grid)
+climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_EPSG3413_{}m.nc'.format(grid)
 
 if ocean_melt in ('x'):
     ocean_file = 'ocean_forcing_latitudinal_ctrl.nc'
@@ -337,6 +337,9 @@ for n, combination in enumerate(combinations):
                     general_params_dict['topg_delta_file'] = topg_delta_file
                 general_params_dict['ys'] = start
                 general_params_dict['ye'] = end
+                general_params_dict['calendar'] = '365_day'
+                general_params_dict['climate_forcing_buffer_size'] = 365
+                
                 general_params_dict['o'] = os.path.join(odir, state_dir, outfile)
                 general_params_dict['o_format'] = oformat
                 general_params_dict['o_size'] = osize
@@ -371,11 +374,10 @@ for n, combination in enumerate(combinations):
                                                        **{'surface.pdd.factor_ice': (fice / ice_density),
                                                           'surface.pdd.factor_snow': (fsnow / ice_density),
                                                           'atmosphere_given_file': climate_file,
-                                                          'atmosphere_given_file': climate_file,
-                                                          'atmosphere_yearly_cycle_file': climate_file,
-                                                          'temp_lapse_rate': lapse_rate,
+                                                          'atmosphere_given_period': 1,
+                                                          # 'pdd_sd_file': climate_file,
                                                           'atmosphere_lapse_rate_file': climate_file,
-                                                          'pdd_sd_file': climate_file,
+                                                          'temp_lapse_rate': lapse_rate,
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
                 ocean_params_dict = generate_ocean(ocean,
