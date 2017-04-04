@@ -7,6 +7,7 @@ try:
 except:
     import subprocess as sub
 from glob import glob
+import numpy as np
 import gdal
 from nco import Nco
 nco = Nco()
@@ -17,18 +18,90 @@ from argparse import ArgumentParser
 
 from netCDF4 import Dataset as NC
 
+def permute_nc(variable, output_order=('time', 'station', 'profile', 'z', 'zb')):
+    '''
+    Permute dimensions of a NetCDF variable to match the output
+    storage order.
+
+    Parameters
+    ----------
+    variable : a netcdf variable
+               e.g. thk = nc.variables['thk']
+    output_order: dimension tuple (optional)
+                  default ordering is ('time', 'z', 'zb', 'y', 'x')
+
+    Returns
+    -------
+    var_perm : array_like
+    '''
+
+    input_dimensions = variable.dimensions
+
+    # filter out irrelevant dimensions
+    dimensions = filter(lambda x: x in input_dimensions,
+                        output_order)
+
+    # create the mapping
+    mapping = map(lambda x: dimensions.index(x),
+                  input_dimensions)
+
+    if mapping:
+        return np.transpose(variable[:], mapping)
+    else:
+        return variable[:]  # so that it does not break processing "mapping"
+
+def permute(array,
+               input_order=('time', 'station', 'profile', 'z', 'zb'),
+               output_order=('station', 'time', 'profile', 'z', 'zb')):
+    '''
+    Permute dimensions of an array to match the output
+    storage order.
+
+    Parameters
+    ----------
+    array: array_like
+    input_order: dimension tuple (optional)
+                  default ordering is ('time', 'station', 'profile', 'z', 'zb')'
+    output_order: dimension tuple (optional)
+                  default ordering is ('time', 'station', 'profile', 'z', 'zb')'
+
+    Returns
+    -------
+    var_perm : array_like
+    '''
+
+    input_dimensions = input_order
+
+    # filter out irrelevant dimensions
+    dimensions = filter(lambda x: x in input_dimensions,
+                        output_order)
+
+    # create the mapping
+    mapping = map(lambda x: dimensions.index(x),
+                  input_dimensions)
+
+    return np.transpose(array, mapping)
+
+
 def compute_normal_speed(ifile):
+    '''
+    Compute normal-to-profile speeds
+    '''
     nc = NC(ifile, 'a')
-    ux = nc.variables['uvelsurf'][:]
-    vy = nc.variables['vvelsurf'][:]
-    nx = nc.variables['nx'][:]
-    ny = nc.variables['ny'][:]
+    ux = permute_nc(nc.variables['uvelsurf'])
+    vy = permute_nc(nc.variables['vvelsurf'])
+    nx = permute_nc(nc.variables['nx'])
+    ny = permute_nc(nc.variables['ny'])
     dims = nc.variables['uvelsurf'].dimensions
-    nx = np.transpose(np.tile(nx, (1,1,1)), [1,0,2])
-    ny = np.transpose(np.tile(ny, (1,1,1)), [1,0,2])
     fill_value = nc.variables['uvelsurf']._FillValue
     nc.createVariable('velsurf_normal', 'd', dimensions=dims, fill_value=fill_value)
-    nc.variables['velsurf_normal'][:] = ux * nx + vy * ny
+    vn = ux * nx + vy * ny
+    # filter out irrelevant dimensions
+    input_dims = filter(lambda x: x in dims,
+                        ('station', 'time', 'profile', 'z', 'zb'))
+    nc.variables['velsurf_normal'][:] = permute(vn,
+                                                input_order=input_dims,
+                                                output_order=dims)
     nc.variables['velsurf_normal'].units = 'm year-1'
     nc.close()
 
@@ -71,6 +144,7 @@ profile_basedir = '../data_sets/flux-gates'
 profile_file = '.'.join(['-'.join([profile_basename, profile_type, ''.join([str(profile_spacing), 'm'])]), 'shp'])
 profile_file_wd = os.path.join(profile_basedir, profile_file)
 
+# Process observations
 obs_dir = 'observations'
 profile_dir = 'profiles'
 velocity_file = 'greenland_vel_mosaic250_v1.nc'
@@ -80,12 +154,12 @@ velocity_profile_file_wd = os.path.join(obs_dir, profile_dir, 'profile_{}m_{}_{}
 cmd = ['extract_profiles.py', '-a',  profile_file_wd, velocity_file_wd, velocity_profile_file_wd]
 sub.call(cmd)
 logger.info('calculating profile-normal speed')
-#compute_normal_speed(velocity_profile_file_wd)
+compute_normal_speed(velocity_profile_file_wd)
 
-#nco.ncap2(input='-s "{}" {}'.format(eqn_str, velocity_profile_file_wd), output=velocity_profile_file_wd, overwrite=True)
-
+# Process experiments
 if not os.path.isdir(os.path.join(idir, 'profiles')):
     os.mkdir(os.path.join(idir, 'profiles'))
+
 exp_files = glob(os.path.join(idir, 'state', '*.nc'))
 for exp_file in exp_files:
     exp_profile_file = 'profile_{}m_{}_{}'.format(profile_spacing, profile_type,  os.path.split(exp_file)[-1])
@@ -93,4 +167,4 @@ for exp_file in exp_files:
     cmd = ['extract_profiles.py', '-a',  profile_file_wd, exp_file, exp_profile_file_wd]
     sub.call(cmd)
     logger.info('calculating profile-normal speed')
-#    compute_normal_speed(exp_profile_file_wd)
+    compute_normal_speed(exp_profile_file_wd)
