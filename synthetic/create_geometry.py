@@ -94,7 +94,7 @@ Xsp = np.cos(np.deg2rad(alpha)) * (X - x_s) - np.sin(np.deg2rad(alpha)) * Zs
 Ysp = Y
 Zsp = np.sin(np.deg2rad(alpha)) * (X - x_s) + np.cos(np.deg2rad(alpha)) * Zs
 # The only problem is now that Xp, Yp is no longer a regular grid, so you need to interpolate back onto the original grid:
-Zspi = griddata(np.ndarray.flatten(Xsp), np.ndarray.flatten(Ysp), np.ndarray.flatten(Zsp), X - x_s, Y, interp='linear') - 500
+Zspi = griddata(np.ndarray.flatten(Xsp), np.ndarray.flatten(Ysp), np.ndarray.flatten(Zsp), X - x_s, Y, interp='linear') - 250
 # Remove mask
 Zspi.masked = False
 Zspi[:, 0] = Zspi[:, 1]
