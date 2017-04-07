@@ -34,7 +34,7 @@ parser.add_argument("--calving", dest="calving",
                     help="calving", default='ocean_kill')
 parser.add_argument("--ocean", dest="ocean",
                     choices=['warming'],
-                    help="Ocean coupler", default='given')
+                    help="Ocean coupler", default='const')
 parser.add_argument("--ocean_melt", dest="ocean_melt",
                     choices=['x', '10myr_latitudinal', '20myr_latitudinal'],
                     help="Ocean melt type", default='20myr_latitudinal')
