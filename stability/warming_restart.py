@@ -162,11 +162,11 @@ else:
 climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_EPSG3413_{}m.nc'.format(grid)
 
 if ocean_melt in ('x'):
-    ocean_file = 'ocean_forcing_latitudinal_ctrl.nc'
+    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_ctrl.nc'
 elif ocean_melt in ('20myr_latitudinal'):
-    ocean_file = 'ocean_forcing_latitudinal_285myr_lat_69_20myr_80n.nc'    
+    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_285myr_lat_69_20myr_80n.nc'    
 else:
-    ocean_file = 'ocean_forcing_latitudinal_80n.nc'
+    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_80n.nc'
     
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
