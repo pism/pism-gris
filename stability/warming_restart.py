@@ -42,7 +42,7 @@ parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris')
 parser.add_argument("--exstep", dest="exstep", type=int,
-                    help="Writing interval for spatial time series", default=100)
+                    help="Writing interval for spatial time series", default=10)
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
@@ -273,10 +273,14 @@ for n, combination in enumerate(combinations):
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
-    name_options['lapse'] = lapse_rate
-    name_options['tm'] = T_max
-    name_options['fice'] = fice
-    name_options['fsnow'] = fsnow
+    if do_lapse:
+        name_options['lapse'] = lapse_rate
+    if do_T_max:
+        name_options['tm'] = T_max
+    if do_fice:
+        name_options['fice'] = fice
+    if do_fsnow:
+        name_options['fsnow'] = fsnow
     name_options['bed_deformation'] = bed_deformation
     name_options['calving'] = calving
     if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):

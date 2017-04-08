@@ -98,13 +98,12 @@ def compute_normal_speed(ifile):
     vn = ux * nx + vy * ny
     # filter out irrelevant dimensions
     input_dims = filter(lambda x: x in dims,
-                        ('station', 'time', 'profile', 'z', 'zb'))
+                        ('time', 'station', 'profile', 'z', 'zb'))
     nc.variables['velsurf_normal'][:] = permute(vn,
                                                 input_order=input_dims,
                                                 output_order=dims)
     nc.variables['velsurf_normal'].units = 'm year-1'
     nc.close()
-
 
 # set up the option parser
 parser = ArgumentParser()
@@ -151,10 +150,10 @@ velocity_file = 'greenland_vel_mosaic250_v1.nc'
 velocity_file_wd = os.path.join(obs_dir, 'velocity', velocity_file)
 velocity_profile_file_wd = os.path.join(obs_dir, profile_dir, 'profile_{}m_{}_{}'.format(profile_spacing, profile_type,  velocity_file))
 
-cmd = ['extract_profiles.py', '--special_vars', profile_file_wd, velocity_file_wd, velocity_profile_file_wd]
+cmd = ['extract_profiles.py', '-a', '--special_vars', profile_file_wd, velocity_file_wd, velocity_profile_file_wd]
 sub.call(cmd)
 logger.info('calculating profile-normal speed')
-# compute_normal_speed(velocity_profile_file_wd)
+compute_normal_speed(velocity_profile_file_wd)
 
 # Process experiments
 if not os.path.isdir(os.path.join(idir, 'profiles')):
@@ -167,4 +166,4 @@ for exp_file in exp_files:
     cmd = ['extract_profiles.py', '--special_vars',  profile_file_wd, exp_file, exp_profile_file_wd]
     sub.call(cmd)
     logger.info('calculating profile-normal speed')
-    # compute_normal_speed(exp_profile_file_wd)
+    compute_normal_speed(exp_profile_file_wd)

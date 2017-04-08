@@ -273,7 +273,7 @@ def prepare_pr(dry=False):
     for pr_file in PR_files:
         logger.info('extracting {}'.format(pr_file))
         cmd = ['gunzip', pr_file]
-        # sub.call(cmd)
+        sub.call(cmd)
         pr_files.append(pr_file[:-3])
         
     pr_merged_file_daily_mean = 'DMI-HIRHAM5_GL2_ERAI_2001_2014_PR_{}.nc'.format(daily_mean)
@@ -308,7 +308,7 @@ def prepare_tas(dry=False):
     for tas_file in TAS_files:
         logger.info('extracting {}'.format(tas_file))
         cmd = ['gunzip', tas_file]
-        # sub.call(cmd)
+        sub.call(cmd)
         tas_files.append(tas_file[:-3])
 
     tas_merged_file_daily_mean = 'DMI-HIRHAM5_GL2_ERAI_2001_2014_TAS_{}.nc'.format(daily_mean)
@@ -360,7 +360,7 @@ def prepare_smb(dry=False):
     for smb_file in SMB_files:
         logger.info('extracting {}'.format(smb_file))
         cmd = ['gunzip', smb_file]
-        # sub.call(cmd)
+        sub.call(cmd)
         smb_files.append(smb_file[:-3])
 
     smb_merged_file_daily_mean = 'DMI-HIRHAM5_GL2_ERAI_2001_2014_SMB_{}.nc'.format(daily_mean)
@@ -400,7 +400,7 @@ time_mean = 'YDM'
 topo_file = 'topo_geog.nc'
 rotated_grid_file = 'rotated_grid.txt'
 
-dry = False
+dry = True
 pr_merged_file_time_mean = prepare_pr(dry=dry)
 tas_merged_file_time_mean = prepare_tas(dry=dry)
 smb_merged_file_time_mean = prepare_smb(dry=dry)
