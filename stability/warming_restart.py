@@ -95,7 +95,6 @@ parser.add_argument("--step", dest="step", type=int,
 parser.add_argument("--test_climate_models", dest="test_climate_models", action="store_true",
                     help="Turn off ice dynamics and mass transport to test climate models", default=False)
 
-
 options = parser.parse_args()
 
 nn = options.n
