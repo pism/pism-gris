@@ -33,7 +33,7 @@ parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
                     help="claving", default='vonmises_calving')
 parser.add_argument("--ocean", dest="ocean",
-                    choices=['warming'],
+                    choices=['warming', 'const'],
                     help="Ocean coupler", default='warming')
 parser.add_argument("--ocean_melt", dest="ocean_melt",
                     choices=['x', '10myr_latitudinal', '20myr_latitudinal'],
