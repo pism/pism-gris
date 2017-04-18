@@ -147,8 +147,10 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     gdalwarp $CUT -overwrite  -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID  -dstnodata -9999 -of GTiff NETCDF:$jak_in:$bed jak_g${GRID}m_v${ver}.tif
     gdal_translate -co "FORMAT=NC4" -of netCDF jak_g${GRID}m_v${ver}.tif jak_g${GRID}m_v${ver}.nc
     ncrename -v bed,Band1 jak_g${GRID}m_v${ver}.nc
+    ncatted -a _FillValue,Band1,d,, jak_g${GRID}m_v${ver}.nc
     ncks -A -v Band1 jak_g${GRID}m_v${ver}.nc $outfile
-    ncap2 -O -s "where(bed==-9999) {bed=Band1;}; where(Band1<=-9990) {bed=-9999;};" $outfile $outfile
+    ncap2 -O -s "where(Band1!=-9999) {bed=Band1;};" $outfile $outfile
+    ncks -O -v Band1 -x $outfile $outfile
     
     ncks -4 -L 3 -O g${GRID}m_${var}_v${ver}.nc griddes_${GRID}m.nc
     nc2cdo.py --srs "+init=epsg:3413" griddes_${GRID}m.nc
