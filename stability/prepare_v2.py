@@ -82,7 +82,7 @@ parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
 parser.add_argument("--dataset_version", dest="version",
-                    choices=['2'],
+                    choices=['2', '3'],
                     help="input data set version", default='2')
 parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity_approximation",
                     choices=['centered', 'upstream'],

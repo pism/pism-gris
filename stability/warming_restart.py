@@ -81,7 +81,7 @@ parser.add_argument("--stress_balance", dest="stress_balance",
 parser.add_argument("--topg_delta", dest="topg_delta_file",
                     help="end of initialization detla=(topg-topg_initial) file", default=None)
 parser.add_argument("--dataset_version", dest="version",
-                    choices=['2'],
+                    choices=['2', '3'],
                     help="input data set version", default='2')
 parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity_approximation",
                     choices=['centered', 'upstream'],
