@@ -294,7 +294,7 @@ for n, combination in enumerate(combinations):
             if start == simulation_start_year:
                 calving_params_dict = generate_calving(calving,
                                                        float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
-                                                       ocean_kill_file=input_file,
+                                                       ocean_kill_file=pism_dataname,
                                                        frontal_melt=frontal_melt)
             else:
                 calving_params_dict = generate_calving(calving,
