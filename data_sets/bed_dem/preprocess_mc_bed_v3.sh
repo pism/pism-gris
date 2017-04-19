@@ -149,7 +149,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     ncrename -v bed,Band1 jak_g${GRID}m_v${ver}.nc
     ncatted -a _FillValue,Band1,d,, jak_g${GRID}m_v${ver}.nc
     ncks -A -v Band1 jak_g${GRID}m_v${ver}.nc $outfile
-    ncap2 -O -s "where(Band1!=-9999) {bed=Band1;};" $outfile $outfile
+    ncap2 -O -s "where(Band1!=-9999) {bed=Band1; thickness=surface-bed;}; where(thickness<0) {thickness=0;};" $outfile $outfile
     ncks -O -v Band1 -x $outfile $outfile
     
     ncks -4 -L 3 -O g${GRID}m_${var}_v${ver}.nc griddes_${GRID}m.nc
