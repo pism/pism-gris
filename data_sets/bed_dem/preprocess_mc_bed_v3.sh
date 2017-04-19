@@ -199,6 +199,13 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     e1=864700
     n1=-657600
 
+    buffer_e=40650
+    buffer_n=22000
+    e0=$(($e0 - $buffer_e))
+    n0=$(($n0 - $buffer_n))
+    e1=$(($e1 + $buffer_e))
+    n1=$(($n1 + $buffer_n))
+
     # Shift to cell centers
     e0=$(($e0 + $GRID / 2 ))
     n0=$(($n0 + $GRID / 2))
