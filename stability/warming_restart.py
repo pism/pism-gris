@@ -82,7 +82,7 @@ parser.add_argument("--topg_delta", dest="topg_delta_file",
                     help="end of initialization detla=(topg-topg_initial) file", default=None)
 parser.add_argument("--dataset_version", dest="version",
                     choices=['2', '3'],
-                    help="input data set version", default='2')
+                    help="input data set version", default='3')
 parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity_approximation",
                     choices=['centered', 'upstream'],
                     help="How to approximate vertical velocities", default='upstream')
@@ -132,6 +132,8 @@ do_fsnow = False
 do_lapse = False
 if params_list is not None:
     params = params_list.split(',')
+    if 'sia_e' in params:
+        do_sia_e = True
     if 'T_max' in params:
         do_T_max = True
     if 'eigen_calving_k' in params:
@@ -200,10 +202,13 @@ if not os.path.isdir(odir_tmp):
 # set up model initialization
 # ########################################################
 
-sia_e = (1.25)
 ssa_n = (3.25)
 ssa_e = (1.0)
 
+if do_sia_e:
+    sia_e_values = [1.25, 1.5, 2, 3]
+else:
+    sia_e_values = [1.25]
 if do_T_max:
     T_max_values = [0, 1, 5, 10]
 else:
@@ -232,7 +237,8 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(lapse_rate_values,
+combinations = list(itertools.product(sia_e_values,
+                                      lapse_rate_values,
                                       T_max_values,
                                       eigen_calving_k_values,
                                       fice_values,
@@ -267,11 +273,13 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    sia_e, lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
+    if do_sia_e:
+        name_options['sia_e'] = sia_e
     if do_lapse:
         name_options['lapse'] = lapse_rate
     if do_T_max:
