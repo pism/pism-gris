@@ -100,6 +100,8 @@ system = options.system
 bed_type = options.bed_type
 calving = options.calving
 climate = options.climate
+climate_relax = 'pdd'
+
 exstep = options.exstep
 float_kill_calve_near_grounding_line = options.float_kill_calve_near_grounding_line
 frontal_melt = options.frontal_melt
@@ -228,7 +230,7 @@ for n, combination in enumerate(combinations):
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
     # All runs in one script file for coarse grids that fit into max walltime
-    script = 'prep_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
+    script = 'calib_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
     for filename in (script):
         try:
             os.remove(filename)
@@ -311,10 +313,10 @@ for n, combination in enumerate(combinations):
 
 
         f.write(cmd)
+        f.write('\n\n')
 
         infile = outfile
 
-        climate = 'pdd'
         relax_start = 0
         relax_end = 5
         experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(relax_start), '{}'.format(relax_end)])
@@ -344,7 +346,7 @@ for n, combination in enumerate(combinations):
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         ice_density = 910.
-        climate_params_dict = generate_climate(climate,
+        climate_params_dict = generate_climate(climate_relax,
                                                **{'surface.pdd.factor_ice': (fice / ice_density),
                                                   'surface.pdd.factor_snow': (fsnow / ice_density),
                                                   'atmosphere_given_file': climate_file,
@@ -378,7 +380,7 @@ for n, combination in enumerate(combinations):
         f.write('\n\n')
 
 
-    script_post = 'prep_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
+    script_post = 'calib_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
     scripts_post.append(script_post)
 
     post_header = make_batch_post_header(system)
