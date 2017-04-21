@@ -136,19 +136,21 @@ logger.addHandler(ch)
 logger.addHandler(fh)
 
 eqn_str = 'velsurf_normal=uvelsurf*nx+vvelsurf*ny;'
-profile_basename = 'greenland-flux-gates'
+profile_name = 'greenland'
 profile_spacing = 250
 profile_type = '29'
+profile_basename = '{}-flux-gates-{}-{}m'.format(profile_name, profile_type, profile_spacing)
 profile_basedir = '../data_sets/flux-gates'
-profile_file = '.'.join(['-'.join([profile_basename, profile_type, ''.join([str(profile_spacing), 'm'])]), 'shp'])
+profile_file = '.'.join([profile_basename, 'shp'])
 profile_file_wd = os.path.join(profile_basedir, profile_file)
+
 
 # Process observations
 obs_dir = 'observations'
 profile_dir = 'profiles'
 velocity_file = 'greenland_vel_mosaic250_v1.nc'
 velocity_file_wd = os.path.join(obs_dir, 'velocity', velocity_file)
-velocity_profile_file_wd = os.path.join(obs_dir, profile_dir, 'profile_{}m_{}_{}'.format(profile_spacing, profile_type,  velocity_file))
+velocity_profile_file_wd = os.path.join(obs_dir, profile_dir, 'profile_{}_{}m_{}_{}'.format(profile_name, profile_spacing, profile_type,  velocity_file))
 
 cmd = ['extract_profiles.py', '-a', '--special_vars', profile_file_wd, velocity_file_wd, velocity_profile_file_wd]
 sub.call(cmd)
@@ -161,7 +163,7 @@ if not os.path.isdir(os.path.join(idir, 'profiles')):
 
 exp_files = glob(os.path.join(idir, 'state', '*.nc'))
 for exp_file in exp_files:
-    exp_profile_file = 'profile_{}m_{}_{}'.format(profile_spacing, profile_type,  os.path.split(exp_file)[-1])
+    exp_profile_file = 'profile_{}_{}m_{}_{}'.format(profile_name, profile_spacing, profile_type,  os.path.split(exp_file)[-1])
     exp_profile_file_wd = os.path.join(idir, 'profiles', exp_profile_file)
     cmd = ['extract_profiles.py', '--special_vars',  profile_file_wd, exp_file, exp_profile_file_wd]
     sub.call(cmd)
