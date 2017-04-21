@@ -130,6 +130,7 @@ do_eigen_calving_k = False
 do_fice = False
 do_fsnow = False
 do_lapse = False
+do_sia_e = False
 if params_list is not None:
     params = params_list.split(',')
     if 'sia_e' in params:
