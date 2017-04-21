@@ -304,8 +304,13 @@ for n, combination in enumerate(combinations):
                                       calving_params_dict,
                                       spatial_ts_dict,
                                       scalar_ts_dict)
+        
+        # Remove flow law so this works with different SIA N
+        if 'sia_flow_law' in all_params_dict:
+            del all_params_dict['sia_flow_law']
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
 
+        
         if system in ('debug'):
             cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job.${batch}'.format(outdir=odir, batch=batch_system['job_id'])])
         else:
@@ -315,10 +320,10 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         f.write('\n\n')
 
-        infile = outfile
+        infile = os.path.join(odir, state_dir, outfile)
 
         relax_start = 0
-        relax_end = 5
+        relax_end = 25
         experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(relax_start), '{}'.format(relax_end)])
 
         outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
@@ -360,13 +365,19 @@ for n, combination in enumerate(combinations):
                                                frontal_melt=frontal_melt)
 
 
+        exvars = default_spatial_ts_vars()
+        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, 1, odir=odir_tmp, split=True)
+
         all_params_dict = merge_dicts(general_params_dict,
                                       grid_params_dict,
                                       stress_balance_params_dict,
                                       climate_params_dict,
                                       ocean_params_dict,
                                       hydro_params_dict,
-                                      calving_params_dict)
+                                      calving_params_dict,
+                                      spatial_ts_dict)
+        if 'sia_flow_law' in all_params_dict:
+            del all_params_dict['sia_flow_law']
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
 
         if system in ('debug'):
