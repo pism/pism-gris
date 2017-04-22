@@ -229,6 +229,9 @@ for n, combination in enumerate(combinations):
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
+    full_exp_name_relax =  '_'.join([climate_relax, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    full_outfile_relax = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name_relax)
+    
     # All runs in one script file for coarse grids that fit into max walltime
     script = 'calib_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
     for filename in (script):
@@ -324,7 +327,7 @@ for n, combination in enumerate(combinations):
 
         relax_start = 0
         relax_end = 25
-        experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(relax_start), '{}'.format(relax_end)])
+        experiment =  '_'.join([climate_relax, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(relax_start), '{}'.format(relax_end)])
 
         outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
         general_params_dict = OrderedDict()
@@ -366,7 +369,7 @@ for n, combination in enumerate(combinations):
 
 
         exvars = default_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, 1, odir=odir_tmp, split=True)
+        spatial_ts_dict = generate_spatial_ts(full_outfile_relax, exvars, 1, odir=odir_tmp, split=True)
 
         all_params_dict = merge_dicts(general_params_dict,
                                       grid_params_dict,
@@ -402,7 +405,7 @@ for n, combination in enumerate(combinations):
         f.write(post_header)
 
         extra_file = spatial_ts_dict['extra_file']
-        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(simulation_start_year+exstep, simulation_end_year, exstep)])
+        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(1, 25, 1)])
         myoutfile = extra_file + '.nc'
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
