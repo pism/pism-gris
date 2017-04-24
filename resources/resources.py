@@ -197,6 +197,27 @@ def glacial_spatial_ts_vars():
     return exvars
 
 
+def calibrate_spatial_ts_vars():
+    '''
+    Returns a list of essential extra vars
+    '''
+    
+    exvars = ['flux_divergence',
+              'dHdt',
+              'mask',
+              'lat',
+              'lat_bnds',
+              'lon',
+              'lon_bnds',
+              'surface_mass_balance_average',
+              'thk',
+              'topg',
+              'usurf',
+              'velbase_mag',
+              'velsurf_mag']
+    
+    return exvars
+
 def essential_spatial_ts_vars():
     '''
     Returns a list of essential extra vars

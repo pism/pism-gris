@@ -174,6 +174,7 @@ odir_tmp = '_'.join([odir, 'tmp'])
 if not os.path.isdir(odir_tmp):
     os.mkdir(odir_tmp)
 
+
 # ########################################################
 # set up model initialization
 # ########################################################
@@ -181,13 +182,11 @@ if not os.path.isdir(odir_tmp):
 fsnow = 4
 fice = 8
 
-ssa_e = (1.0)
-
 sia_e_values = [1.25, 1.5, 2, 3]
-sia_n_values = [3, 3.25]
-ssa_n_values = [3, 3.25]
-ppq_values = [0.4, 0.6, 0.8]
-tefo_values = [0.015, 0.020]
+sia_n_values = [3]
+ssa_n_values = [3.25]
+ppq_values = [0.6, 0.8]
+tefo_values = [0.020]
 
 thickness_calving_threshold_vales = [100]
 phi_min_values = [5.0]

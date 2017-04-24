@@ -110,8 +110,11 @@ parser = ArgumentParser()
 parser.description = "Generating scripts for model calibration."
 parser.add_argument("INDIR", nargs=1,
                     help="main directory", default=None)
+parser.add_argument("-a", "--append", dest="append", action="store_true",
+                    help="Append. Only process new files. Default=False", default=False)
 
 options = parser.parse_args()
+append = options.append
 idir = options.INDIR[0]
 
 # create logger
@@ -165,7 +168,9 @@ exp_files = glob(os.path.join(idir, 'state', '*.nc'))
 for exp_file in exp_files:
     exp_profile_file = 'profile_{}_{}m_{}_{}'.format(profile_name, profile_spacing, profile_type,  os.path.split(exp_file)[-1])
     exp_profile_file_wd = os.path.join(idir, 'profiles', exp_profile_file)
-    cmd = ['extract_profiles.py', '--special_vars',  profile_file_wd, exp_file, exp_profile_file_wd]
-    sub.call(cmd)
-    logger.info('calculating profile-normal speed')
-    compute_normal_speed(exp_profile_file_wd)
+    if not (append and os.path.isfile(exp_profile_file)):
+        logger.info('processing {}'.format(exp_file))
+        cmd = ['extract_profiles.py', '--special_vars',  profile_file_wd, exp_file, exp_profile_file_wd]
+        sub.call(cmd)
+        logger.info('calculating profile-normal speed')
+        compute_normal_speed(exp_profile_file_wd)
