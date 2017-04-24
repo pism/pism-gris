@@ -181,6 +181,7 @@ if not os.path.isdir(odir_tmp):
 
 fsnow = 4
 fice = 8
+ssa_e = 1
 
 sia_e_values = [1.25, 1.5, 2, 3]
 sia_n_values = [3]
