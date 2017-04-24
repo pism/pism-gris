@@ -290,7 +290,7 @@ for n, combination in enumerate(combinations):
                                                ocean_kill_file=pism_dataname,
                                                frontal_melt=frontal_melt)
             
-        exvars = default_spatial_ts_vars()
+        exvars = calibrate_spatial_ts_vars()
         spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
                                             start=simulation_start_year,
