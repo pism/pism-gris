@@ -59,7 +59,7 @@ parser.add_argument("-s", "--system", dest="system",
                     help="computer system to use.", default='pleiades_broadwell')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
-                    help="output size type", default='ctrl')
+                    help="output size type", default='no_bath')
 parser.add_argument("--bed_deformation", dest="bed_deformation",
                     choices=['off', 'lc', 'iso'],
                     help="Bed deformation model.", default='off')

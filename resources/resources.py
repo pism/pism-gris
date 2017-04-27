@@ -121,7 +121,6 @@ def stability_spatial_ts_vars():
               'dbdt',
               'dHdt',
               'discharge_flux',
-              'eigen_calving_rate',
               'flux_divergence',
               'height_above_flotation',
               'ice_mass',
@@ -142,18 +141,13 @@ def stability_spatial_ts_vars():
               'temppabase',
               'tempsurf',
               'thk',
-              'tillwat',
               'topg',
               'usurf',
               'velbar',
               'velbase',
               'velbase_mag',
               'velsurf',
-              'velsurf_mag',
-              'vonmises_calving_rate',
-              'vonmises_stress',
-              'wvelbase',
-              'wvelsurf']
+              'velsurf_mag']
     
     return exvars
 

@@ -168,7 +168,7 @@ exp_files = glob(os.path.join(idir, 'state', '*.nc'))
 for exp_file in exp_files:
     exp_profile_file = 'profile_{}_{}m_{}_{}'.format(profile_name, profile_spacing, profile_type,  os.path.split(exp_file)[-1])
     exp_profile_file_wd = os.path.join(idir, 'profiles', exp_profile_file)
-    if not (append and os.path.isfile(exp_profile_file)):
+    if (not append) or (not append and not os.path.isfile(exp_profile_file)):
         logger.info('processing {}'.format(exp_file))
         cmd = ['extract_profiles.py', '--special_vars',  profile_file_wd, exp_file, exp_profile_file_wd]
         sub.call(cmd)

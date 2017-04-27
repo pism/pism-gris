@@ -59,7 +59,7 @@ parser.add_argument("-s", "--system", dest="system",
                     help="computer system to use.", default='pleiades_broadwell')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
-                    help="output size type", default='ctrl')
+                    help="output size type", default='no_bath')
 parser.add_argument("--frontal_melt", dest="frontal_melt", action="store_true",
                     help="Turn on frontal melt", default=False)
 parser.add_argument("--hydrology", dest="hydrology",
