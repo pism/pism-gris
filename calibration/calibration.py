@@ -171,7 +171,7 @@ if not os.path.isdir(odir_tmp):
 # set up model initialization
 # ########################################################
 
-thickeness_calving_threshold = 100
+thickness_calving_threshold = 100
 
 ssa_e = (1.0)
 ssa_n_values = [3, 3.25, 3.5]
