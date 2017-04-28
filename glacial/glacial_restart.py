@@ -128,9 +128,9 @@ else:
     input_file = options.FILE[0]
 
 if domain.lower() in ('greenland_ext', 'gris_ext'):
-    pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
+    pism_dataname = '../data_sets/bed_dem/pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 else:
-    pism_dataname = 'pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
+    pism_dataname = '../data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 if precip in ('racmo'):
     precip_file = pism_dataname
 elif precip in ('hirham'):
@@ -139,11 +139,11 @@ else:
     print('Precip model {} not support. How did we get here?'.format(precip))
 
 if ocean_melt in ('x'):
-    ocean_file = 'ocean_forcing_latitudinal_ctrl.nc'
+    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_ctrl.nc'
 elif ocean_melt in ('20myr_latitudinal'):
-    ocean_file = 'ocean_forcing_latitudinal_20myr_80n.nc'    
+    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_20myr_80n.nc'    
 else:
-    ocean_file = 'ocean_forcing_latitudinal_80n.nc'
+    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_80n.nc'
     
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
