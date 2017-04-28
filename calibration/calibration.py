@@ -77,6 +77,9 @@ parser.add_argument("--dataset_version", dest="version",
 parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity_approximation",
                     choices=['centered', 'upstream'],
                     help="How to approximate vertical velocities", default='upstream')
+parser.add_argument("--calving", dest="calving",
+                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
+                    help="calving", default='vonmises_calving')
 
 
 options = parser.parse_args()
@@ -91,7 +94,7 @@ system = options.system
 
 bed_deformation = options.bed_deformation
 bed_type = options.bed_type
-calving = 'ocean_kill'
+calving = options.calving
 climate = 'flux'
 exstep = options.exstep
 float_kill_calve_near_grounding_line = options.float_kill_calve_near_grounding_line
@@ -168,6 +171,8 @@ if not os.path.isdir(odir_tmp):
 # set up model initialization
 # ########################################################
 
+thickeness_calving_threshold = 100
+
 ssa_e = (1.0)
 ssa_n_values = [3, 3.25, 3.5]
 sia_e_values = [1.25, 1.5, 2, 3]
@@ -210,6 +215,11 @@ for n, combination in enumerate(combinations):
     name_options['phi_max'] = phi_max
     name_options['topg_min'] = topg_min
     name_options['topg_max'] = topg_max
+    name_options['calving'] = calving
+    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
+        name_options['threshold'] = thickness_calving_threshold
+    if calving in ('eigen_calving', 'hybrid_calving'):
+        name_options['k'] = eigen_calving_k
 
     
     vversion = 'v' + str(version)
@@ -274,6 +284,7 @@ for n, combination in enumerate(combinations):
         ocean_params_dict = generate_ocean(ocean)
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving,
+                                               thickness_calving_threshold=thickness_calving_threshold,
                                                float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
                                                ocean_kill_file=pism_dataname)
         
