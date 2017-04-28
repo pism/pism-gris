@@ -353,6 +353,7 @@ for n, combination in enumerate(combinations):
                 calving_params_dict = generate_calving(calving,
                                                        thickness_calving_threshold=thickness_calving_threshold,
                                                        eigen_calving_k=eigen_calving_k,
+                                                       float_kill_margin_only='',
                                                        float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
                                                        ocean_kill_file=pism_dataname,
                                                        frontal_melt=frontal_melt)

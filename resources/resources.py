@@ -623,7 +623,6 @@ def generate_calving(calving, **kwargs):
         params_dict['calving'] = 'eigen_calving,vonmises_calving,thickness_calving'
     elif calving in ('float_kill'):
         params_dict['calving'] = calving
-        params_dict['float_kill_margin_only'] = ''
     else:
         print('calving {} not recognized, exiting'.format(calving))
         import sys
