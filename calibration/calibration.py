@@ -65,7 +65,7 @@ parser.add_argument("--precip", dest="precip",
                     choices=['racmo', 'hirham'],
                     help="Precipitation model", default='racmo')
 parser.add_argument("--stable_gl", dest="float_kill_calve_near_grounding_line", action="store_true",
-                    help="Stable grounding line", default=False)
+                    help="Stable grounding line", default=True)
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
@@ -274,6 +274,7 @@ for n, combination in enumerate(combinations):
         ocean_params_dict = generate_ocean(ocean)
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving,
+                                               float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
                                                ocean_kill_file=pism_dataname)
         
         exvars = glacial_spatial_ts_vars()
