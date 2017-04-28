@@ -225,6 +225,10 @@ for n, combination in enumerate(combinations):
     name_options['ssa_n'] = ssa_n
     name_options['ppq'] = ppq
     name_options['tefo'] = tefo
+    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
+        name_options['threshold'] = thickness_calving_threshold
+    if calving in ('eigen_calving', 'hybrid_calving'):
+        name_options['k'] = eigen_calving_k
 
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
@@ -288,6 +292,7 @@ for n, combination in enumerate(combinations):
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving,
                                                float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
+                                               thickness_calving_threshold=thickness_calving_threshold,
                                                ocean_kill_file=pism_dataname,
                                                frontal_melt=frontal_melt)
             
