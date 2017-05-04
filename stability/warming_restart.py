@@ -74,8 +74,8 @@ parser.add_argument("--hydrology", dest="hydrology",
                     help="Basal hydrology model.", default='diffuse')
 parser.add_argument("-p", "--params", dest="params_list",
                     help="Comma-separated list with params for sensitivity", default=None)
-parser.add_argument("--stable_gl", dest="float_kill_calve_near_grounding_line", action="store_true",
-                    help="Stable grounding line", default=False)
+parser.add_argument("--stable_gl", dest="float_kill_calve_near_grounding_line", action="store_false",
+                    help="Stable grounding line", default=True)
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
@@ -459,7 +459,7 @@ for n, combination in enumerate(combinations):
         myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(simulation_start_year+exstep, simulation_end_year, exstep)])
         myoutfile = extra_file + '.nc'
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
-        cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
+        cmd = ' '.join(['ncrcat -O -4 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])
