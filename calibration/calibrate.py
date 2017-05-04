@@ -225,6 +225,7 @@ for n, combination in enumerate(combinations):
     name_options['ssa_n'] = ssa_n
     name_options['ppq'] = ppq
     name_options['tefo'] = tefo
+    name_options['calving'] = calving
     if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
         name_options['threshold'] = thickness_calving_threshold
     if calving in ('eigen_calving', 'hybrid_calving'):
