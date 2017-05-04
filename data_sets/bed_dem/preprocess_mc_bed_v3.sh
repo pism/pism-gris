@@ -83,8 +83,6 @@ xmax=$((864700 + $buffer_x))
 ymax=$((-657600 + $buffer_y))
 
 GRID=150
-jak_in=JKS_BedElevation_${GRID}m.nc
-
 
 for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     outfile_prefix=pism_Greenland_ext_${GRID}m_mcb_jpl_v${ver}
@@ -144,15 +142,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
 
     ncks -O -v Band1,topg -x $outfile $outfile
     
-    gdalwarp $CUT -overwrite  -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID  -dstnodata -9999 -of GTiff NETCDF:$jak_in:$bed jak_g${GRID}m_v${ver}.tif
-    gdal_translate -co "FORMAT=NC4" -of netCDF jak_g${GRID}m_v${ver}.tif jak_g${GRID}m_v${ver}.nc
-    ncrename -v bed,Band1 jak_g${GRID}m_v${ver}.nc
-    ncatted -a _FillValue,Band1,d,, jak_g${GRID}m_v${ver}.nc
-    ncks -A -v Band1 jak_g${GRID}m_v${ver}.nc $outfile
-    ncap2 -O -s "where(Band1!=-9999) {bed=Band1; thickness=surface-bed;}; where(thickness<0) {thickness=0;};" $outfile $outfile
-    ncks -O -v Band1 -x $outfile $outfile
-    
-    ncks -4 -L 3 -O g${GRID}m_${var}_v${ver}.nc griddes_${GRID}m.nc
+    ncks -4 -O g${GRID}m_${var}_v${ver}.nc griddes_${GRID}m.nc
     nc2cdo.py --srs "+init=epsg:3413" griddes_${GRID}m.nc
     if [[ $NN == 1 ]] ; then
         REMAP_EXTRAPOLATE=on cdo -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
@@ -160,7 +150,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
         REMAP_EXTRAPOLATE=on cdo -P $NN -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
     fi
     
-    mpiexec -np 4 fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
+    mpiexec -np $NN fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
     ncks -4 -A -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp2_${GRID}m.nc $outfile
     cdo setmissval,-9999 -selvar,bed $outfile bedmiss_${GRID}m.nc
     ncks -A -v bed bedmiss_${GRID}m.nc $outfile 
@@ -168,9 +158,6 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     ncatted -a long_name,surface,o,c,"ice surface elevation" -a standard_name,surface,o,c,"surface_altitude" -a units,surface,o,c,"meters" $outfile
     ncatted -a long_name,errbed,o,c,"bed topography/ice thickness error" -a units,errbed,o,c,"meters" $outfile
     ncatted -a long_name,thickness,o,c,"ice thickness" -a standard_name,thickness,o,c,"land_ice_thickness" -a units,thickness,o,c,"meters" $outfile
-    ncatted -a units,mask,d,, -a flag_values,mask,o,b,0,1,2,3 -a flag_meanings,mask,o,c,"ocean ice_free_land grounded_ice floating_ice" $outfile
-    ncatted -a units,source,d,, -a flag_values,source,o,b,0,1,2,3,4,6 -a flag_meanings,source,o,c,"ocean gimpdem mass_conservation interpolation hydrodstatic_equilibrium kriging" $outfile
-    ncatted -a Title,global,o,c,"BedMachine: Greenland dataset based on mass conservation" -a Author,global,o,c,"Mathieu Morlighem" -a version,global,o,c,"$ver" -a proj4,global,o,c,"+init=epsg:3413" $outfile
     ncatted -a _FillValue,,d,, -a missing_value,,d,, $outfile
     ncatted -a _FillValue,errbed,o,s,-9999 $outfile
     # remove regridding artifacts, give precedence to mask: we set thickness and
