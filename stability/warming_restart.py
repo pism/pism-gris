@@ -8,6 +8,7 @@ try:
     import subprocess32 as sub
 except:
     import subprocess as sub
+
 from argparse import ArgumentParser
 import sys
 sys.path.append('../resources/')
@@ -31,7 +32,7 @@ parser.add_argument("--climate", dest="climate",
                     help="Climate", default='warming')
 parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
-                    help="claving", default='vonmises_calving')
+                    help="calving", default='vonmises_calving')
 parser.add_argument("--ocean", dest="ocean",
                     choices=['warming', 'const'],
                     help="Ocean coupler", default='warming')
@@ -462,9 +463,8 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])
-        print myfiles
         myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
-        cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
+        cmd = ' '.join(['ncrcat -O -4 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
 
     

@@ -413,7 +413,7 @@ for n, combination in enumerate(combinations):
         myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(1, 25, 1)])
         myoutfile = extra_file + '.nc'
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
-        cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
+        cmd = ' '.join(['ncrcat -O -4 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
 
     
