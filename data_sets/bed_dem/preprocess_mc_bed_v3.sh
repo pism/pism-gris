@@ -28,6 +28,17 @@ if [ $# -gt 4 ] ; then
   user="$4"
 fi
 
+run_with_mpi () {
+
+    if [ -z "$SLURM_JOBID" ];
+    then
+        echo "running without SLURM $*"
+        mpiexec -n $*
+    else
+        echo "running under SLURM $*"
+        mpirun -machinefile ./nodes_$SLURM_JOBID -np $*
+    fi
+}
 
 # get file; see page http://websrv.cs.umt.edu/isis/index.php/Present_Day_Greenland
 DATAVERSION=1.1
@@ -150,7 +161,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
         REMAP_EXTRAPOLATE=on cdo -P $NN -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
     fi
     
-    mpiexec -np $NN fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
+    run_with_mpi $NN fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
     ncks -4 -A -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp2_${GRID}m.nc $outfile
     cdo setmissval,-9999 -selvar,bed $outfile bedmiss_${GRID}m.nc
     ncks -A -v bed bedmiss_${GRID}m.nc $outfile 
