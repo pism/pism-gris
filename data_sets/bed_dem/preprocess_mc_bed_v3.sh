@@ -70,8 +70,8 @@ echo
 # wget -nc ftp://data.cresis.ku.edu/data/grids/old_format/$plummerfile
 
 ibcaofile=IBCAO_V3_500m_RR
-# wget -nc http://www.ngdc.noaa.gov/mgg/bathymetry/arctic/grids/version3_0/${ibcaofile}_tif.zip
-# unzip -o ${ibcaofile}_tif.zip
+wget -nc http://www.ngdc.noaa.gov/mgg/bathymetry/arctic/grids/version3_0/${ibcaofile}_tif.zip
+unzip -o ${ibcaofile}_tif.zip
 
 # Create a buffer that is a multiple of the grid resolution
 # and works for grid resolutions up to 36km.
