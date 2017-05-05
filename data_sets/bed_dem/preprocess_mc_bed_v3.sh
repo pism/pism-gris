@@ -8,6 +8,8 @@ if [ $# -gt 0 ] ; then
   NN="$1"
 fi
 
+N=1
+
 infile_clean=MCdataset-2015-04-27.nc
 if [ -n "$2" ]; then
     infile_clean=$2
@@ -82,7 +84,7 @@ echo
 
 ibcaofile=IBCAO_V3_500m_RR
 wget -nc http://www.ngdc.noaa.gov/mgg/bathymetry/arctic/grids/version3_0/${ibcaofile}_tif.zip
-unzip -o ${ibcaofile}_tif.zip
+#unzip -o ${ibcaofile}_tif.zip
 
 # Create a buffer that is a multiple of the grid resolution
 # and works for grid resolutions up to 36km.
@@ -95,7 +97,8 @@ ymax=$((-657600 + $buffer_y))
 
 GRID=150
 
-for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
+#for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
+for GRID in 3000; do
     outfile_prefix=pism_Greenland_ext_${GRID}m_mcb_jpl_v${ver}
     outfile=${outfile_prefix}.nc
     outfile_ctrl=${outfile_prefix}_ctrl.nc
@@ -136,16 +139,8 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     
     # This is not needed, but it can be used by PISM to calculate correct cell volumes, and for remapping scripts"
     ncatted -a proj4,global,o,c,"+init=epsg:3413" $outfile
-    
-    ba13file=Greenland_bedrock_topography_V3_clean
-    #rsync -rvu --progress $user@beauregard.gi.alaska.edu:/data/tmp/data_sets/greenland_beds_v3/${ba13file}.nc
-    
-    gdalwarp $CUT -overwrite -r average -s_srs "+proj=stere +ellps=WGS84 +datum=WGS84 +lon_0=-39 +lat_0=90 +lat_ts=71 +units=m" -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -dstnodata -9999 -of GTiff NETCDF:${ba13file}.nc:topg ${ba13file}_epsg3413_g${GRID}m.tif
-    gdal_translate -co "FORMAT=NC4" -of netCDF ${ba13file}_epsg3413_g${GRID}m.tif ${ba13file}_epsg3413_g${GRID}m.nc
-    ncatted -a standard_name,topg,d,,  ${ba13file}_epsg3413_g${GRID}m.nc
-    ncks -A -v topg ${ba13file}_epsg3413_g${GRID}m.nc $outfile
-    ncap2 -O -s "where(thickness==0) {bed=topg;}; where(bed==-9999) {bed=topg;};" $outfile $outfile
 
+    # Add IBCAO bathymetry for the outer part of the domain
     gdalwarp $CUT -overwrite -r average -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff ${ibcaofile}_tif/${ibcaofile}.tif ${ibcaofile}_epsg3413_g${GRID}m.tif
     gdal_translate -co "FORMAT=NC4" -of netCDF  ${ibcaofile}_epsg3413_g${GRID}m.tif  ${ibcaofile}_epsg3413_g${GRID}m.nc
     ncks -A -v Band1 ${ibcaofile}_epsg3413_g${GRID}m.nc $outfile
@@ -155,10 +150,10 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     
     ncks -4 -O g${GRID}m_${var}_v${ver}.nc griddes_${GRID}m.nc
     nc2cdo.py --srs "+init=epsg:3413" griddes_${GRID}m.nc
-    if [[ $NN == 1 ]] ; then
+    if [[ $N == 1 ]] ; then
         REMAP_EXTRAPOLATE=on cdo -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
     else
-        REMAP_EXTRAPOLATE=on cdo -P $NN -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
+        REMAP_EXTRAPOLATE=on cdo -P $N -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
     fi
     
     run_with_mpi $NN fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
