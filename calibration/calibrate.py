@@ -229,9 +229,6 @@ for n, combination in enumerate(combinations):
         name_options['threshold'] = thickness_calving_threshold
     if calving in ('eigen_calving', 'hybrid_calving'):
         name_options['k'] = eigen_calving_k
-
-    # Now update calving
-    calving += ',ocean_kill'
         
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
@@ -293,7 +290,7 @@ for n, combination in enumerate(combinations):
         ocean_params_dict = generate_ocean(ocean,
                                            ocean_given_file=ocean_file)
         hydro_params_dict = generate_hydrology(hydrology)
-        calving_params_dict = generate_calving(calving,
+        calving_params_dict = generate_calving(calving + ',ocean_kill',
                                                float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
                                                thickness_calving_threshold=thickness_calving_threshold,
                                                ocean_kill_file=pism_dataname,
@@ -370,7 +367,7 @@ for n, combination in enumerate(combinations):
         ocean_params_dict = generate_ocean(ocean,
                                            ocean_given_file=ocean_file)
         hydro_params_dict = generate_hydrology(hydrology)
-        calving_params_dict = generate_calving(calving,
+        calving_params_dict = generate_calving(calving + ',ocean_kill',
                                                float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
                                                ocean_kill_file=pism_dataname,
                                                frontal_melt=frontal_melt)
