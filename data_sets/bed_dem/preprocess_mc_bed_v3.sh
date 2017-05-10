@@ -8,7 +8,7 @@ if [ $# -gt 0 ] ; then
   NN="$1"
 fi
 
-N=1
+N=$NN
 
 infile_clean=MCdataset-2015-04-27.nc
 if [ -n "$2" ]; then
@@ -97,8 +97,7 @@ ymax=$((-657600 + $buffer_y))
 
 GRID=150
 
-#for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
-for GRID in 3000; do
+for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     outfile_prefix=pism_Greenland_ext_${GRID}m_mcb_jpl_v${ver}
     outfile=${outfile_prefix}.nc
     outfile_ctrl=${outfile_prefix}_ctrl.nc
@@ -134,9 +133,7 @@ for GRID in 3000; do
     for var in "errbed" "surface" "thickness" "mask" "source"; do
         ncks -A g${GRID}m_${var}_v${ver}.nc $outfile
     done
-    
-    ncap2 -O -s "where(mask==3) bed=-9999" $outfile $outfile
-    
+        
     # This is not needed, but it can be used by PISM to calculate correct cell volumes, and for remapping scripts"
     ncatted -a proj4,global,o,c,"+init=epsg:3413" $outfile
 
@@ -145,7 +142,6 @@ for GRID in 3000; do
     gdal_translate -co "FORMAT=NC4" -of netCDF  ${ibcaofile}_epsg3413_g${GRID}m.tif  ${ibcaofile}_epsg3413_g${GRID}m.nc
     ncks -A -v Band1 ${ibcaofile}_epsg3413_g${GRID}m.nc $outfile
     ncap2 -O -s "where(bed==-9999) {bed=Band1;}; where(Band1<=-9990) {bed=-9999;};" $outfile $outfile
-
     ncks -O -v Band1,topg -x $outfile $outfile
     
     ncks -4 -O g${GRID}m_${var}_v${ver}.nc griddes_${GRID}m.nc

@@ -42,7 +42,7 @@ parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris')
 parser.add_argument("--exstep", dest="exstep", type=int,
-                    help="Writing interval for spatial time series", default=10)
+                    help="Writing interval for spatial time series", default=50)
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
@@ -76,8 +76,8 @@ parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
 parser.add_argument("--dataset_version", dest="version",
-                    choices=['2', '3'],
-                    help="input data set version", default='3')
+                    choices=['2', '3', '3a'],
+                    help="input data set version", default='3a')
 parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity_approximation",
                     choices=['centered', 'upstream'],
                     help="How to approximate vertical velocities", default='upstream')
@@ -148,7 +148,9 @@ else:
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 
-    
+calving += ',ocean_kill'
+
+
 pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
@@ -184,7 +186,7 @@ fice = 8
 ssa_e = 1
 thickness_calving_threshold = 100
 
-sia_e_values = [1.25, 1.5, 2, 3]
+sia_e_values = [1.25, 1.5, 2]
 sia_n_values = [3]
 ssa_n_values = [3.25]
 ppq_values = [0.6, 0.8]

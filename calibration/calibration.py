@@ -72,8 +72,8 @@ parser.add_argument("--stress_balance", dest="stress_balance",
 parser.add_argument("--topg_delta", dest="topg_delta_file",
                     help="end of initialization detla=(topg-topg_initial) file", default=None)
 parser.add_argument("--dataset_version", dest="version",
-                    choices=['2'],
-                    help="input data set version", default='2')
+                    choices=['2', '3', '3a'],
+                    help="input data set version", default='3a')
 parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity_approximation",
                     choices=['centered', 'upstream'],
                     help="How to approximate vertical velocities", default='upstream')
@@ -175,7 +175,7 @@ thickness_calving_threshold = 100
 
 ssa_e = (1.0)
 ssa_n_values = [3, 3.25, 3.5]
-sia_e_values = [1.25, 1.5, 2, 3]
+sia_e_values = [1.25, 1.5, 2]
 ppq_values = [0.4, 0.6, 0.8]
 tefo_values = [0.015, 0.020]
 phi_min_values = [5.0]
