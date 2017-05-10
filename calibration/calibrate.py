@@ -148,9 +148,6 @@ else:
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 
-calving += ',ocean_kill'
-
-
 pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
@@ -233,6 +230,9 @@ for n, combination in enumerate(combinations):
     if calving in ('eigen_calving', 'hybrid_calving'):
         name_options['k'] = eigen_calving_k
 
+    # Now update calving
+    calving += ',ocean_kill'
+        
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
