@@ -212,7 +212,7 @@ if do_sia_e:
 else:
     sia_e_values = [1.25]
 if do_T_max:
-    T_max_values = [0, 1, 5, 10]
+    T_max_values = [0, 1, 2, 5, 10]
 else:
     T_max_values = [0]
 if do_lapse:
