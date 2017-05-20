@@ -132,6 +132,7 @@ do_fice = False
 do_fsnow = False
 do_lapse = False
 do_sia_e = False
+do_sigma_max = False
 if params_list is not None:
     params = params_list.split(',')
     if 'sia_e' in params:
@@ -146,6 +147,8 @@ if params_list is not None:
         do_fsnow = True    
     if 'lapse' in params:
         do_lapse = True    
+    if 'sigma_max' in params:
+        do_sigma_max = True
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -231,6 +234,10 @@ if do_fsnow:
     fsnow_values = [3, 4, 5]
 else:
     fsnow_values = [4]
+if do_sigma_max:
+    sigma_max_values = [0.5e6, 0.75e6, 1e6]
+else:
+    sigma_max_values = [1e6]
 ocean_melt_power_values = [1]
 thickness_calving_threshold_vales = [100]
 ppq_values = [0.6]
@@ -240,6 +247,7 @@ phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
 combinations = list(itertools.product(sia_e_values,
+                                      sigma_max_values,
                                       lapse_rate_values,
                                       T_max_values,
                                       eigen_calving_k_values,
@@ -275,7 +283,7 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    sia_e, lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    sia_e, sigma_max, lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -296,6 +304,8 @@ for n, combination in enumerate(combinations):
         name_options['threshold'] = thickness_calving_threshold
     if calving in ('eigen_calving', 'hybrid_calving'):
         name_options['k'] = eigen_calving_k
+    if do_sigma_max:
+        name_options['sm'] = sigma_max
     if test_climate_models == True:
         name_options['test_climate'] = 'on'
     
@@ -406,11 +416,12 @@ for n, combination in enumerate(combinations):
                                                            frontal_melt=frontal_melt)
                 else:
                     calving_params_dict = generate_calving(calving,
-                                                           thickness_calving_threshold=thickness_calving_threshold,
-                                                           eigen_calving_k=eigen_calving_k,
-                                                           float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
-                                                           ocean_kill_file=regridfile,
-                                                           frontal_melt=frontal_melt)
+                                                           **{'thickness_calving_threshold': thickness_calving_threshold,
+                                                           'eigen_calving_k': eigen_calving_k,
+                                                           'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
+                                                           'ocean_kill_file': regridfile,
+                                                           'frontal_melt': frontal_melt,
+                                                              'calving.vonmises.sigma_max': sigma_max})
 
                 exvars = stability_spatial_ts_vars()
                 spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
