@@ -132,7 +132,6 @@ def stability_spatial_ts_vars():
               'sftgif',
               'smelt_average',
               'srunoff_average',
-              'strain_rates',
               'surface_mass_balance_average',
               'taub_mag',
               'tauc',
