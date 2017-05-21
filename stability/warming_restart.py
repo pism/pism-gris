@@ -409,19 +409,21 @@ for n, combination in enumerate(combinations):
                 hydro_params_dict = generate_hydrology(hydrology)
                 if start == simulation_start_year:
                     calving_params_dict = generate_calving(calving,
-                                                           thickness_calving_threshold=thickness_calving_threshold,
-                                                           eigen_calving_k=eigen_calving_k,
-                                                           float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
-                                                           ocean_kill_file=input_file,
-                                                           frontal_melt=frontal_melt)
+                                                           **{'thickness_calving_threshold': thickness_calving_threshold,
+                                                              'eigen_calving_k': eigen_calving_k,
+                                                              'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
+                                                              'ocean_kill_file': input_file,
+                                                              'frontal_melt': frontal_melt,
+                                                              'calving.vonmises.sigma_max': sigma_max})
                 else:
                     calving_params_dict = generate_calving(calving,
                                                            **{'thickness_calving_threshold': thickness_calving_threshold,
-                                                           'eigen_calving_k': eigen_calving_k,
-                                                           'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
-                                                           'ocean_kill_file': regridfile,
-                                                           'frontal_melt': frontal_melt,
+                                                              'eigen_calving_k': eigen_calving_k,
+                                                              'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
+                                                              'ocean_kill_file': regridfile,
+                                                              'frontal_melt': frontal_melt,
                                                               'calving.vonmises.sigma_max': sigma_max})
+                    
 
                 exvars = stability_spatial_ts_vars()
                 spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
