@@ -149,6 +149,8 @@ if params_list is not None:
         do_lapse = True    
     if 'sigma_max' in params:
         do_sigma_max = True
+    if 'ocean_f' in params:
+        do_ocean_f = True
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -238,6 +240,10 @@ if do_sigma_max:
     sigma_max_values = [0.5e6, 0.75e6, 1e6]
 else:
     sigma_max_values = [1e6]
+if do_ocean_f:
+    ocean_f_values = [1, 1.1, 1.25, 1.5, 2, 4]
+else:
+    ocean_f_values = [1]
 ocean_melt_power_values = [1]
 thickness_calving_threshold_vales = [100]
 ppq_values = [0.6]
@@ -246,7 +252,8 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(sia_e_values,
+combinations = list(itertools.product(ocean_f_values,
+                                      sia_e_values,
                                       sigma_max_values,
                                       lapse_rate_values,
                                       T_max_values,
@@ -283,7 +290,7 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    sia_e, sigma_max, lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    ocean_f, sia_e, sigma_max, lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -306,6 +313,8 @@ for n, combination in enumerate(combinations):
         name_options['k'] = eigen_calving_k
     if do_sigma_max:
         name_options['sm'] = sigma_max
+    if do_ocean_f:
+        name_options['of'] = ocean_f
     if test_climate_models == True:
         name_options['test_climate'] = 'on'
     
@@ -313,6 +322,7 @@ for n, combination in enumerate(combinations):
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
     climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=T_max)
+    ocean_modifier_file = 'pism_abrupt_ocean_{ocean_f}.nc'.format(ocean_f=ocean_f)
     # All runs in one script file for coarse grids that fit into max walltime
     script_combined = 'warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
     with open(script_combined, 'w') as f_combined:
@@ -405,7 +415,7 @@ for n, combination in enumerate(combinations):
                                                           'atmosphere_delta_T_file': climate_modifier_file})
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=ocean_file,
-                                                   ocean_frac_mass_flux_file=climate_modifier_file)
+                                                   ocean_frac_mass_flux_file=ocean_modifier_file)
                 hydro_params_dict = generate_hydrology(hydrology)
                 if start == simulation_start_year:
                     calving_params_dict = generate_calving(calving,
