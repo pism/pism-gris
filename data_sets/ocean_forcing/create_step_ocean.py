@@ -19,6 +19,7 @@ options = parser.parse_args()
 args = options.FILE
 start = 0
 end = 50000
+step = 10
 warming_factor = options.warming_factor
 bnds_interval_since_refdate = np.array(range(start, end + step, step))
 time_interval_since_refdate = (bnds_interval_since_refdate[0:-1] +
