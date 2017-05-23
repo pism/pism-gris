@@ -482,7 +482,7 @@ for n, combination in enumerate(combinations):
         myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(simulation_start_year+exstep, simulation_end_year, exstep)])
         myoutfile = extra_file + '.nc'
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
-        cmd = ' '.join(['ncrcat -O -4 -h', myfiles, myoutfile, '\n'])
+        cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])

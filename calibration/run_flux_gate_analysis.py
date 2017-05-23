@@ -105,6 +105,17 @@ def compute_normal_speed(ifile):
     nc.variables['velsurf_normal'].units = 'm year-1'
     nc.close()
 
+def add_run_stats(ifile, ds=1500):
+    '''
+    Add missing run_stats
+    '''
+    nc = NC(ifile, 'a')
+    if 'run_stats' not in nc.variables:
+        nc.createVariable('run_stats', 'b', dimensions=())
+    nc.variables['run_stats'].grid_dx_meters = ds
+    nc.close()
+
+
 # set up the option parser
 parser = ArgumentParser()
 parser.description = "Generating scripts for model calibration."
@@ -112,9 +123,12 @@ parser.add_argument("INDIR", nargs=1,
                     help="main directory", default=None)
 parser.add_argument("-a", "--append", dest="append", action="store_true",
                     help="Append. Only process new files. Default=False", default=False)
+parser.add_argument("--ds", dest="ds", type=int,
+                    help="Add run_stats: grid_dx_meters", default=1500)
 
 options = parser.parse_args()
 append = options.append
+ds = options.ds
 idir = options.INDIR[0]
 
 # create logger
@@ -174,3 +188,5 @@ for exp_file in exp_files:
         sub.call(cmd)
         logger.info('calculating profile-normal speed')
         compute_normal_speed(exp_profile_file_wd)
+        #ds = int(os.path.split(exp_file)[-1].split('gris_g')[1].split('m_')[0])
+        #add_run_stats(exp_profile_file_wd, ds=ds)
