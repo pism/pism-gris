@@ -133,6 +133,7 @@ do_fsnow = False
 do_lapse = False
 do_sia_e = False
 do_sigma_max = False
+do_tct = False
 if params_list is not None:
     params = params_list.split(',')
     if 'sia_e' in params:
@@ -151,6 +152,8 @@ if params_list is not None:
         do_sigma_max = True
     if 'ocean_f' in params:
         do_ocean_f = True
+    if 'tct' in params:
+        do_tct = True
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -245,7 +248,10 @@ if do_ocean_f:
 else:
     ocean_f_values = [1]
 ocean_melt_power_values = [1]
-thickness_calving_threshold_vales = [100]
+if do_tct:
+    thickness_calving_threshold_vales = [100]
+else:
+    thickness_calving_threshold_vales = [100, 200, 250]
 ppq_values = [0.6]
 tefo_values = [0.020]
 phi_min_values = [5.0]
