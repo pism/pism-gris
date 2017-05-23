@@ -250,9 +250,9 @@ else:
     ocean_f_values = [1]
 ocean_melt_power_values = [1]
 if do_tct:
-    thickness_calving_threshold_vales = [100]
+    thickness_calving_threshold_values = [100]
 else:
-    thickness_calving_threshold_vales = [100, 200, 250]
+    thickness_calving_threshold_values = [100, 200, 250]
 ppq_values = [0.6]
 tefo_values = [0.020]
 phi_min_values = [5.0]
@@ -268,7 +268,7 @@ combinations = list(itertools.product(ocean_f_values,
                                       fice_values,
                                       fsnow_values,
                                       ocean_melt_power_values,
-                                      thickness_calving_threshold_vales,
+                                      thickness_calving_threshold_values,
                                       ppq_values,
                                       tefo_values,
                                       phi_min_values,
