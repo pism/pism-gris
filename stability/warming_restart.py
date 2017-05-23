@@ -133,6 +133,7 @@ do_fsnow = False
 do_lapse = False
 do_sia_e = False
 do_sigma_max = False
+do_ocean_f = False
 do_tct = False
 if params_list is not None:
     params = params_list.split(',')
