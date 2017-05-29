@@ -42,7 +42,7 @@ parser.add_argument("--ocean_melt", dest="ocean_melt",
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris')
-parser.add_argument("--exstep", dest="exstep", type=int,
+parser.add_argument("--exstep", dest="exstep",
                     help="Writing interval for spatial time series", default=10)
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
@@ -486,11 +486,11 @@ for n, combination in enumerate(combinations):
         f.write(post_header)
 
         extra_file = spatial_ts_dict['extra_file']
-        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(simulation_start_year+exstep, simulation_end_year, exstep)])
-        myoutfile = extra_file + '.nc'
-        myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
-        cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
-        f.write(cmd)
+        # myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(simulation_start_year+exstep, simulation_end_year, exstep)])
+        # myoutfile = extra_file + '.nc'
+        # myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
+        # cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
+        # f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])
         myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
