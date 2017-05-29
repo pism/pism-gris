@@ -485,12 +485,19 @@ for n, combination in enumerate(combinations):
 
         f.write(post_header)
 
+        if exstep == 'monthly':
+            mexstep = 1. / 12
+        elif exstep == 'daily':
+            mexstep = 1. / 365
+        else:
+            mexstep = exstep
+            
         extra_file = spatial_ts_dict['extra_file']
-        # myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(simulation_start_year+exstep, simulation_end_year, exstep)])
-        # myoutfile = extra_file + '.nc'
-        # myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
-        # cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
-        # f.write(cmd)
+        myfiles = ' '.join(['{}_{:.2}.nc'.format(extra_file, k) for k in np.arange(simulation_start_year+mexstep, simulation_end_year, mexstep)])
+        myoutfile = extra_file + '.nc'
+        myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
+        cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
+        f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])
         myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
