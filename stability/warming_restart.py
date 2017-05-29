@@ -3,6 +3,7 @@
 
 import itertools
 from collections import OrderedDict
+import numpy as np
 import os
 try:
     import subprocess32 as sub
