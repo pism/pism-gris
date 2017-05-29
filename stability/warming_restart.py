@@ -494,7 +494,7 @@ for n, combination in enumerate(combinations):
             mexstep = exstep
             
         extra_file = spatial_ts_dict['extra_file']
-        myfiles = ' '.join(['{}_{:.2}.nc'.format(extra_file, k) for k in np.arange(simulation_start_year+mexstep, simulation_end_year, mexstep)])
+        myfiles = ' '.join(['{}_{:.3f}.nc'.format(extra_file, k) for k in np.arange(simulation_start_year+mexstep, simulation_end_year, mexstep)])
         myoutfile = extra_file + '.nc'
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
