@@ -491,7 +491,7 @@ for n, combination in enumerate(combinations):
         elif exstep == 'daily':
             mexstep = 1. / 365
         else:
-            mexstep = exstep
+            mexstep = int(exstep)
             
         extra_file = spatial_ts_dict['extra_file']
         myfiles = ' '.join(['{}_{:.3f}.nc'.format(extra_file, k) for k in np.arange(simulation_start_year+mexstep, simulation_end_year, mexstep)])
