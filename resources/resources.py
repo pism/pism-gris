@@ -723,6 +723,8 @@ def generate_ocean(ocean, **kwargs):
             params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
     elif ocean == 'warming':
         params_dict['ocean'] = 'given,frac_SMB'
+    elif ocean == 'warming_3eqn':
+        params_dict['ocean'] = 'th,delta_T'
     elif ocean == 'paleo_const':
         params_dict['ocean'] = 'given,delta_SL'        
     elif ocean == 'paleo_const_mbp':

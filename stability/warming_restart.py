@@ -37,9 +37,6 @@ parser.add_argument("--calving", dest="calving",
 parser.add_argument("--ocean", dest="ocean",
                     choices=['warming', 'const'],
                     help="Ocean coupler", default='warming')
-parser.add_argument("--ocean_melt", dest="ocean_melt",
-                    choices=['x', '10myr_latitudinal', '20myr_latitudinal'],
-                    help="Ocean melt type", default='20myr_latitudinal')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris')
@@ -118,7 +115,6 @@ frontal_melt = options.frontal_melt
 grid = options.grid
 hydrology = options.hydrology
 ocean = options.ocean
-ocean_melt = options.ocean_melt
 stress_balance = options.stress_balance
 topg_delta_file = options.topg_delta_file
 test_climate_models = options.test_climate_models
@@ -135,6 +131,7 @@ do_lapse = False
 do_sia_e = False
 do_sigma_max = False
 do_ocean_f = False
+do_ocean_m = False
 do_tct = False
 if params_list is not None:
     params = params_list.split(',')
@@ -154,6 +151,8 @@ if params_list is not None:
         do_sigma_max = True
     if 'ocean_f' in params:
         do_ocean_f = True
+    if 'ocean_m' in params:
+        do_ocean_m = True
     if 'tct' in params:
         do_tct = True
 
@@ -174,12 +173,7 @@ else:
 
 climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_EPSG3413_{}m.nc'.format(grid)
 
-if ocean_melt in ('x'):
-    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_ctrl.nc'
-elif ocean_melt in ('20myr_latitudinal'):
-    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_285myr_lat_69_20myr_80n.nc'    
-else:
-    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_80n.nc'
+ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_285myr_lat_69_20myr_80n.nc'    
     
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
@@ -249,6 +243,10 @@ if do_ocean_f:
     ocean_f_values = [1, 1.1, 1.25, 1.5, 2, 4]
 else:
     ocean_f_values = [1]
+if do_ocean_m:
+    ocean_m_values = [285, 300, 350, 400, 450, 500]
+else:
+    ocean_m_values = [285]
 ocean_melt_power_values = [1]
 if do_tct:
     thickness_calving_threshold_values = [100, 200, 250]
@@ -261,6 +259,7 @@ phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
 combinations = list(itertools.product(ocean_f_values,
+                                      ocean_m_values,
                                       sia_e_values,
                                       sigma_max_values,
                                       lapse_rate_values,
@@ -298,7 +297,7 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    ocean_f, sia_e, sigma_max, lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    ocean_f, ocean_m, sia_e, sigma_max, lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -323,6 +322,8 @@ for n, combination in enumerate(combinations):
         name_options['sm'] = sigma_max
     if do_ocean_f:
         name_options['of'] = ocean_f
+    if do_ocean_m:
+        name_options['of'] = ocean_m
     if test_climate_models == True:
         name_options['test_climate'] = 'on'
     
@@ -421,8 +422,11 @@ for n, combination in enumerate(combinations):
                                                           'temp_lapse_rate': lapse_rate,
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
+                ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_{}myr_lat_69_20myr_80n.nc'.format(ocean_m)
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=ocean_file,
+                                                   ocean_th_file=ocean_file,
+                                                   ocean_delta_T_file=ocean_modifier_file,
                                                    ocean_frac_mass_flux_file=ocean_modifier_file)
                 hydro_params_dict = generate_hydrology(hydrology)
                 if start == simulation_start_year:
