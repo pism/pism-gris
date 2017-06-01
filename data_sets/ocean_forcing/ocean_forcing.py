@@ -4,16 +4,108 @@
 import numpy as np
 from netCDF4 import Dataset as NC
 
-try:
-    import pypismtools.pypismtools as ppt
-except:
-    import pypismtools as ppt
-
 from netcdftime import utime
 import dateutil
 import numpy as np
 from argparse import ArgumentParser                            
     
+def get_dims(nc):
+    '''
+    Gets dimensions from netcdf instance
+
+    Parameters:
+    -----------
+    nc: netCDF instance
+
+    Returns:
+    --------
+    xdim, ydim, zdim, tdim: dimensions
+    '''
+
+    # a list of possible x-dimensions names
+    xdims = ['x', 'x1']
+    # a list of possible y-dimensions names
+    ydims = ['y', 'y1']
+    # a list of possible z-dimensions names
+    zdims = ['z', 'z1']
+    # a list of possible time-dimensions names
+    tdims = ['t', 'time']
+
+    xdim = None
+    ydim = None
+    zdim = None
+    tdim = None
+
+    # assign x dimension
+    for dim in xdims:
+        if dim in list(nc.dimensions.keys()):
+            xdim = dim
+    # assign y dimension
+    for dim in ydims:
+        if dim in list(nc.dimensions.keys()):
+            ydim = dim
+    # assign z dimension
+    for dim in zdims:
+        if dim in list(nc.dimensions.keys()):
+            zdim = dim
+    # assign time dimension
+    for dim in tdims:
+        if dim in list(nc.dimensions.keys()):
+            tdim = dim
+    return xdim, ydim, zdim, tdim
+
+
+def get_projection_from_file(nc):
+    '''
+    Gets a Proj projection instance from a pointer to a netCDF file
+
+    Parameters
+    ----------
+    nc : a netCDF object instance
+
+    Returns
+    -------
+    p : Proj4 projection instance
+    '''
+
+    from pyproj import Proj
+
+    # First, check if we have a global attribute 'proj4'
+    # which contains a Proj4 string:
+    try:
+        p = Proj(str(nc.proj4))
+        print(
+            'Found projection information in global attribute proj4, using it')
+    except:
+        try:
+            p = Proj(str(nc.projection))
+            print(
+                'Found projection information in global attribute projection, using it')
+        except:
+            try:
+                # go through variables and look for 'grid_mapping' attribute
+                for var in nc.variables.keys():
+                    if hasattr(nc.variables[var], 'grid_mapping'):
+                        mappingvarname = nc.variables[var].grid_mapping
+                        print(
+                            'Found projection information in variable "%s", using it' %
+                            mappingvarname)
+                        break
+                var_mapping = nc.variables[mappingvarname]
+                p = Proj(proj="stere",
+                         ellps=var_mapping.ellipsoid,
+                         datum=var_mapping.ellipsoid,
+                         units="m",
+                         lat_ts=var_mapping.standard_parallel,
+                         lat_0=var_mapping.latitude_of_projection_origin,
+                         lon_0=var_mapping.straight_vertical_longitude_from_pole,
+                         x_0=var_mapping.false_easting,
+                         y_0=var_mapping.false_northing)
+            except:
+                print('No mapping information found, return empy string.')
+                p = ''
+
+    return p
 
 # Set up the option parser
 parser = ArgumentParser()
@@ -49,9 +141,9 @@ nc = NC(infile, 'a')
     
 lon_0 = -45
 
-p = ppt.get_projection_from_file(nc)
+p = get_projection_from_file(nc)
 
-xdim, ydim, zdim, tdim = ppt.get_dims(nc)
+xdim, ydim, zdim, tdim = get_dims(nc)
 
 # x0, y0 = p(lon_0, lat_0)
 # x1, y1 = p(lon_0, lat_1)
