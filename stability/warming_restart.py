@@ -193,11 +193,12 @@ sub.call(cmd)
 if not os.path.isdir(odir):
     os.mkdir(odir)
 
+profile_dir = 'profile'
 state_dir = 'state'
 scalar_dir = 'scalar'
 spatial_dir = 'spatial'
 snap_dir = 'snap'
-for tsdir in (scalar_dir, spatial_dir, snap_dir, state_dir):
+for tsdir in (profile_dir, scalar_dir, spatial_dir, snap_dir, state_dir):
     if not os.path.isdir(os.path.join(odir, tsdir)):
         os.mkdir(os.path.join(odir, tsdir))
 odir_tmp = '_'.join([odir, 'tmp'])
@@ -367,6 +368,7 @@ for n, combination in enumerate(combinations):
                 prefix = generate_prefix_str(pism_exec)
 
                 general_params_dict = OrderedDict()
+                general_params_dict['profile'] = os.join(profile_dir, 'profile_{}.py'.format(batch_system['job_id']))
                 if start == simulation_start_year:
                     general_params_dict['bootstrap'] = ''
                     general_params_dict['i'] = pism_dataname

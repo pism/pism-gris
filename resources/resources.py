@@ -114,11 +114,12 @@ def stability_spatial_ts_vars():
     Returns a list of commonly-used extra vars
     '''
     
-    exvars = ['basal_mass_balance_average',
+    exvars = ['basal_mass_balance',
               'beta',
               'cell_area',
               'dbdt',
               'dHdt',
+              'diffusivity',
               'discharge_mass_flux',
               'flux_divergence',
               'height_above_flotation',
@@ -132,7 +133,7 @@ def stability_spatial_ts_vars():
               'sftgif',
               'smelt_average',
               'srunoff_average',
-              'surface_mass_balance_average',
+              'surface_mass_balance',
               'taub_mag',
               'tauc',
               'temppabase',
