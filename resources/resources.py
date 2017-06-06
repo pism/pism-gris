@@ -136,6 +136,7 @@ def stability_spatial_ts_vars():
               'surface_mass_balance',
               'taub_mag',
               'tauc',
+              'tempicethk',
               'temppabase',
               'tempsurf',
               'thk',

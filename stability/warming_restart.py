@@ -368,7 +368,7 @@ for n, combination in enumerate(combinations):
                 prefix = generate_prefix_str(pism_exec)
 
                 general_params_dict = OrderedDict()
-                general_params_dict['profile'] = os.path.join(profile_dir, 'profile_{}.py'.format(batch_system['job_id']))
+                general_params_dict['profile'] = os.path.join(profile_dir, 'profile_${}.py'.format(batch_system['job_id']))
                 if start == simulation_start_year:
                     general_params_dict['bootstrap'] = ''
                     general_params_dict['i'] = pism_dataname
