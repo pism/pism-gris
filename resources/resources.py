@@ -137,6 +137,7 @@ def stability_spatial_ts_vars():
               'taub_mag',
               'tauc',
               'tempicethk',
+              'tempicethk_basal',
               'temppabase',
               'tempsurf',
               'thk',
