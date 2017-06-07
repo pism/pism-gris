@@ -250,7 +250,7 @@ else:
     ocean_m_values = [285]
 ocean_melt_power_values = [1]
 if do_tct:
-    thickness_calving_threshold_values = [100, 200, 250]
+    thickness_calving_threshold_values = [250, 400]
 else:
     thickness_calving_threshold_values = [250]
 ppq_values = [0.6]
