@@ -182,23 +182,19 @@ regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
-# Anaconda libssl problem on chinook
-if system in ('chinook'):
-    ncgen = '/usr/bin/ncgen'
-else:
-    ncgen = 'ncgen'
+ncgen = 'ncgen'
 cmd = [ncgen, '-o',
        pism_config_nc, pism_config_cdl]
 sub.call(cmd)
 if not os.path.isdir(odir):
     os.mkdir(odir)
 
-profile_dir = 'profile'
+perf_dir = 'performance'
 state_dir = 'state'
 scalar_dir = 'scalar'
 spatial_dir = 'spatial'
 snap_dir = 'snap'
-for tsdir in (profile_dir, scalar_dir, spatial_dir, snap_dir, state_dir):
+for tsdir in (perf_dir, scalar_dir, spatial_dir, snap_dir, state_dir):
     if not os.path.isdir(os.path.join(odir, tsdir)):
         os.mkdir(os.path.join(odir, tsdir))
 odir_tmp = '_'.join([odir, 'tmp'])
@@ -368,7 +364,7 @@ for n, combination in enumerate(combinations):
                 prefix = generate_prefix_str(pism_exec)
 
                 general_params_dict = OrderedDict()
-                general_params_dict['profile'] = os.path.join(odir, profile_dir, 'profile_${}.py'.format(batch_system['job_id']))
+                general_params_dict['profile'] = os.path.join(odir, perf_dir, 'profile_${}.py'.format(batch_system['job_id'].split('.')[0]))
                 if start == simulation_start_year:
                     general_params_dict['bootstrap'] = ''
                     general_params_dict['i'] = pism_dataname
