@@ -309,7 +309,7 @@ for n, combination in enumerate(combinations):
         name_options['fice'] = fice
     if do_fsnow:
         name_options['fsnow'] = fsnow
-    name_options['bed_deformation'] = bed_deformation
+    name_options['bd'] = bed_deformation
     name_options['calving'] = calving
     if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
         name_options['threshold'] = thickness_calving_threshold
