@@ -1,9 +1,10 @@
-gridtype = lonlat
+gridtype = projection
 xsize = 402
 ysize = 602
 xfirst = -16
 xinc = 0.05
 yfirst = -14
 yinc = 0.05
-xnpole = -200
-ynpole = 18
+grid_mapping_name = rotated_latitude_longitude
+grid_north_pole_longitude = -200
+grid_north_pole_latitude = 18

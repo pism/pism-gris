@@ -129,7 +129,7 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
 else:
     pism_dataname = '../data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
     
-climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_EPSG3413_{}m.nc'.format(grid)
+climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)
 
 if precip in ('racmo'):
     precip_file = pism_dataname

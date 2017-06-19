@@ -171,7 +171,7 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
 else:
     pism_dataname = '../data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
-climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_EPSG3413_{}m.nc'.format(grid)
+climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)
 
 ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_285myr_lat_69_20myr_80n.nc'    
     
@@ -246,7 +246,7 @@ else:
     ocean_m_values = [285]
 ocean_melt_power_values = [1]
 if do_tct:
-    thickness_calving_threshold_values = [250, 400]
+    thickness_calving_threshold_values = [100, 200, 250, 400]
 else:
     thickness_calving_threshold_values = [250]
 ppq_values = [0.6]
