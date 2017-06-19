@@ -241,9 +241,11 @@ if do_ocean_f:
 else:
     ocean_f_values = [1]
 if do_ocean_m:
-    ocean_m_values = [285, 300, 350, 400, 450, 500]
+    ocean_m0_values = [285, 300, 350, 400, 450, 500]
+    ocean_m1_values = [5, 10, 20]
 else:
-    ocean_m_values = [285]
+    ocean_m0_values = [285]
+    ocean_m1_values = [20]
 ocean_melt_power_values = [1]
 if do_tct:
     thickness_calving_threshold_values = [100, 200, 250, 400]
@@ -256,7 +258,8 @@ phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
 combinations = list(itertools.product(ocean_f_values,
-                                      ocean_m_values,
+                                      ocean_m0_values,
+                                      ocean_m1_values,
                                       sia_e_values,
                                       sigma_max_values,
                                       lapse_rate_values,
@@ -294,7 +297,7 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    ocean_f, ocean_m, sia_e, sigma_max, lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    ocean_f, ocean_m0, ocean_m1, sia_e, sigma_max, lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -320,7 +323,8 @@ for n, combination in enumerate(combinations):
     if do_ocean_f:
         name_options['of'] = ocean_f
     if do_ocean_m:
-        name_options['of'] = ocean_m
+        name_options['om0'] = ocean_m0
+        name_options['om1'] = ocean_m1
     if test_climate_models == True:
         name_options['test_climate'] = 'on'
     
@@ -420,7 +424,7 @@ for n, combination in enumerate(combinations):
                                                           'temp_lapse_rate': lapse_rate,
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
-                ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_{}myr_lat_69_20myr_80n.nc'.format(ocean_m)
+                ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_{}myr_lat_69_{}myr_80n.nc'.format(ocean_m0, ocean_m1)
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=ocean_file,
                                                    ocean_th_file=ocean_file,
