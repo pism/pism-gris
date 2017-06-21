@@ -241,7 +241,7 @@ if do_ocean_f:
 else:
     ocean_f_values = [1]
 if do_ocean_m:
-    ocean_m_values = ['low', 'mid', 'high']
+    ocean_m_values = ['low', 'med', 'high']
 else:
     ocean_m_values = ['low']
 ocean_melt_power_values = [1]
