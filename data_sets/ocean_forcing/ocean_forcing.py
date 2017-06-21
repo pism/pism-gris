@@ -7,8 +7,8 @@ from netCDF4 import Dataset as NC
 from netcdftime import utime
 import dateutil
 import numpy as np
-from argparse import ArgumentParser                            
-    
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+
 def get_dims(nc):
     '''
     Gets dimensions from netcdf instance
@@ -108,8 +108,8 @@ def get_projection_from_file(nc):
     return p
 
 # Set up the option parser
-parser = ArgumentParser()
-parser.description = "Script adds ocean forcing to HIRHAM atmosphere/surface forcing file. Sets a constant, spatially-uniform basal melt rate of b_a before time t_a, and b_e after time t_a."
+parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
+parser.description = "Script creates ocean forcing."
 parser.add_argument("FILE", nargs='*')
 parser.add_argument("--bmelt_0",dest="bmelt_0", type=float,
                     help="southern basal melt rate, in m yr-1",default=228)
@@ -118,7 +118,7 @@ parser.add_argument("--bmelt_1",dest="bmelt_1", type=float,
 parser.add_argument("--lat_0",dest="lat_0", type=float,
                     help="latitude to apply southern basal melt rate",default=69)
 parser.add_argument("--lat_1",dest="lat_1", type=float,
-                    help="latitude to apply northern basal melt rate",default=81)
+                    help="latitude to apply northern basal melt rate",default=80)
 parser.add_argument("-m", "--process_mask", dest="mask", action="store_true",
                     help='''
                     Process the mask, no melting on land''', default=False)
@@ -134,6 +134,8 @@ bmelt_1 = options.bmelt_1 * ice_density
 lat_0 = options.lat_0
 lat_1 = options.lat_1
 mask = options.mask
+tct_0 = 400
+tct_1 = 100
 
 infile = args[0]
 
@@ -151,7 +153,11 @@ xdim, ydim, zdim, tdim = get_dims(nc)
 # bmelt = a*y + b
 a = (bmelt_1 - bmelt_0) / (lat_1 - lat_0)
 b = bmelt_0 - a * lat_0
-    
+
+# tct = a*y + b
+a_tct = (tct_1 - tct_0) / (lat_1 - lat_0)
+b_tct = tct_0 - a_tct * lat_0
+
 x = nc.variables[xdim]
 y = nc.variables[ydim]
 
@@ -215,12 +221,18 @@ if (var not in nc.variables.keys()):
 else:
     btemp_var = nc.variabels[var]
 btemp_var.grid_mapping = "mapping"
-    
+
+var = "thk_threshold"
+if (var not in nc.variables.keys()):
+    tct_var = def_var(nc, var, "m")
+else:
+    tct_var = nc.variabels[var]
+tct_var.grid_mapping = "mapping"
+
 if mask:
     mask_var = nc.variables['mask'][:]
     nc.variables['mask'].grid_mapping = "mapping"
     land_mask = (mask_var != 0) & (mask_var !=3)
-
 
 nt = len(time_var[:])
 for t in range(nt):
@@ -234,7 +246,12 @@ for t in range(nt):
     if mask:
         bmelt[land_mask] = 0.
     bmelt_var[t,::] = bmelt
-    btemp_var[t,::] = 0
+    
+    tct_var[t,::] = 0
+    tct = a_tct * Lat + b_tct
+    tct[Lat<lat_0] = a_tct * lat_0 + b_tct
+    tct[Lat>lat_1] = a_tct * lat_1 + b_tct
+    tct_var[t,::] = tct
     nc.sync()
         
 
