@@ -30,19 +30,11 @@ parser.add_argument("--climate", dest="climate",
                     choices=['flux'],
                     help="Climate", default='flux')
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
-                    help="calving", default='ocean_kill')
-parser.add_argument("--ocean", dest="ocean",
-                    choices=['warming'],
-                    help="Ocean coupler", default='const')
-parser.add_argument("--ocean_melt", dest="ocean_melt",
-                    choices=['x', '10myr_latitudinal', '20myr_latitudinal'],
-                    help="Ocean melt type", default='20myr_latitudinal')
+                    choices=['float_kill', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'],
+                    help="calving", default='vonmises_calving')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris')
-parser.add_argument("--exstep", dest="exstep", type=int,
-                    help="Writing interval for spatial time series", default=50)
 parser.add_argument("-f", "--o_format", dest="oformat",
                     choices=['netcdf3', 'netcdf4_parallel', 'pnetcdf'],
                     help="output format", default='netcdf4_parallel')
@@ -67,11 +59,6 @@ parser.add_argument("--hydrology", dest="hydrology",
                     help="Basal hydrology model.", default='diffuse')
 parser.add_argument("-p", "--params", dest="params_list",
                     help="Comma-separated list with params for sensitivity", default=None)
-parser.add_argument("--precip", dest="precip",
-                    choices=['racmo', 'hirham'],
-                    help="Precipitation model", default='racmo')
-parser.add_argument("--stable_gl", dest="float_kill_calve_near_grounding_line", action="store_false",
-                    help="Stable grounding line", default=True)
 parser.add_argument("--stress_balance", dest="stress_balance",
                     choices=['sia', 'ssa+sia', 'ssa'],
                     help="stress balance solver", default='ssa+sia')
@@ -102,14 +89,9 @@ calving = options.calving
 climate = options.climate
 climate_relax = 'pdd'
 
-exstep = options.exstep
-float_kill_calve_near_grounding_line = options.float_kill_calve_near_grounding_line
-frontal_melt = options.frontal_melt
 grid = options.grid
 hydrology = options.hydrology
-ocean = options.ocean
-ocean_melt = options.ocean_melt
-precip = options.precip
+ocean = 'const'
 stress_balance = options.stress_balance
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
@@ -129,33 +111,14 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
 else:
     pism_dataname = '../data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
     
-climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)
-
-if precip in ('racmo'):
-    precip_file = pism_dataname
-elif precip in ('hirham'):
-    precip_file = 'DMI-HIRHAM5_GL2_ERAI_1980_2014_PR_TM_EPSG3413_{}m.nc'.format(grid)
-else:
-    print('Precip model {} not support. How did we get here?'.format(precip))
-
-if ocean_melt in ('x'):
-    ocean_file = 'ocean_forcing_latitudinal_ctrl.nc'
-elif ocean_melt in ('20myr_latitudinal'):
-    ocean_file = 'ocean_forcing_latitudinal_20myr_80n.nc'    
-else:
-    ocean_file = 'ocean_forcing_latitudinal_80n.nc'
-    
+climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)    
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 
 pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
-# Anaconda libssl problem on chinook
-if system in ('chinook'):
-    ncgen = '/usr/bin/ncgen'
-else:
-    ncgen = 'ncgen'
+ncgen = 'ncgen'
 cmd = [ncgen, '-o',
        pism_config_nc, pism_config_cdl]
 sub.call(cmd)
@@ -164,9 +127,7 @@ if not os.path.isdir(odir):
 
 state_dir = 'state'
 scalar_dir = 'scalar'
-spatial_dir = 'spatial'
-snap_dir = 'snap'
-for tsdir in (scalar_dir, spatial_dir, snap_dir, state_dir):
+for tsdir in (scalar_dir, state_dir):
     if not os.path.isdir(os.path.join(odir, tsdir)):
         os.mkdir(os.path.join(odir, tsdir))
 odir_tmp = '_'.join([odir, 'tmp'])
@@ -181,12 +142,11 @@ if not os.path.isdir(odir_tmp):
 fsnow = 4
 fice = 8
 ssa_e = 1
-thickness_calving_threshold = 250
 
 sia_e_values = [1.25, 1.5, 2, 3]
 sia_n_values = [3]
 ssa_n_values = [3.25]
-ppq_values = [0.6, 0.8]
+ppq_values = [0.6]
 tefo_values = [0.020]
 
 phi_min_values = [5.0]
@@ -207,7 +167,6 @@ combinations = list(itertools.product(sia_e_values,
 tsstep = 'yearly'
 
 scripts = []
-scripts_post = []
 
 simulation_start_year = options.start_year
 simulation_end_year = options.end_year
@@ -225,8 +184,6 @@ for n, combination in enumerate(combinations):
     name_options['ppq'] = ppq
     name_options['tefo'] = tefo
     name_options['calving'] = calving
-    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
-        name_options['threshold'] = thickness_calving_threshold
     if calving in ('eigen_calving', 'hybrid_calving'):
         name_options['k'] = eigen_calving_k
         
@@ -287,17 +244,11 @@ for n, combination in enumerate(combinations):
         ice_density = 910.
         climate_params_dict = generate_climate(climate,
                                                force_to_thickness_file=pism_dataname)
-        ocean_params_dict = generate_ocean(ocean,
-                                           ocean_given_file=ocean_file)
+        ocean_params_dict = generate_ocean(ocean)
         hydro_params_dict = generate_hydrology(hydrology)
         calving_params_dict = generate_calving(calving + ',ocean_kill',
-                                               float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
-                                               thickness_calving_threshold=thickness_calving_threshold,
-                                               ocean_kill_file=pism_dataname,
-                                               frontal_melt=frontal_melt)
+                                               ocean_kill_file=pism_dataname)
             
-        exvars = calibrate_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
                                             start=simulation_start_year,
                                             end=simulation_end_year,
@@ -310,7 +261,6 @@ for n, combination in enumerate(combinations):
                                       ocean_params_dict,
                                       hydro_params_dict,
                                       calving_params_dict,
-                                      spatial_ts_dict,
                                       scalar_ts_dict)
         
         # Remove flow law so this works with different SIA N
@@ -324,103 +274,11 @@ for n, combination in enumerate(combinations):
         else:
             cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job_1.${batch}  2>&1'.format(outdir=odir, batch=batch_system['job_id'])])
 
-
         f.write(cmd)
         f.write('\n\n')
+        scripts.append(script)
 
-        infile = os.path.join(odir, state_dir, outfile)
-
-        relax_start = 0
-        relax_end = 25
-        experiment =  '_'.join([climate_relax, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(relax_start), '{}'.format(relax_end)])
-
-        outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
-        general_params_dict = OrderedDict()
-        general_params_dict['i'] = infile
-        general_params_dict['ys'] = relax_start
-        general_params_dict['ye'] = relax_end
-        general_params_dict['o'] = os.path.join(odir, state_dir, outfile)
-        general_params_dict['o_format'] = oformat
-        general_params_dict['o_size'] = osize
-        general_params_dict['config_override'] = pism_config_nc
-        general_params_dict['backup_interval'] = 100
-            
-        grid_params_dict = generate_grid_description(grid, domain)
-        
-        sb_params_dict = OrderedDict()
-        sb_params_dict['sia_e'] = sia_e
-        sb_params_dict['sia_n'] = sia_n
-        sb_params_dict['ssa_e'] = ssa_e
-        sb_params_dict['ssa_n'] = ssa_n
-        sb_params_dict['pseudo_plastic_q'] = ppq
-        sb_params_dict['till_effective_fraction_overburden'] = tefo
-        sb_params_dict['topg_to_phi'] = ttphi
-        sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
-
-        stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
-        ice_density = 910.
-        climate_params_dict = generate_climate(climate_relax,
-                                               **{'surface.pdd.factor_ice': (fice / ice_density),
-                                                  'surface.pdd.factor_snow': (fsnow / ice_density),
-                                                  'atmosphere_given_file': climate_file,
-                                                  'atmosphere_given_period': 1})
-        ocean_params_dict = generate_ocean(ocean,
-                                           ocean_given_file=ocean_file)
-        hydro_params_dict = generate_hydrology(hydrology)
-        calving_params_dict = generate_calving(calving + ',ocean_kill',
-                                               float_kill_calve_near_grounding_line=float_kill_calve_near_grounding_line,
-                                               ocean_kill_file=pism_dataname,
-                                               frontal_melt=frontal_melt)
-
-
-        exvars = default_spatial_ts_vars()
-        spatial_ts_dict = generate_spatial_ts(full_outfile_relax, exvars, 1, odir=odir_tmp, split=True)
-
-        all_params_dict = merge_dicts(general_params_dict,
-                                      grid_params_dict,
-                                      stress_balance_params_dict,
-                                      climate_params_dict,
-                                      ocean_params_dict,
-                                      hydro_params_dict,
-                                      calving_params_dict,
-                                      spatial_ts_dict)
-        if 'sia_flow_law' in all_params_dict:
-            del all_params_dict['sia_flow_law']
-        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
-
-        if system in ('debug'):
-            cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job_2.${batch}'.format(outdir=odir, batch=batch_system['job_id'])])
-        else:
-            cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job_2.${batch}  2>&1'.format(outdir=odir, batch=batch_system['job_id'])])
-
-
-        f.write(cmd)
-
-        f.write('\n\n')
-
-
-    script_post = 'calib_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
-    scripts.append(script)
-    scripts_post.append(script_post)
-
-    post_header = make_batch_post_header(system)
-
-    with open(script_post, 'w') as f:
-
-        f.write(post_header)
-
-        extra_file = spatial_ts_dict['extra_file']
-        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(1, 25, 1)])
-        myoutfile = extra_file + '.nc'
-        myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
-        cmd = ' '.join(['ncrcat -O -4 -h', myfiles, myoutfile, '\n'])
-        f.write(cmd)
-
-    
 scripts = uniquify_list(scripts)
-scripts_post = uniquify_list(scripts_post)
 print '\n'.join([script for script in scripts])
-print('\nwritten\n')
-print '\n'.join([script for script in scripts_post])
 print('\nwritten\n')
 
