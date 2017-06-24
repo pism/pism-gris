@@ -421,11 +421,11 @@ for n, combination in enumerate(combinations):
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
                 if ocean_m == 'low':
-                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_300myr_lat_69_10myr_80n.nc'
+                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_300myr_lat_70n_10myr_80n.nc'
                 elif ocean_m == 'med':
-                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_400myr_lat_69_20myr_80n.nc'
+                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_400myr_lat_70n_20myr_80n.nc'
                 elif ocean_m == 'high':
-                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_500myr_lat_69_30myr_80n.nc'
+                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_500myr_lat_70n_30myr_80n.nc'
                 else:
                     print('not implemented')
                 ocean_params_dict = generate_ocean(ocean,
@@ -504,7 +504,7 @@ for n, combination in enumerate(combinations):
             
         extra_file = spatial_ts_dict['extra_file']
         myfiles = ' '.join(['{}_{:.3f}.nc'.format(extra_file, k) for k in np.arange(simulation_start_year+mexstep, simulation_end_year, mexstep)])
-        myoutfile = extra_file + '.nc'
+        myoutfile = extra_file + '_' + simulation_start_year + '_' simulation_end_year + '.nc'
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
