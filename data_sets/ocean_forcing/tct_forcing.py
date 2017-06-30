@@ -143,9 +143,6 @@ xdim, ydim, zdim, tdim = get_dims(nc)
 # x0, y0 = p(lon_0, lat_0)
 # x1, y1 = p(lon_0, lat_1)
 
-# bmelt = a*y + b
-a = (bmelt_1 - bmelt_0) / (lat_1 - lat_0)
-b = bmelt_0 - a * lat_0
 
 # tct = a*y + b
 a_tct = (tct_1 - tct_0) / (lat_1 - lat_0)
@@ -201,7 +198,7 @@ def def_var(nc, name, units):
     var.units = units
     return var
 
-var = "thk_threshold"
+var = "thk_calving_threshold"
 if (var not in nc.variables.keys()):
     tct_var = def_var(nc, var, "m")
 else:

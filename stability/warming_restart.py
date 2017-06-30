@@ -241,14 +241,14 @@ if do_ocean_f:
 else:
     ocean_f_values = [1]
 if do_ocean_m:
-    ocean_m_values = ['low', 'med', 'high']
+    ocean_m_values = ['low', 'high']
 else:
     ocean_m_values = ['low']
 ocean_melt_power_values = [1]
 if do_tct:
-    thickness_calving_threshold_values = [100, 200, 250, 300, 400]
+    thickness_calving_threshold_values = ['low', 'high']
 else:
-    thickness_calving_threshold_values = [250]
+    thickness_calving_threshold_values = ['low']
 ppq_values = [0.6]
 tefo_values = [0.020]
 phi_min_values = [5.0]
@@ -311,8 +311,6 @@ for n, combination in enumerate(combinations):
         name_options['fsnow'] = fsnow
     name_options['bd'] = bed_deformation
     name_options['calving'] = calving
-    if calving in ('thickness_calving', 'eigen_calving', 'vonmises_calving', 'hybrid_calving'):
-        name_options['threshold'] = thickness_calving_threshold
     if calving in ('eigen_calving', 'hybrid_calving'):
         name_options['k'] = eigen_calving_k
     if do_sigma_max:
@@ -321,6 +319,8 @@ for n, combination in enumerate(combinations):
         name_options['of'] = ocean_f
     if do_ocean_m:
         name_options['om'] = ocean_m
+    if do_tct:
+        name_options['tct'] = thickness_calving_threshold
     if test_climate_models == True:
         name_options['test_climate'] = 'on'
     
@@ -421,11 +421,17 @@ for n, combination in enumerate(combinations):
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
                 if ocean_m == 'low':
-                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_300myr_lat_70n_10myr_80n.nc'
+                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_lat_70n_10myr_80n.nc'
                 elif ocean_m == 'med':
-                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_400myr_lat_70n_20myr_80n.nc'
+                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_400myr_lat_70n_20myr_80n.nc'
                 elif ocean_m == 'high':
-                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_500myr_lat_70n_30myr_80n.nc'
+                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_500myr_lat_70n_30myr_80n.nc'
+                else:
+                    print('not implemented')
+                if thickness_calving_threshold == 'low':
+                    tct_file = '../data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
+                elif  thickness_calving_threshold == 'high':
+                    tct_file = '../data_sets/ocean_forcing/tct_forcing_600myr_74n_100myr_76n.nc'
                 else:
                     print('not implemented')
                 ocean_params_dict = generate_ocean(ocean,
@@ -437,6 +443,7 @@ for n, combination in enumerate(combinations):
                 if start == simulation_start_year:
                     calving_params_dict = generate_calving(calving,
                                                            **{'thickness_calving_threshold': thickness_calving_threshold,
+                                                              'thickenss_calving_threshold_file': tct_file,
                                                               'eigen_calving_k': eigen_calving_k,
                                                               'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
                                                               'ocean_kill_file': input_file,
@@ -445,6 +452,7 @@ for n, combination in enumerate(combinations):
                 else:
                     calving_params_dict = generate_calving(calving,
                                                            **{'thickness_calving_threshold': thickness_calving_threshold,
+                                                              'thickenss_calving_threshold_file': tct_file,
                                                               'eigen_calving_k': eigen_calving_k,
                                                               'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
                                                               'ocean_kill_file': regridfile,
@@ -504,7 +512,7 @@ for n, combination in enumerate(combinations):
             
         extra_file = spatial_ts_dict['extra_file']
         myfiles = ' '.join(['{}_{:.3f}.nc'.format(extra_file, k) for k in np.arange(simulation_start_year+mexstep, simulation_end_year, mexstep)])
-        myoutfile = extra_file + '_' + simulation_start_year + '_' simulation_end_year + '.nc'
+        myoutfile = '{}_{}_{}.nc'.format(extra_file, simulation_start_year, simulation_end_year)
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)

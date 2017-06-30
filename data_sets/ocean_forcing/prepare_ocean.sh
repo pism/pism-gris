@@ -4,40 +4,55 @@
 set -x -e
 
 GRID=3000
-
 infile=../bed_dem/pism_Greenland_ext_${GRID}m_mcb_jpl_v3a.nc
+
+# #####################################
+# Ocean forcing
+# #####################################
+
 lat_0=70
 lat_1=80
-bmelt0=300
-bmelt1=10
-outfile=ocean_forcing_latitudinal_${bmelt0}myr_lat_$lat_0}n_${bmelt1}myr_${lat_1}n.nc
+
+bmelt_0=300
+bmelt_1=10
+outfile=ocean_forcing_${bmelt_0}myr_${lat_0}n_${bmelt_1}myr_${lat_1}n.nc
 ncks -6 -C -O -v x,y,mask,polar_stereographic $infile $outfile
-python ocean_forcing.py --bmelt_0 $bmelt0 --bmelt_1 $bmelt1 --lat_1 ${lat} $outfile
+python ocean_forcing.py --bmelt_0 ${bmelt_0} --bmelt_1 ${bmelt_1} --lat_0 ${lat_0} --lat_1 ${lat_1} $outfile
 ncatted -a grid_mapping,mask,o,c,"polar_stereographic" -a grid_mapping,shelfbmassflux,o,c,"polar_stereographic" -a grid_mapping,shelfbtemp,o,c,"polar_stereographic" $outfile
 
-bmelt0=400
-bmelt1=20
-outfile=ocean_forcing_latitudinal_${bmelt0}myr_lat_$lat_0}n_${bmelt1}myr_${lat_1}n.nc
+bmelt_0=400
+bmelt_1=20
+outfile=ocean_forcing_${bmelt_0}myr_${lat_0}n_${bmelt_1}myr_${lat_1}n.nc
 ncks -6 -C -O -v x,y,mask,polar_stereographic $infile $outfile
-python ocean_forcing.py --bmelt_0 $bmelt0 --bmelt_1 $bmelt1 --lat_1 ${lat} $outfile
+python ocean_forcing.py --bmelt_0 ${bmelt_0} --bmelt_1 ${bmelt_1} --lat_0 ${lat_0} --lat_1 ${lat_1} $outfile
 ncatted -a grid_mapping,mask,o,c,"polar_stereographic" -a grid_mapping,shelfbmassflux,o,c,"polar_stereographic" -a grid_mapping,shelfbtemp,o,c,"polar_stereographic" $outfile
 
-bmelt0=500
-bmelt1=30
-outfile=ocean_forcing_latitudinal_${bmelt0}myr_lat_$lat_0}n_${bmelt1}myr_${lat_1}n.nc
+bmelt_0=500
+bmelt_1=30
+outfile=ocean_forcing_${bmelt_0}myr_${lat_0}n_${bmelt_1}myr_${lat_1}n.nc
 ncks -6 -C -O -v x,y,mask,polar_stereographic $infile $outfile
-python ocean_forcing.py --bmelt_0 $bmelt0 --bmelt_1 $bmelt1 --lat_1 ${lat} $outfile
+python ocean_forcing.py --bmelt_0 ${bmelt_0} --bmelt_1 ${bmelt_1} --lat_0 ${lat_0} --lat_1 ${lat_1} $outfile
 ncatted -a grid_mapping,mask,o,c,"polar_stereographic" -a grid_mapping,shelfbmassflux,o,c,"polar_stereographic" -a grid_mapping,shelfbtemp,o,c,"polar_stereographic" $outfile
 
-exit
+# #####################################
+# Thickness calving threshold forcing
+# #####################################
 
-for bmelt0 in 285 300 350 400 450 500; do
-    for lat in 78 79 80; do
-        for bmelt1 in 5 10 20; do
-            outfile=ocean_forcing_latitudinal_${bmelt0}myr_lat_69_${bmelt1}myr_${lat}n.nc
-            ncks -6 -C -O -v x,y,mask,polar_stereographic $infile $outfile
-            python ocean_forcing.py --bmelt_0 $bmelt0 --bmelt_1 $bmelt1 --lat_1 ${lat} $outfile
-            ncatted -a grid_mapping,mask,o,c,"polar_stereographic" -a grid_mapping,shelfbmassflux,o,c,"polar_stereographic" -a grid_mapping,shelfbtemp,o,c,"polar_stereographic" $outfile
-        done
-    done
-done
+
+lat_0=74
+lat_1=76
+
+tct_0=400
+tct_1=50
+outfile=tct_forcing_${tct_0}myr_${lat_0}n_${tct_1}myr_${lat_1}n.nc
+ncks -6 -C -O -v x,y,mask,polar_stereographic $infile $outfile
+python tct_forcing.py --tct_0 ${tct_0} --tct_1 ${tct_1} --lat_0 ${lat_0} --lat_1 ${lat_1} $outfile
+ncatted -a grid_mapping,thk_calving_threshold,o,c,"polar_stereographic" $outfile
+
+tct_0=600
+tct_1=100
+outfile=tct_forcing_${tct_0}myr_${lat_0}n_${tct_1}myr_${lat_1}n.nc
+ncks -6 -C -O -v x,y,mask,polar_stereographic $infile $outfile
+python tct_forcing.py --tct_0 ${tct_0} --tct_1 ${tct_1} --lat_0 ${lat_0} --lat_1 ${lat_1} $outfile
+ncatted -a grid_mapping,thk_calving_threshold,o,c,"polar_stereographic" $outfile
+
