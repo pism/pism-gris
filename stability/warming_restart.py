@@ -442,8 +442,7 @@ for n, combination in enumerate(combinations):
                 hydro_params_dict = generate_hydrology(hydrology)
                 if start == simulation_start_year:
                     calving_params_dict = generate_calving(calving,
-                                                           **{'thickness_calving_threshold': thickness_calving_threshold,
-                                                              'thickenss_calving_threshold_file': tct_file,
+                                                           **{'thickenss_calving_threshold_file': tct_file,
                                                               'eigen_calving_k': eigen_calving_k,
                                                               'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
                                                               'ocean_kill_file': input_file,
@@ -451,8 +450,7 @@ for n, combination in enumerate(combinations):
                                                               'calving.vonmises.sigma_max': sigma_max})
                 else:
                     calving_params_dict = generate_calving(calving,
-                                                           **{'thickness_calving_threshold': thickness_calving_threshold,
-                                                              'thickenss_calving_threshold_file': tct_file,
+                                                           **{'thickenss_calving_threshold_file': tct_file,
                                                               'eigen_calving_k': eigen_calving_k,
                                                               'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
                                                               'ocean_kill_file': regridfile,
