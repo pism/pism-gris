@@ -421,11 +421,11 @@ for n, combination in enumerate(combinations):
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
                 if ocean_m == 'low':
-                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_lat_70n_10myr_80n.nc'
+                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_70n_10myr_80n.nc'
                 elif ocean_m == 'med':
-                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_400myr_lat_70n_20myr_80n.nc'
+                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_400myr_70n_20myr_80n.nc'
                 elif ocean_m == 'high':
-                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_500myr_lat_70n_30myr_80n.nc'
+                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_500myr_70n_30myr_80n.nc'
                 else:
                     print('not implemented')
                 if thickness_calving_threshold == 'low':

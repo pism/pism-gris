@@ -221,13 +221,7 @@ if (var not in nc.variables.keys()):
 else:
     btemp_var = nc.variabels[var]
 btemp_var.grid_mapping = "mapping"
-
-var = "thk_threshold"
-if (var not in nc.variables.keys()):
-    tct_var = def_var(nc, var, "m")
-else:
-    tct_var = nc.variabels[var]
-tct_var.grid_mapping = "mapping"
+btemp_var[:] = 270.
 
 if mask:
     mask_var = nc.variables['mask'][:]
@@ -247,11 +241,6 @@ for t in range(nt):
         bmelt[land_mask] = 0.
     bmelt_var[t,::] = bmelt
     
-    tct_var[t,::] = 0
-    tct = a_tct * Lat + b_tct
-    tct[Lat<lat_0] = a_tct * lat_0 + b_tct
-    tct[Lat>lat_1] = a_tct * lat_1 + b_tct
-    tct_var[t,::] = tct
     nc.sync()
         
 
