@@ -8,8 +8,14 @@ netcdf pism_overrides {
     pism_overrides:surface.pdd.air_temp_all_precip_as_rain = 274.15;
     pism_overrides:surface.pdd.air_temp_all_precip_as_rain_doc = "Kelvin; threshold temperature above which all precipitation is rain; must exceed air_temp_all_precip_as_snow to avoid division by zero, because difference is in a denominator";
 
+    pism_overrides:surface.pdd.refreeze = 0.47;
+    pism_overrides:surface.pdd.refreeze_doc = "EISMINT-Greenland value [@ref RitzEISMINT]";
+    pism_overrides:surface.pdd.refreeze_type = "scalar";
+    pism_overrides:surface.pdd.refreeze_units = "1";
+
     pism_overrides:surface.pdd.refreeze_ice_melt = "no";
-    pism_overrides:surface.pdd.refreeze_ice_melt_doc = "If set to 'yes', refreeze pdd_refreeze fraction of melted ice, otherwise all of the melted ice runs off.";
+    pism_overrides:surface.pdd.refreeze_ice_melt_doc = "If set to 'yes', refreeze surface.pdd.refreeze fraction of melted ice, otherwise all of the melted ice runs off.";
+    pism_overrides:surface.pdd.refreeze_ice_melt_type = "boolean";
 
     pism_overrides:run_info.institution = "University of Alaska Fairbanks";
     pism_overrides:run_info.institution_doc = "Institution name. This string is written to output files as the 'institution' global attribute.";

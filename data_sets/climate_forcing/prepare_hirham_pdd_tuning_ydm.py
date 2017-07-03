@@ -405,32 +405,31 @@ tas_merged_file_time_mean = prepare_tas(dry=dry)
 smb_merged_file_time_mean = prepare_smb(dry=dry)
 
 merged_file_time_mean = 'DMI-HIRHAM5_GL2_ERAI_2001_2014_{}.nc'.format(time_mean)
-# logger.info('merge PR, TAS, and SMB')
-# nco.ncks(input=smb_merged_file_time_mean, output=merged_file_time_mean, overwrite=True)
-# nco.ncks(input=pr_merged_file_time_mean, output=merged_file_time_mean, append=True)
-# nco.ncks(input=tas_merged_file_time_mean, output=merged_file_time_mean, append=True)
+logger.info('merge PR, TAS, and SMB')
+nco.ncks(input=smb_merged_file_time_mean, output=merged_file_time_mean, overwrite=True)
+nco.ncks(input=pr_merged_file_time_mean, output=merged_file_time_mean, append=True)
+nco.ncks(input=tas_merged_file_time_mean, output=merged_file_time_mean, append=True)
 
-# # add topo file
-# logger.info('removing height dimension of topo file')
-# topo_file_tmp_1 = 'tmp1_topo_geog.nc'
-# topo_file_tmp_2 = 'tmp2_topo_geog.nc'
-# nco.ncwa(input=topo_file, output=topo_file_tmp_1, average='height')
-# nco.ncwa(input=topo_file_tmp_1, output=topo_file_tmp_2, average='time')
-# logger.info('renaming variables and dimensions')
-# rDict={ 'var6':'usurf'}
-# dDict={ 'x':'rlon', 'y': 'rlat'}
-# nco.ncrename(input=topo_file_tmp_2, options=[c.Rename("variable", rDict),
-#                                              c.Rename("dimension", dDict)])
+# add topo file
+logger.info('removing height dimension of topo file')
+topo_file_tmp_1 = 'tmp1_topo_geog.nc'
+topo_file_tmp_2 = 'tmp2_topo_geog.nc'
+nco.ncwa(input=topo_file, output=topo_file_tmp_1, average='height')
+nco.ncwa(input=topo_file_tmp_1, output=topo_file_tmp_2, average='time')
+logger.info('renaming variables and dimensions')
+rDict={ 'var6':'usurf'}
+dDict={ 'x':'rlon', 'y': 'rlat'}
+nco.ncrename(input=topo_file_tmp_2, options=[c.Rename("variable", rDict),
+                                             c.Rename("dimension", dDict)])
 
-# logger.info('add topo file {} to {}'.format(topo_file, merged_file_time_mean))
-# nco.ncks(input=topo_file_tmp_2, output=merged_file_time_mean, append=True, variable='usurf')
-# opt = [c.Atted(mode="o", att_name="units", var_name="usurf", value="m"),
-#        c.Atted(mode="o", att_name="standard_name", var_name="usurf", value="surface_altitude")]
-# nco.ncatted(input=merged_file_time_mean, options=opt)
+logger.info('add topo file {} to {}'.format(topo_file, merged_file_time_mean))
+nco.ncks(input=topo_file_tmp_2, output=merged_file_time_mean, append=True, variable='usurf')
+opt = [c.Atted(mode="o", att_name="units", var_name="usurf", value="m"),
+       c.Atted(mode="o", att_name="standard_name", var_name="usurf", value="surface_altitude")]
+nco.ncatted(input=merged_file_time_mean, options=opt)
 
 
-#for grid_spacing in (18000, 9000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900, 600):
-for grid_spacing in (1200, 900, 600):
+for grid_spacing in (18000, 9000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900, 600):
     grid_file = 'epsg3413_griddes_{}m.nc'.format(grid_spacing)
     logger.info('generating grid description {}'.format(grid_file))
     create_epsg3413_grid(grid_file, grid_spacing)

@@ -415,7 +415,6 @@ for n, combination in enumerate(combinations):
                                                           'surface.pdd.factor_snow': (fsnow / ice_density),
                                                           'atmosphere_given_file': climate_file,
                                                           'atmosphere_given_period': 1,
-                                                          # 'pdd_sd_file': climate_file,
                                                           'atmosphere_lapse_rate_file': climate_file,
                                                           'temp_lapse_rate': lapse_rate,
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
