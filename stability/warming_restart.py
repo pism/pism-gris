@@ -229,7 +229,7 @@ if do_fice:
 else:
     fice_values = [8]
 if do_fsnow:
-    fsnow_values = [3, 4, 5]
+    fsnow_values = [3, 4]
 else:
     fsnow_values = [4]
 if do_sigma_max:
@@ -413,6 +413,7 @@ for n, combination in enumerate(combinations):
                 climate_params_dict = generate_climate(climate,
                                                        **{'surface.pdd.factor_ice': (fice / ice_density),
                                                           'surface.pdd.factor_snow': (fsnow / ice_density),
+                                                          'pdd_firn_depth_file': '../data_sets/climate_forcing/firn_forcing.nc',
                                                           'atmosphere_given_file': climate_file,
                                                           'atmosphere_given_period': 1,
                                                           'atmosphere_lapse_rate_file': climate_file,
