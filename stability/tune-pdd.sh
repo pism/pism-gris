@@ -1,6 +1,6 @@
 #!/bin/bash
 
-odir=2017_06_pdd_firn
+odir=2017_07_pdd_ela
 grid=4500
 ./warming_restart.py -s debug -n 4 -g $grid --end_year 2 --step 2 --exstep 1 --test_climate_models --params fice,lapse --o_dir $odir ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 

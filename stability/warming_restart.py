@@ -225,7 +225,7 @@ if do_eigen_calving_k:
 else:
     eigen_calving_k_values = [1e18]
 if do_fice:    
-    fice_values = [4, 6, 8, 10, 12]
+    fice_values = [4, 6, 8]
 else:
     fice_values = [8]
 if do_fsnow:

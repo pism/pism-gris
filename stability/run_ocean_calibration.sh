@@ -35,3 +35,5 @@ tct=low
 /Volumes/79n/data/gris-analysis/plotting/plotting.py -o ctrl_runmean_10yr --runmean 10 --plot basin_discharge --bounds -100 10 --time_bounds 2008 3008 2017_06_ocean_1kyr/spatial_basins/b_*_ex_gris_g2400m_warming_v3a_no_bath_bd_off_calving_vonmises_calving_om_low_tct_low_0_1000/scalar_fldsum_b_*_ex_gris_g2400m_warming_v3a_no_bath_bd_off_calving_vonmises_calving_om_${om}_tct_${tct}_0_1000.nc
 
 /Volumes/79n/data/gris-analysis/plotting/plotting.py -o ctrl_runmean_10yr --runmean 10 --plot basin_smb  --time_bounds 2008 3008 2017_06_ocean_1kyr/spatial_basins/b_*_ex_gris_g2400m_warming_v3a_no_bath_bd_off_calving_vonmises_calving_om_low_tct_low_0_1000/scalar_fldsum_b_*_ex_gris_g2400m_warming_v3a_no_bath_bd_off_calving_vonmises_calving_om_${om}_tct_${tct}_0_1000.nc
+
+/Volumes/79n/data/gris-analysis/plotting/plotting.py -o ctrl --plot per_basin_cumulative  --time_bounds 2008 3008 2017_06_ocean_1kyr/spatial_basins/b_*_ex_gris_g2400m_warming_v3a_no_bath_bd_off_calving_vonmises_calving_om_low_tct_low_0_1000/sum_fldsum_b_*_ex_gris_g2400m_warming_v3a_no_bath_bd_off_calving_vonmises_calving_om_${om}_tct_${tct}_0_1000.nc
