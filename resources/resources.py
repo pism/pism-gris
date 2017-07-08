@@ -117,6 +117,7 @@ def stability_spatial_ts_vars():
               'dHdt',
               'diffusivity',
               'flux_divergence',
+              'firn_depth',
               'hardav',
               'height_above_flotation',
               'ice_mass',
