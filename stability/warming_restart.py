@@ -309,7 +309,7 @@ for n, combination in enumerate(combinations):
     if do_lapse:
         name_options['lapse'] = lapse_rate
     if do_rcp:
-        name_options['tm'] = rcp
+        name_options['rcp'] = rcp
     if do_fice:
         name_options['fice'] = fice
     if do_fsnow:
