@@ -86,9 +86,9 @@ parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity
                     choices=['centered', 'upstream'],
                     help="How to approximate vertical velocities", default='upstream')
 parser.add_argument("--start_year", dest="start_year", type=int,
-                    help="Simulation start year", default=0)
-parser.add_argument("--end_year", dest="end_year", type=int,
-                    help="Simulation end year", default=10000)
+                    help="Simulation start year", default=2008)
+parser.add_argument("--duration", dest="duration", type=int,
+                    help="Years to simulate", default=1000)
 parser.add_argument("--step", dest="step", type=int,
                     help="Step in years for restarting", default=2500)
 parser.add_argument("--test_climate_models", dest="test_climate_models", action="store_true",
@@ -286,7 +286,7 @@ scripts_combinded = []
 scripts_post = []
 
 simulation_start_year = options.start_year
-simulation_end_year = options.end_year
+simulation_end_year = options.start_year + options.duration
 restart_step = options.step
 
 if restart_step > (simulation_end_year - simulation_start_year):
@@ -337,11 +337,11 @@ for n, combination in enumerate(combinations):
     if rcp == 'ctrl':
         climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0)
     elif rcp == '26':
-        climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=1)
+        climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_2008-5008.nc'
     elif rcp == '45':
-        climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=2)
+        climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_2008-5008.nc'
     elif rcp == '85':
-        climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=5)
+        climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_2008-5008.nc'
     else:
         print("How did I get here")
         
