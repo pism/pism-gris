@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2015 Andy Aschwanden
+# Copyright (C) 2017 Andy Aschwanden
 
 import numpy as np
 from netCDF4 import Dataset as NC
@@ -111,20 +111,33 @@ def get_projection_from_file(nc):
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.description = "Script creates ocean forcing."
 parser.add_argument("FILE", nargs='*')
+parser.add_argument("--firn_0",dest="firn_0", type=float,
+                    help="fir thickness at alt_0, in m",default=0.)
+parser.add_argument("--firn_1",dest="firn_1", type=float,
+                    help="firn thickness at alt_1, in m",default=100.)
+parser.add_argument("--alt_0",dest="alt_0", type=float,
+                    help="altitude 0",default=1250.)
+parser.add_argument("--alt_1",dest="alt_1", type=float,
+                    help="altitude 1",default=3000.)
 
 
 options = parser.parse_args()
 args = options.FILE
 
 ice_density = 910.
-
 infile = args[0]
 
+firn_1 = options.firn_1
+firn_0 = options.firn_0
+alt_1 = float(options.alt_1)
+alt_0 = float(options.alt_0)
+
+print options
 nc = NC(infile, 'a')
 
 xdim, ydim, zdim, tdim = get_dims(nc)
 
-usurf = nc.variables['surface'][:]
+altitude = nc.variables['surface'][:]
 # create a new dimension for bounds only if it does not yet exist
 if tdim is None:
     time_dim = 'time'
@@ -177,24 +190,17 @@ firn_var.grid_mapping = "mapping"
 
 
 # firn_depth = a*y + b
-firn_1 = 100.
-firn_0 = 0.
-usurf_1 = 3000.
-usurf_0 = 1250.
-
-a = (firn_1 - firn_0) / (usurf_1 - usurf_0)
-b = firn_0 - a * usurf_0
-
-print a, b
+a = (firn_1 - firn_0) / (alt_1 - alt_0)
+b = firn_0 - a * alt_0
 nt = len(time_var[:])
 for t in range(nt):
     if time_bnds_var is not None:
         print('Processing from {} to {}'.format(time_bnds_var[t,0], time_bnds_var[t,1]))
     else:
         print('Processing {}'.format(dates[t]))            
-    firn = a * usurf + b
-    firn[usurf<usurf_0] = firn_0
-    firn[usurf>usurf_1] = firn_1
+    firn = a * altitude + b
+    firn[altitude<alt_0] = firn_0
+    firn[altitude>alt_1] = firn_1
     firn_var[t,::] = firn
     nc.sync()
         

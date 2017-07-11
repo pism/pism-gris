@@ -145,6 +145,8 @@ if params_list is not None:
         do_fice = True
     if 'fsnow' in params:
         do_fsnow = True    
+    if 'firn' in params:
+        do_firn = True    
     if 'lapse' in params:
         do_lapse = True    
     if 'sigma_max' in params:
@@ -232,6 +234,10 @@ if do_fsnow:
     fsnow_values = [3, 4]
 else:
     fsnow_values = [4]
+if do_firn:
+    firn_values = ['off', 'ctrl']
+else:
+    fsnow_values = ['ctrl']
 if do_sigma_max:
     sigma_max_values = [0.5e6, 0.75e6, 1e6]
 else:
@@ -264,6 +270,7 @@ combinations = list(itertools.product(ocean_f_values,
                                       eigen_calving_k_values,
                                       fice_values,
                                       fsnow_values,
+                                      firn_values,
                                       ocean_melt_power_values,
                                       thickness_calving_threshold_values,
                                       ppq_values,
@@ -294,7 +301,7 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    ocean_f, ocean_m, sia_e, sigma_max, lapse_rate, T_max, eigen_calving_k, fice, fsnow, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    ocean_f, ocean_m, sia_e, sigma_max, lapse_rate, T_max, eigen_calving_k, fice, fsnow, firn, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -309,6 +316,8 @@ for n, combination in enumerate(combinations):
         name_options['fice'] = fice
     if do_fsnow:
         name_options['fsnow'] = fsnow
+    if do_firn:
+        name_options['firn'] = firn
     name_options['bd'] = bed_deformation
     name_options['calving'] = calving
     if calving in ('eigen_calving', 'hybrid_calving'):
@@ -410,10 +419,18 @@ for n, combination in enumerate(combinations):
 
                 stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
                 ice_density = 910.
+
+                if firn == 'off':
+                    firn_file = '../data_sets/climate_forcing/firn_forcing_off.nc'
+                elif firn == 'ctrl':
+                    firn_file = '../data_sets/climate_forcing/firn_forcing_ctrl.nc'
+                else:
+                    print("How did I get here?")
+
                 climate_params_dict = generate_climate(climate,
                                                        **{'surface.pdd.factor_ice': (fice / ice_density),
                                                           'surface.pdd.factor_snow': (fsnow / ice_density),
-                                                          'pdd_firn_depth_file': '../data_sets/climate_forcing/firn_forcing.nc',
+                                                          'pdd_firn_depth_file': firn_file,
                                                           'atmosphere_given_file': climate_file,
                                                           'atmosphere_given_period': 1,
                                                           'atmosphere_lapse_rate_file': climate_file,
