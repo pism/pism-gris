@@ -123,11 +123,12 @@ version = options.version
 
 # Check which parameters are used for sensitivity study
 params_list = options.params_list
-do_T_max = False
 do_eigen_calving_k = False
 do_fice = False
 do_fsnow = False
+do_firn = False
 do_lapse = False
+do_rcp = False
 do_sia_e = False
 do_sigma_max = False
 do_ocean_f = False
@@ -137,8 +138,6 @@ if params_list is not None:
     params = params_list.split(',')
     if 'sia_e' in params:
         do_sia_e = True
-    if 'T_max' in params:
-        do_T_max = True
     if 'eigen_calving_k' in params:
         do_eigen_calving_k = True
     if 'fice' in params:
@@ -149,12 +148,14 @@ if params_list is not None:
         do_firn = True    
     if 'lapse' in params:
         do_lapse = True    
-    if 'sigma_max' in params:
-        do_sigma_max = True
-    if 'ocean_f' in params:
-        do_ocean_f = True
     if 'ocean_m' in params:
         do_ocean_m = True
+    if 'ocean_f' in params:
+        do_ocean_f = True
+    if 'rcp' in params:
+        do_rcp = True
+    if 'sigma_max' in params:
+        do_sigma_max = True
     if 'tct' in params:
         do_tct = True
 
@@ -173,10 +174,7 @@ if domain.lower() in ('greenland_ext', 'gris_ext'):
 else:
     pism_dataname = '../data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
-climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)
-
-ocean_file = '../data_sets/ocean_forcing/ocean_forcing_latitudinal_285myr_lat_69_20myr_80n.nc'    
-    
+climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)    
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 
@@ -214,10 +212,10 @@ if do_sia_e:
     sia_e_values = [1.25, 1.5, 2, 3]
 else:
     sia_e_values = [1.25]
-if do_T_max:
-    T_max_values = [0, 1, 2, 5, 10]
+if do_rcp:
+    rcp_values = ['ctrl', '26', '45', '85']
 else:
-    T_max_values = [0]
+    rcp_values = ['ctrl']
 if do_lapse:
     lapse_rate_values = [0, 6]
 else:
@@ -237,7 +235,7 @@ else:
 if do_firn:
     firn_values = ['off', 'ctrl']
 else:
-    fsnow_values = ['ctrl']
+    firn_values = ['ctrl']
 if do_sigma_max:
     sigma_max_values = [0.5e6, 0.75e6, 1e6]
 else:
@@ -266,7 +264,7 @@ combinations = list(itertools.product(ocean_f_values,
                                       sia_e_values,
                                       sigma_max_values,
                                       lapse_rate_values,
-                                      T_max_values,
+                                      rcp_values,
                                       eigen_calving_k_values,
                                       fice_values,
                                       fsnow_values,
@@ -301,7 +299,7 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    ocean_f, ocean_m, sia_e, sigma_max, lapse_rate, T_max, eigen_calving_k, fice, fsnow, firn, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    ocean_f, ocean_m, sia_e, sigma_max, lapse_rate, rcp, eigen_calving_k, fice, fsnow, firn, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -310,8 +308,8 @@ for n, combination in enumerate(combinations):
         name_options['sia_e'] = sia_e
     if do_lapse:
         name_options['lapse'] = lapse_rate
-    if do_T_max:
-        name_options['tm'] = T_max
+    if do_rcp:
+        name_options['tm'] = rcp
     if do_fice:
         name_options['fice'] = fice
     if do_fsnow:
@@ -336,7 +334,17 @@ for n, combination in enumerate(combinations):
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
-    climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=T_max)
+    if rcp == 'ctrl':
+        climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0)
+    elif rcp == '26':
+        climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=1)
+    elif rcp == '45':
+        climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=2)
+    elif rcp == '85':
+        climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=5)
+    else:
+        print("How did I get here")
+        
     ocean_modifier_file = 'pism_abrupt_ocean_{ocean_f}.nc'.format(ocean_f=ocean_f)
     # All runs in one script file for coarse grids that fit into max walltime
     script_combined = 'warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
