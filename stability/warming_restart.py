@@ -28,9 +28,6 @@ parser.add_argument("-w", '--wall_time', dest="walltime",
                     help='''walltime. default: 100:00:00.''', default="100:00:00")
 parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
                     help='''queue. default=long.''', default='long')
-parser.add_argument("--climate", dest="climate",
-                    choices=['warming', 'warming_precip'],
-                    help="Climate", default='warming')
 parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
                     help="calving", default='vonmises_calving')
@@ -90,7 +87,7 @@ parser.add_argument("--start_year", dest="start_year", type=int,
 parser.add_argument("--duration", dest="duration", type=int,
                     help="Years to simulate", default=1000)
 parser.add_argument("--step", dest="step", type=int,
-                    help="Step in years for restarting", default=2500)
+                    help="Step in years for restarting", default=1000)
 parser.add_argument("--test_climate_models", dest="test_climate_models", action="store_true",
                     help="Turn off ice dynamics and mass transport to test climate models", default=False)
 
@@ -107,7 +104,7 @@ system = options.system
 bed_deformation = options.bed_deformation
 bed_type = options.bed_type
 calving = options.calving
-climate = options.climate
+climate = 'warming'
 exstep = options.exstep
 float_kill_calve_near_grounding_line = options.float_kill_calve_near_grounding_line
 forcing_type = options.forcing_type
@@ -133,6 +130,7 @@ do_sia_e = False
 do_sigma_max = False
 do_ocean_f = False
 do_ocean_m = False
+do_precip_scaling = False
 do_tct = False
 if params_list is not None:
     params = params_list.split(',')
@@ -152,6 +150,8 @@ if params_list is not None:
         do_ocean_m = True
     if 'ocean_f' in params:
         do_ocean_f = True
+    if 'precip_scaling' in params:
+        do_precip_scaling = True
     if 'rcp' in params:
         do_rcp = True
     if 'sigma_max' in params:
@@ -249,6 +249,10 @@ if do_ocean_m:
 else:
     ocean_m_values = ['low']
 ocean_melt_power_values = [1]
+if do_precip_scaling:
+    precip_scaling_values = ['on', 'off']
+else:
+    precip_scaling_values = ['off']
 if do_tct:
     thickness_calving_threshold_values = ['low', 'high']
 else:
@@ -264,6 +268,7 @@ combinations = list(itertools.product(ocean_f_values,
                                       sia_e_values,
                                       sigma_max_values,
                                       lapse_rate_values,
+                                      precip_scaling_values,
                                       rcp_values,
                                       eigen_calving_k_values,
                                       fice_values,
@@ -299,7 +304,7 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    ocean_f, ocean_m, sia_e, sigma_max, lapse_rate, rcp, eigen_calving_k, fice, fsnow, firn, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    ocean_f, ocean_m, sia_e, sigma_max, lapse_rate, precip_scaling, rcp, eigen_calving_k, fice, fsnow, firn, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -308,6 +313,8 @@ for n, combination in enumerate(combinations):
         name_options['sia_e'] = sia_e
     if do_lapse:
         name_options['lapse'] = lapse_rate
+    if do_precip_scaling:
+        name_options['ps'] = precip_scaling
     if do_rcp:
         name_options['rcp'] = rcp
     if do_fice:
@@ -445,6 +452,10 @@ for n, combination in enumerate(combinations):
                                                           'temp_lapse_rate': lapse_rate,
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
+                
+                if precip_scaling == 'on':
+                    climate_params_dict['atmosphere'] += ',paleo_precip'
+                
                 if ocean_m == 'low':
                     ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_70n_10myr_80n.nc'
                 elif ocean_m == 'med':
@@ -539,12 +550,17 @@ for n, combination in enumerate(combinations):
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
+        ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
+        myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])
+        myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
         if restart_step < (simulation_end_year - simulation_start_year):
-            ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
-            myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])
-            myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
             cmd = ' '.join(['ncrcat -O -4 -h', myfiles, myoutfile, '\n'])
             f.write(cmd)
+        ts_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
+        cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
+        cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,surface_mass_flux_cumulative@units=Gt -divc,1e12 -chname,mass_rate_of_change_glacierized,ice_mass,discharge_flux,discharge_cumulative,surface_ice_flux,surface_mass_flux_cumulative -timcumsum', myoutfile, cumsum_outfile, '\n'])
+        f.write(cmd)
+
 
     
 scripts = uniquify_list(scripts)
