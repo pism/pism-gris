@@ -83,7 +83,7 @@ parser.add_argument("--vertical_velocity_approximation", dest="vertical_velocity
                     choices=['centered', 'upstream'],
                     help="How to approximate vertical velocities", default='upstream')
 parser.add_argument("--start_year", dest="start_year", type=int,
-                    help="Simulation start year", default=2008)
+                    help="Simulation start year", default=0)
 parser.add_argument("--duration", dest="duration", type=int,
                     help="Years to simulate", default=1000)
 parser.add_argument("--step", dest="step", type=int,
@@ -344,11 +344,11 @@ for n, combination in enumerate(combinations):
     if rcp == 'ctrl':
         climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0)
     elif rcp == '26':
-        climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_2008-5008.nc'
+        climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'
     elif rcp == '45':
-        climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_2008-5008.nc'
+        climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'
     elif rcp == '85':
-        climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_2008-5008.nc'
+        climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'
     else:
         print("How did I get here")
         

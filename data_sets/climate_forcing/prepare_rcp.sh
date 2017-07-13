@@ -12,8 +12,9 @@ for rcp in 26 45 85; do
     cdo -O yearmean ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_GRIS_2008-2300.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_GRIS_2008-2300.nc
     cdo -O sub ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_GRIS_2008-2300.nc -seltimestep,1 ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_GRIS_2008-2300.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-2300.nc
     cdo -O trend -selyear,2201/2300 ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-2300.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-2300_a.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-2300_b.nc
-    ncks -O ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-2300.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-5008.nc
-    python extend_cmip5.py ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-5008.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-2300_a.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-2300_b.nc
-    ncrename -O -v tas,delta_T  ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-5008.nc  ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-5008.nc
-    ncwa -a lat,lon -O ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-5008.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-5008.nc
+    ncks -O ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-2300.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-7008.nc
+    python extend_cmip5.py ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-7008.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-2300_a.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-2300_b.nc
+    ncrename -O -v tas,delta_T  ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-7008.nc  ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-7008.nc
+    ncwa -a lat,lon -O ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-7008.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-7008.nc
+    cdo settaxis,01-01-01,12:00:00,1year ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_2008-7008.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_ym_anom_GRIS_0-5000.nc
 done
