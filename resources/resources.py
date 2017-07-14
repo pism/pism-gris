@@ -838,7 +838,7 @@ def make_batch_header(system, cores, walltime, queue):
                               't2standard' : 24,
                               't2small' : 24,
                               'debug' : 24}}
-    mpido = 'mpiexec.hydra -n {cores}'.format(cores=cores)
+    mpido = 'mpiexec -n {cores}'.format(cores=cores)
     systems['electra_broadwell'] = {'mpido' : mpido,
                            'submit' : 'qsub',
                            'work_dir' : 'PBS_O_WORKDIR',
