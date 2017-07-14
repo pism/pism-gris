@@ -241,9 +241,9 @@ if do_sigma_max:
 else:
     sigma_max_values = [1e6]
 if do_ocean_f:
-    ocean_f_values = [1, 1.1, 1.25, 1.5, 2, 4]
+    ocean_f_values = ['on', 'off']
 else:
-    ocean_f_values = [1]
+    ocean_f_values = ['off']
 if do_ocean_m:
     ocean_m_values = ['low', 'high']
 else:
@@ -352,7 +352,6 @@ for n, combination in enumerate(combinations):
     else:
         print("How did I get here")
         
-    ocean_modifier_file = 'pism_abrupt_ocean_{ocean_f}.nc'.format(ocean_f=ocean_f)
     # All runs in one script file for coarse grids that fit into max walltime
     script_combined = 'warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
     with open(script_combined, 'w') as f_combined:
@@ -472,9 +471,10 @@ for n, combination in enumerate(combinations):
                     print('not implemented')
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=ocean_file,
-                                                   ocean_th_file=ocean_file,
-                                                   ocean_delta_T_file=ocean_modifier_file,
-                                                   ocean_frac_mass_flux_file=ocean_modifier_file)
+                                                   ocean_runoff_smb_file=climate_modifier_file)
+                if ocean_f == 'on':
+                    ocean_params_dict['ocean'] += ',runoff_SMB'
+
                 hydro_params_dict = generate_hydrology(hydrology)
                 if start == simulation_start_year:
                     calving_params_dict = generate_calving(calving,
