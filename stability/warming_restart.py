@@ -445,6 +445,7 @@ for n, combination in enumerate(combinations):
                                                        **{'surface.pdd.factor_ice': (fice / ice_density),
                                                           'surface.pdd.factor_snow': (fsnow / ice_density),
                                                           'pdd_firn_depth_file': firn_file,
+                                                          'pdd_aschwanden': '',
                                                           'atmosphere_given_file': climate_file,
                                                           'atmosphere_given_period': 1,
                                                           'atmosphere_lapse_rate_file': climate_file,
@@ -453,8 +454,7 @@ for n, combination in enumerate(combinations):
                                                           'atmosphere_delta_T_file': climate_modifier_file})
                 
                 if precip_scaling == 'on':
-                    climate_params_dict['atmosphere'] += ',paleo_precip'
-                
+                    climate_params_dict['atmosphere'] += ',paleo_precip'                
                 if ocean_m == 'low':
                     ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_70n_10myr_80n.nc'
                 elif ocean_m == 'med':

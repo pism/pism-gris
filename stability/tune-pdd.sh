@@ -1,18 +1,20 @@
 #!/bin/bash
 
-odir=2017_07_firn
+odir=2017_07_pdd_tune
 grid=4500
-./warming_restart.py -s debug -n 4 -g $grid --end_year 100 --step 100 --exstep 1 --test_climate_models --params lapse,fice --o_dir $odir ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+./warming_restart.py --o_dir $odir --test_climate_models --exstep 4 --params lapse,fice -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
 
 for file in warm_gris_g${grid}m_warming_v3a_no_bath_lapse_0_*_bd_off_calving_vonmises_calving_test_climate_on.sh; do
     sh $file
 done
 
-./warming_restart.py -s debug -n 4 -g $grid --end_year 100 --step 100 --exstep 1 --params lapse,fice --o_dir $odir ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
-for file in warm_gris_g${grid}m_warming_v3a_no_bath_lapse_0_*_bd_off_calving_vonmises_calving.sh; do
-    sh $file
-done
+odir=2017_07_pdd_aschwanden
+grid=4500
+
+./warming_restart.py --o_dir $odir --test_climate_models --exstep 4 --params lapse -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
 e0=-638000
@@ -39,22 +41,24 @@ n1=$(($n1 - $grid / 2))
 climate_ext=../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_TM_BIL_EPSG3413_${grid}m.nc
 climate_sm=../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_TM_BIL_EPSG3413_${grid}m_sm.nc
 climate_melt=../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_TM_BIL_EPSG3413_${grid}m_melt.nc
+climate_melt_sum=../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_TM_BIL_EPSG3413_${grid}m_melt_fldsum.nc
 
 ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1. $climate_ext $climate_sm
 
-ncap2 -6 -O -s "where(climatic_mass_balance>10000) climatic_mass_balance=-2e9;" $climate_sm $climate_melt
 ncatted -a _FillValue,climatic_mass_balance,o,d,-2e9 $climate_melt
 ncks -A -v mask ../data_sets/bed_dem/pism_Greenland_4500m_mcb_jpl_v3a_ctrl.nc $climate_melt
 ncap2 -6 -O -s "where(mask!=2) climatic_mass_balance=-2e9;" $climate_melt $climate_melt
-
+cdo setattribute,climatic_mass_balance@units="Gt year-1"  -divc,1e12 -mulc,4500 -mulc,4500 -fldsum $climate_melt $climate_melt_sum
 rmsd_dir=cmb_rmsd
 mkdir -p $odir/$rmsd_dir
 cd  $odir/state/
 for file in *${grid}*.nc; do
     ncks -6 -O -v climatic_mass_balance $file ../$rmsd_dir/$file
     ncks -6 -A -v mask  ../../$climate_melt ../$rmsd_dir/$file
-    ncap2 -O -s "where(mask!=2) climatic_mass_balance=-2e9; where(climatic_mass_balance>10000) climatic_mass_balance=-2e9;" ../$rmsd_dir/$file ../$rmsd_dir/$file
+    ncap2 -O -s "where(mask!=2) climatic_mass_balance=-2e9;" ../$rmsd_dir/$file ../$rmsd_dir/$file
     ncatted -a _FillValue,climatic_mass_balance,o,d,-2e9 ../$rmsd_dir/$file
+    cdo setattribute,climatic_mass_balance@units="Gt year-1"  -divc,1e12 -mulc,4500 -mulc,4500 -fldsum ../$rmsd_dir/$file ../$rmsd_dir/fldsum_$file
+
     cdo sqrt -fldmean -sqr -sub -selvar,climatic_mass_balance ../$rmsd_dir/$file -selvar,climatic_mass_balance ../../$climate_melt ../$rmsd_dir/rmsd_$file
     ncks -6 -A -v pism_config $file ../$rmsd_dir/rmsd_$file
     gdal_translate  NETCDF:../$rmsd_dir/$file:climatic_mass_balance  ../$rmsd_dir/$file.tif
