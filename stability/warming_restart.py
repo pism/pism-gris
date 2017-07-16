@@ -102,7 +102,7 @@ system = options.system
 bed_deformation = options.bed_deformation
 bed_type = options.bed_type
 calving = options.calving
-climate = 'warming'
+climate = 'warming_precip'
 exstep = options.exstep
 float_kill_calve_near_grounding_line = options.float_kill_calve_near_grounding_line
 forcing_type = options.forcing_type
@@ -248,7 +248,7 @@ else:
     ocean_m_values = ['low']
 ocean_melt_power_values = [1]
 if do_precip_scaling:
-    precip_scaling_values = ['on', 'off']
+    precip_scaling_values = [0, 0.05, 0.07]
 else:
     precip_scaling_values = ['off']
 if do_tct:
@@ -302,7 +302,7 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    ocean_f, ocean_m, sia_e, sigma_max, lapse_rate, precip_scaling, rcp, eigen_calving_k, fice, fsnow, firn, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    ocean_f, ocean_m, sia_e, sigma_max, lapse_rate, precip_scaling_factor, rcp, eigen_calving_k, fice, fsnow, firn, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -312,7 +312,7 @@ for n, combination in enumerate(combinations):
     if do_lapse:
         name_options['lapse'] = lapse_rate
     if do_precip_scaling:
-        name_options['ps'] = precip_scaling
+        name_options['ps'] = precip_scaling_factor
     if do_rcp:
         name_options['rcp'] = rcp
     if do_fice:
@@ -447,12 +447,11 @@ for n, combination in enumerate(combinations):
                                                           'atmosphere_given_file': climate_file,
                                                           'atmosphere_given_period': 1,
                                                           'atmosphere_lapse_rate_file': climate_file,
-                                                          'temp_lapse_rate': lapse_rate,
+                                                          'atmosphere.precip_exponential_factor_for_temperature': precip_scaling_factor,
+                                                          'temp_lapse_rate': lapse_rate,                                                          
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
                 
-                if precip_scaling == 'on':
-                    climate_params_dict['atmosphere'] += ',paleo_precip'                
                 if ocean_m == 'low':
                     ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_70n_10myr_80n.nc'
                 elif ocean_m == 'med':
