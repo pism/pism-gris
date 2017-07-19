@@ -3,7 +3,7 @@
 odir=2017_07_pdd_tune
 grid=4500
 
-./warming_restart.py --o_dir $odir --test_climate_models --exstep 4 --params lapse,fice -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+./warming_restart.py --o_dir $odir --o_size big_2d --test_climate_models --exstep 4 --params lapse,fice -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
 for file in warm_gris_g${grid}m_warming_v3a_no_bath_lapse_0_*_bd_off_calving_vonmises_calving_test_climate_on.sh; do
@@ -13,8 +13,7 @@ done
 
 odir=2017_07_pdd_aschwanden
 grid=4500
-
-./warming_restart.py --o_dir $odir --test_climate_models --exstep 4 --params lapse -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+./warming_restart.py --o_size big_2d --o_dir $odir --test_climate_models --exstep 4 --params lapse -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
 e0=-638000
@@ -49,6 +48,7 @@ ncatted -a _FillValue,climatic_mass_balance,o,d,-2e9 $climate_melt
 ncks -A -v mask ../data_sets/bed_dem/pism_Greenland_4500m_mcb_jpl_v3a_ctrl.nc $climate_melt
 ncap2 -6 -O -s "where(mask!=2) climatic_mass_balance=-2e9;" $climate_melt $climate_melt
 cdo setattribute,climatic_mass_balance@units="Gt year-1"  -divc,1e12 -mulc,4500 -mulc,4500 -fldsum $climate_melt $climate_melt_sum
+
 rmsd_dir=cmb_rmsd
 mkdir -p $odir/$rmsd_dir
 cd  $odir/state/

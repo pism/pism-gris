@@ -555,7 +555,7 @@ for n, combination in enumerate(combinations):
         if restart_step < (simulation_end_year - simulation_start_year):
             cmd = ' '.join(['ncrcat -O -4 -h', myfiles, myoutfile, '\n'])
             f.write(cmd)
-        cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', ts_file, '\n'])
+        cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', '{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year), '\n'])
         f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
