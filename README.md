@@ -31,6 +31,8 @@ Repository which contains scripts and tools for simulations of the Greenland Ice
 data_sets
 --------
 
+- /bed_dem: generate boot files from BedMachine bed and ice thickness
+
 initMIP
 --------
 

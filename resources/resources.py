@@ -139,8 +139,10 @@ def stability_spatial_ts_vars():
               'usurf',
               'velbase_mag',
               'velsurf',
-              'velsurf_mag']
-    
+              'velsurf_mag',
+              'vonmises_calving_rate',
+              'vonmises_stress']
+
     return exvars
 
 

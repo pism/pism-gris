@@ -559,7 +559,7 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
-        cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,surface_mass_flux_cumulative@units=Gt -divc,1e12 -chname,mass_rate_of_change_glacierized,ice_mass,discharge_flux,discharge_cumulative,surface_ice_flux,surface_mass_flux_cumulative -timcumsum', myoutfile, cumsum_outfile, '\n'])
+        cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,sub_shelf_ice_flux_cumulative@units=Gt,surface_mass_flux_cumulative@units=G -divc,1e12 -chname,mass_rate_of_change_glacierized,ice_mass,discharge_flux,discharge_cumulative,sub_shelf_ice_flux,sub_shelf_ice_flux_cumulative,surface_ice_flux,surface_mass_flux_cumulative -timcumsum', myoutfile, cumsum_outfile, '\n'])
         f.write(cmd)
 
 
