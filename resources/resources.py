@@ -719,7 +719,7 @@ def generate_ocean(ocean, **kwargs):
         if 'ocean_delta_SL_file' not in kwargs:
             params_dict['ocean_delta_SL_file'] = 'pism_dSL.nc'
     elif ocean == 'warming':
-        params_dict['ocean'] = 'given'
+        params_dict['ocean'] = 'given,runoff_SMB'
     elif ocean == 'warming_3eqn':
         params_dict['ocean'] = 'th,delta_T'
     elif ocean == 'paleo_const':

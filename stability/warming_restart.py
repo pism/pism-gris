@@ -126,7 +126,7 @@ do_lapse = False
 do_rcp = False
 do_sia_e = False
 do_sigma_max = False
-do_ocean_f = False
+do_ocean_n = False
 do_ocean_m = False
 do_precip_scaling = False
 do_tct = False
@@ -146,8 +146,8 @@ if params_list is not None:
         do_lapse = True    
     if 'ocean_m' in params:
         do_ocean_m = True
-    if 'ocean_f' in params:
-        do_ocean_f = True
+    if 'ocean_n' in params:
+        do_ocean_n = True
     if 'precip_scaling' in params:
         do_precip_scaling = True
     if 'rcp' in params:
@@ -238,10 +238,10 @@ if do_sigma_max:
     sigma_max_values = [0.5e6, 0.75e6, 1e6]
 else:
     sigma_max_values = [1e6]
-if do_ocean_f:
-    ocean_f_values = ['on', 'off']
+if do_ocean_n:
+    ocean_n_values = [0.5]
 else:
-    ocean_f_values = ['off']
+    ocean_n_values = [0, 0.5, 1, 2]
 if do_ocean_m:
     ocean_m_values = ['low', 'high']
 else:
@@ -261,7 +261,7 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(ocean_f_values,
+combinations = list(itertools.product(ocean_n_values,
                                       ocean_m_values,
                                       sia_e_values,
                                       sigma_max_values,
@@ -302,7 +302,7 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    ocean_f, ocean_m, sia_e, sigma_max, lapse_rate, precip_scaling_factor, rcp, eigen_calving_k, fice, fsnow, firn, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    ocean_n, ocean_m, sia_e, sigma_max, lapse_rate, precip_scaling_factor, rcp, eigen_calving_k, fice, fsnow, firn, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -322,13 +322,10 @@ for n, combination in enumerate(combinations):
     if do_firn:
         name_options['firn'] = firn
     name_options['bd'] = bed_deformation
-    name_options['calving'] = calving
-    if calving in ('eigen_calving', 'hybrid_calving'):
-        name_options['k'] = eigen_calving_k
     if do_sigma_max:
         name_options['sm'] = sigma_max
-    if do_ocean_f:
-        name_options['of'] = ocean_f
+    if do_ocean_n:
+        name_options['of'] = ocean_n
     if do_ocean_m:
         name_options['om'] = ocean_m
     if do_tct:
@@ -337,7 +334,7 @@ for n, combination in enumerate(combinations):
         name_options['test_climate'] = 'on'
     
     vversion = 'v' + str(version)
-    full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
     if rcp == 'ctrl':
         climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0)
@@ -361,7 +358,7 @@ for n, combination in enumerate(combinations):
 
             end = start + restart_step
 
-            experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
+            experiment =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
             script = 'warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
             scripts.append(script)
@@ -467,10 +464,9 @@ for n, combination in enumerate(combinations):
                 else:
                     print('not implemented')
                 ocean_params_dict = generate_ocean(ocean,
-                                                   ocean_given_file=ocean_file,
-                                                   ocean_runoff_smb_file=climate_modifier_file)
-                if ocean_f == 'on':
-                    ocean_params_dict['ocean'] += ',runoff_SMB'
+                                                   **{'ocean_given_file': ocean_file,
+                                                      'ocean.runoff_to_ocean_melt_power': ocean_n,
+                                                      'ocean_runoff_smb_file': climate_modifier_file})
 
                 hydro_params_dict = generate_hydrology(hydrology)
                 if start == simulation_start_year:
