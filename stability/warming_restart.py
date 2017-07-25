@@ -250,7 +250,7 @@ ocean_melt_power_values = [1]
 if do_precip_scaling:
     precip_scaling_values = [0, 0.05, 0.07]
 else:
-    precip_scaling_values = ['off']
+    precip_scaling_values = [0.05]
 if do_tct:
     thickness_calving_threshold_values = ['low', 'high']
 else:
@@ -549,6 +549,8 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', myoutfile, '\n'])
         f.write(cmd)
+        cmd = ' '.join(['~/gris-analysis/scripts/nc_add_hillshade.py', myoutfile, '\n'])
+        f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])
         myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
@@ -559,7 +561,7 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
-        cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,sub_shelf_ice_flux_cumulative@units=Gt,surface_mass_flux_cumulative@units=G -divc,1e12 -chname,mass_rate_of_change_glacierized,ice_mass,discharge_flux,discharge_cumulative,sub_shelf_ice_flux,sub_shelf_ice_flux_cumulative,surface_ice_flux,surface_mass_flux_cumulative -timcumsum', myoutfile, cumsum_outfile, '\n'])
+        cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,sub_shelf_ice_flux_cumulative@units=Gt,surface_mass_flux_cumulative@units=G -divc,1e12 -chname,mass_rate_of_change_glacierized,ice_mass,discharge_flux,discharge_cumulative,grounded_basal_ice_flux,grounded_basal_ice_flux_cumulative,sub_shelf_ice_flux,sub_shelf_ice_flux_cumulative,surface_ice_flux,surface_mass_flux_cumulative -timcumsum', myoutfile, cumsum_outfile, '\n'])
         f.write(cmd)
 
 
