@@ -239,9 +239,9 @@ if do_sigma_max:
 else:
     sigma_max_values = [1e6]
 if do_ocean_n:
-    ocean_n_values = [0.5]
-else:
     ocean_n_values = [0, 0.5, 1, 2]
+else:
+    ocean_n_values = [0.5]
 if do_ocean_m:
     ocean_m_values = ['low', 'high']
 else:
