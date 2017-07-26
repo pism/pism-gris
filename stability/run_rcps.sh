@@ -47,6 +47,11 @@ for basin in CW NE NO NW SE SW; do
     done
 done
 
+end_year=3000
+lapse=6
+ps=0.05
+/Volumes/79n/data/gris-analysis/plotting/plotting.py -o 2009_${end_year}  --time_bounds 2009 ${end_year} --plot rcp_area_cold 2017_07_rcps/scalar/rel_ts_gris_g2400m_warming_v3a_no_bath_lapse_${lapse}_ps_${ps}_rcp_*_bd_off_calving_vonmises_calving_of_on_0_1000.nc
+
 
 for basin in CW NE NO NW SE SW; do
     for rcp in 26 45 85; do
