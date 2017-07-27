@@ -211,7 +211,7 @@ if do_sia_e:
 else:
     sia_e_values = [1.25]
 if do_rcp:
-    rcp_values = ['ctrl', '26', '45', '85']
+    rcp_values = ['26', '45', '85']
 else:
     rcp_values = ['ctrl']
 if do_lapse:
@@ -239,9 +239,9 @@ if do_sigma_max:
 else:
     sigma_max_values = [1e6]
 if do_ocean_n:
-    ocean_n_values = [0, 0.5, 1, 2]
+    ocean_n_values = ['low', 'high']
 else:
-    ocean_n_values = [0.5]
+    ocean_n_values = ['low']
 if do_ocean_m:
     ocean_m_values = ['low', 'high']
 else:
@@ -463,9 +463,24 @@ for n, combination in enumerate(combinations):
                     tct_file = '../data_sets/ocean_forcing/tct_forcing_600myr_74n_100myr_76n.nc'
                 else:
                     print('not implemented')
+
+                if ocean_n == 'low':
+                    ocean_alpha = 0.5
+                    ocean_beta = 1.0
+                elif ocean_n == 'med':
+                    ocean_alpha = 0.55
+                    ocean_beta = 1.1
+                elif ocean_n == 'high':
+                    ocean_alpha = 0.6
+                    ocean_beta = 1.2
+                else:
+                    print('not implemented')
+
+                    
                 ocean_params_dict = generate_ocean(ocean,
                                                    **{'ocean_given_file': ocean_file,
-                                                      'ocean.runoff_to_ocean_melt_power': ocean_n,
+                                                      'ocean.runoff_to_ocean_melt_power_alpha': ocean_alpha,
+                                                      'ocean.runoff_to_ocean_melt_power_beta': ocean_beta,
                                                       'ocean_runoff_smb_file': climate_modifier_file})
 
                 hydro_params_dict = generate_hydrology(hydrology)
