@@ -471,8 +471,8 @@ for n, combination in enumerate(combinations):
                     ocean_alpha = 0.55
                     ocean_beta = 1.1
                 elif ocean_n == 'high':
-                    ocean_alpha = 0.6
-                    ocean_beta = 1.2
+                    ocean_alpha = 1.0
+                    ocean_beta = 2.0
                 else:
                     print('not implemented')
 

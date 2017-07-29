@@ -221,7 +221,7 @@ if (var not in nc.variables.keys()):
 else:
     btemp_var = nc.variabels[var]
 btemp_var.grid_mapping = "mapping"
-btemp_var[:] = 270.
+btemp_var[:] = 0
 
 if mask:
     mask_var = nc.variables['mask'][:]
