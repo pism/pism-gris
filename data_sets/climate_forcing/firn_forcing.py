@@ -116,7 +116,7 @@ parser.add_argument("--firn_0",dest="firn_0", type=float,
 parser.add_argument("--firn_1",dest="firn_1", type=float,
                     help="firn thickness at alt_1, in m",default=100.)
 parser.add_argument("--alt_0",dest="alt_0", type=float,
-                    help="altitude 0",default=1250.)
+                    help="altitude 0",default=1200.)
 parser.add_argument("--alt_1",dest="alt_1", type=float,
                     help="altitude 1",default=3000.)
 

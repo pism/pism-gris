@@ -1,20 +1,11 @@
 #!/bin/bash
 
-odir=2017_07_pdd_tune
+odir=2017_07_pdd_calib
 grid=4500
 
-./warming_restart.py --o_dir $odir --o_size big_2d --test_climate_models --exstep 4 --params lapse,fice -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+./warming_restart.py --o_dir $odir --test_climate_models --exstep 4 --params fice -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
-
-for file in warm_gris_g${grid}m_warming_v3a_no_bath_lapse_0_*_bd_off_calving_vonmises_calving_test_climate_on.sh; do
-    sh $file
-done
-
-
-odir=2017_07_pdd_aschwanden
-grid=4500
-./warming_restart.py --o_size big_2d --o_dir $odir --test_climate_models --exstep 4 --params lapse -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
-
+sh warm_gris_g4500m_v3a_fice_8_bd_off_test_climate_on.sh
 
 e0=-638000
 n0=-3349600
@@ -60,7 +51,6 @@ for file in *${grid}*.nc; do
     cdo setattribute,climatic_mass_balance@units="Gt year-1"  -divc,1e12 -mulc,4500 -mulc,4500 -fldsum ../$rmsd_dir/$file ../$rmsd_dir/fldsum_$file
 
     cdo sqrt -fldmean -sqr -sub -selvar,climatic_mass_balance ../$rmsd_dir/$file -selvar,climatic_mass_balance ../../$climate_melt ../$rmsd_dir/rmsd_$file
-    ncks -6 -A -v pism_config $file ../$rmsd_dir/rmsd_$file
     gdal_translate  NETCDF:../$rmsd_dir/$file:climatic_mass_balance  ../$rmsd_dir/$file.tif
 done
 cd ../..

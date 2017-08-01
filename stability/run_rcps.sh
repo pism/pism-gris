@@ -41,9 +41,10 @@ for basin in CW NE NO NW SE SW; do
         /Volumes/79n/data/gris-analysis/basins/extract_basins.py --o_dir ../basins --basins $basin ex_gris_g3600m_v3a_no_bath_lapse_6_ps_0_rcp_${rcp}_bd_off_calving_vonmises_calving_0_1000.nc       
     done
 done
+
 for basin in CW NE NO NW SE SW; do
-    for rcp in 26 45 85; do
-        /Volumes/79n/data/gris-analysis/basins/extract_basins.py --o_dir ../basins --basins $basin ex_gris_g3600m_v3a_no_bath_lapse_6_ps_0.05_rcp_${rcp}_bd_off_calving_vonmises_calving_0_1000.nc       
+    for file in ex_g*.nc; do
+        /Volumes/79n/data/gris-analysis/basins/extract_basins.py --o_dir ../basins --basins $basin $file
     done
 done
 
@@ -58,20 +59,6 @@ for basin in CW NE NO NW SE SW; do
     for rcp in 26 45 85; do
         extract_interface.py --step 20 -t ice_ocean -o 2017_07_rcps_ps/ice_ocean/ice_ocean_g2400m_lapse_6_rcp_${rcp}_${basin}.shp 2017_07_rcps_ps/basins/b_${basin}_ex_gris_g2400m_warming_v3a_no_bath_lapse_6_ps_0.05_rcp_${rcp}_bd_off_calving_vonmises_calving_of_on_0_1000/b_${basin}_ex_gris_g2400m_warming_v3a_no_bath_lapse_6_ps_0.05_rcp_${rcp}_bd_off_calving_vonmises_calving_of_on_0_1000.nc
         dissolve_by_attribute.py -o  2017_07_rcps_ps/ice_ocean/ice_ocean_g2400m_lapse_6_rcp_${rcp}_${basin}_ds.shp  2017_07_rcps_ps/ice_ocean/ice_ocean_g2400m_lapse_6_rcp_${rcp}_${basin}.shp
-    done
-done
-
-for lapse in 6; do
-    for ps in 0.05; do
-        end_year=2100
-        /Volumes/79n/data/gris-analysis/plotting/plotting.py -o lapse_${lapse}_ps_${ps}_2009_${end_year} --title lapse_${lapse}_ps_${ps} --time_bounds 2009 ${end_year} --bounds 0 0.15 --plot rcp_mass 2017_07_rcps_ps/scalar/cumsum_ts_gris_g2400m_warming_v3a_no_bath_lapse_${lapse}_ps_${ps}_rcp_*_bd_off_calving_vonmises_calving_of_on_0_1000.nc
-        /Volumes/79n/data/gris-analysis/plotting/plotting.py -o lapse_${lapse}_ps_${ps}_2009_${end_year} --title lapse_${lapse}_ps_${ps} --time_bounds 2009 ${end_year} --bounds 0 0.15 --plot rcp_d 2017_07_rcps_ps/scalar/cumsum_ts_gris_g2400m_warming_v3a_no_bath_lapse_${lapse}_ps_${ps}_rcp_*_bd_off_calving_vonmises_calving_of_on_0_1000.nc
-        end_year=2200
-        /Volumes/79n/data/gris-analysis/plotting/plotting.py -o lapse_${lapse}_ps_${ps}_2009_${end_year} --title lapse_${lapse}_ps_${ps} --time_bounds 2009 ${end_year} --bounds 0 0.75 --plot rcp_mass 2017_07_rcps_ps/scalar/cumsum_ts_gris_g2400m_warming_v3a_no_bath_lapse_${lapse}_ps_${ps}_rcp_*_bd_off_calving_vonmises_calving_of_on_0_1000.nc
-        /Volumes/79n/data/gris-analysis/plotting/plotting.py -o lapse_${lapse}_ps_${ps}_2009_${end_year} --title lapse_${lapse}_ps_${ps} --time_bounds 2009 ${end_year} --bounds 0 0.75 --plot rcp_d 2017_07_rcps_ps/scalar/cumsum_ts_gris_g2400m_warming_v3a_no_bath_lapse_${lapse}_ps_${ps}_rcp_*_bd_off_calving_vonmises_calving_of_on_0_1000.nc
-        end_year=3000
-        /Volumes/79n/data/gris-analysis/plotting/plotting.py -o lapse_${lapse}_ps_${ps}_2009_${end_year} --title lapse_${lapse}_ps_${ps} --time_bounds 2009 ${end_year} --bounds 0 5 --plot rcp_mass 2017_07_rcps_ps/scalar/cumsum_ts_gris_g2400m_warming_v3a_no_bath_lapse_${lapse}_ps_${ps}_rcp_*_bd_off_calving_vonmises_calving_of_on_0_1000.nc
-        /Volumes/79n/data/gris-analysis/plotting/plotting.py -o lapse_${lapse}_ps_${ps}_2009_${end_year} --title lapse_${lapse}_ps_${ps} --time_bounds 2009 ${end_year} --bounds 0 5 --plot rcp_d 2017_07_rcps_ps/scalar/cumsum_ts_gris_g2400m_warming_v3a_no_bath_lapse_${lapse}_ps_${ps}_rcp_*_bd_off_calving_vonmises_calving_of_on_0_1000.nc
     done
 done
 
@@ -93,10 +80,14 @@ dissolve_by_attribute.py -o 2017_07_rcps_ps/ice_ocean_g2400m_lapse_6_rcp_45_GRIS
 dissolve_by_attribute.py -o 2017_07_rcps_ps/ice_ocean/ice_ocean_g2400m_lapse_6_rcp_85_GRIS_ds.shp 2017_07_rcps_ps/ice_ocean_g2400m_lapse_6_rcp_85_GRIS.shp
 
 # Plot RCP mass
+end_year=2100
+/Volumes/79n/data/gris-analysis/plotting/plotting.py -o 2009_${end_year} --time_bounds 2009 ${end_year}  --plot rcp_ens_mass 2017_07_ocean/scalar/cumsum_ts_gris_g2400m_v3a_rcp*.nc
+end_year=2200
+/Volumes/79n/data/gris-analysis/plotting/plotting.py -o 2009_${end_year} --time_bounds 2009 ${end_year}  --plot rcp_ens_mass 2017_07_ocean/scalar/cumsum_ts_gris_g2400m_v3a_rcp*.nc
 end_year=3000
- /Volumes/79n/data/gris-analysis/plotting/plotting.py -o lapse_6_2009_${end_year} --time_bounds 2009 ${end_year}  --plot rcp_mass 2017_07_rcps_ps/scalar/cumsum_ts_gris_g2400m_warming_v3a_no_bath_lapse_6_ps_0.05_rcp_*_bd_off_calving_vonmises_calving_of_on_0_1000.nc
-# Plot RCP mass for two lapse rates
- /Volumes/79n/data/gris-analysis/plotting/plotting.py -o lapse_combined_2009_${end_year} --time_bounds 2009 ${end_year}  --plot rcp_lapse_mass 2017_07_rcps_ps/scalar/cumsum_ts_gris_g2400m_warming_v3a_no_bath_lapse_6_ps_0.05_rcp_*_bd_off_calving_vonmises_calving_of_on_0_1000.nc 2017_07_rcps_ps/scalar/cumsum_ts_gris_g2400m_warming_v3a_no_bath_lapse_0_ps_0.05_rcp_*_bd_off_calving_vonmises_calving_of_on_0_1000.nc
+/Volumes/79n/data/gris-analysis/plotting/plotting.py -o 2009_${end_year} --time_bounds 2009 ${end_year}  --plot rcp_ens_mass 2017_07_ocean/scalar/cumsum_ts_gris_g2400m_v3a_rcp*.nc
+/Volumes/79n/data/gris-analysis/plotting/plotting.py -o 2009_${end_year} --time_bounds 2009 ${end_year}  --plot rcp_ens_area 2017_07_ocean/scalar/rel_ts_gris_g2400m_v3a_rcp*.nc
+/Volumes/79n/data/gris-analysis/plotting/plotting.py -o 2009_${end_year} --time_bounds 2009 ${end_year}  --plot rcp_ens_volume 2017_07_ocean/scalar/rel_ts_gris_g2400m_v3a_rcp*.nc
 
 end_year=3000
 ps=0.05
