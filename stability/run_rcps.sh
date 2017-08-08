@@ -104,11 +104,29 @@ done
 
 
 # Basal enthalpy
+odir=2017_07_ocean
 grid=2400
-mkdir -p 2017_07_rcps_ps/enth_base
-python /Volumes/79n/data/gris-analysis/enth_base/extract_basal_enthalpy.py ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc  2017_07_rcps_ps/enth_base/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_of_on_0_100.nc
-for rcp in ctrl 26 45 85; do
-    python /Volumes/79n/data/gris-analysis/enth_base/extract_basal_enthalpy.py 2017_07_rcps_ps/state/gris_g${grid}m_warming_v3a_no_bath_lapse_6_ps_0.05_rcp_${rcp}_bd_off_calving_vonmises_calving_of_on_0_1000.nc 2017_07_rcps_ps/enth_base/gris_g${grid}m_warming_v3a_no_bath_lapse_6_ps_0.05_rcp_${rcp}_bd_off_calving_vonmises_calving_of_on_0_1000.nc
-    cdo mulc,100 -div -sub 2017_07_rcps_ps/enth_base/gris_g${grid}m_warming_v3a_no_bath_lapse_6_ps_0.05_rcp_${rcp}_bd_off_calving_vonmises_calving_of_on_0_1000.nc 2017_07_rcps_ps/enth_base/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_of_on_0_100.nc 2017_07_rcps_ps/enth_base/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_of_on_0_100.nc 2017_07_rcps_ps/enth_base/gris_g${grid}m_warming_v3a_no_bath_lapse_6_ps_0.05_rcp_${rcp}_bd_off_calving_vonmises_calving_of_on_0_1000_rel_diff.nc
-    gdal_translate -a_srs EPSG:3413 NETCDF:2017_07_rcps_ps/enth_base/gris_g${grid}m_warming_v3a_no_bath_lapse_6_ps_0.05_rcp_${rcp}_bd_off_calving_vonmises_calving_of_on_0_1000_rel_diff.nc:basal_enthalpy 2017_07_rcps_ps/enth_base/gris_g${grid}m_warming_v3a_no_bath_lapse_6_ps_0.05_rcp_${rcp}_bd_off_calving_vonmises_calving_of_on_0_1000_rel_diff.tif
+mkdir -p $odir/enth_base
+python /Volumes/79n/data/gris-analysis/enth_base/extract_basal_enthalpy.py ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc ${odir}/enth_base/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_of_on_0_100.nc
+cd ${odir}/state
+for file in gris_g${grid}*.nc; do
+    python /Volumes/79n/data/gris-analysis/enth_base/extract_basal_enthalpy.py $file ../enth_base/$file
+done
+cd ../enth_base
+for rcp in 26 45 85; do
+    cdo -O ensmean gris_g${grid}m_v3a_rcp_${rcp}_*.nc ensmean_gris_g${grid}m_v3a_rcp_${rcp}.nc
+    cdo mulc,100 -div -sub   ensmean_gris_g${grid}m_v3a_rcp_${rcp}.nc gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_of_on_0_100.nc gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_of_on_0_100.nc rel_diff_ensmean_gris_g${grid}m_v3a_rcp_${rcp}.nc
+    gdal_translate -a_srs EPSG:3413 NETCDF:rel_diff_ensmean_gris_g${grid}m_v3a_rcp_${rcp}.nc:basal_enthalpy  rel_diff_ensmean_gris_g${grid}m_v3a_rcp_${rcp}.tif
+done
+cd ../../
+
+
+
+for file in ts_*;do
+    cdo mulc,100 -div -sub -seltimestep,-1 $file -seltimestep,1 $file -seltimestep,1 $file rel_diff_$file
+done
+for rcp in 26 45 85; do
+    cdo -O ensmean rel_diff_ts_gris_g2400m_v3a_rcp_${rcp}_*.nc ensmean_rel_diff_ts_gris_g2400m_v3a_rcp_${rcp}.nc
+    cdo -O ensmin rel_diff_ts_gris_g2400m_v3a_rcp_${rcp}_*.nc ensmin_rel_diff_ts_gris_g2400m_v3a_rcp_${rcp}.nc
+    cdo -O ensmax rel_diff_ts_gris_g2400m_v3a_rcp_${rcp}_*.nc ensmax_rel_diff_ts_gris_g2400m_v3a_rcp_${rcp}.nc
 done
