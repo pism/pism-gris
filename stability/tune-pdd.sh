@@ -1,9 +1,9 @@
 #!/bin/bash
 
-odir=2017_07_pdd_calib_1200m
+odir=2017_08_pdd_calib
 grid=4500
 
-./warming_restart.py --o_size big --o_dir $odir --test_climate_models --exstep monthly --params fice -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+./warming_restart.py --o_size big --o_dir $odir --test_climate_models --exstep 1 --params fice -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 sh warm_gris_g4500m_v3a_fice_8_bd_off_test_climate_on.sh
 
