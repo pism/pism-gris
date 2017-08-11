@@ -4,7 +4,7 @@
 set -x -e
 
 GRID=3000
-infile=../bed_dem/pism_Greenland_ext_${GRID}m_mcb_jpl_v3a.nc
+infile=../bed_dem/pism_Greenland_ext_${GRID}m_mcb_jpl_v3a_ctrl.nc
 
 # #####################################
 # Ocean forcing
