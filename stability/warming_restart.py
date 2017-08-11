@@ -553,7 +553,7 @@ for n, combination in enumerate(combinations):
             mexstep = int(exstep)
             
         extra_file = spatial_ts_dict['extra_file']
-        myfiles = ' '.join(['{}_{:.3f}.nc'.format(extra_file, k) for k in np.arange(simulation_start_year+mexstep, simulation_end_year, mexstep)])
+        myfiles = ' '.join(['{}_{:.3f}.nc'.format(extra_file, k) for k in np.arange(simulation_start_year+mexstep, simulation_end_year + mexstep, mexstep)])
         myoutfile = '{}_{}_{}.nc'.format(extra_file, simulation_start_year, simulation_end_year)
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
@@ -579,7 +579,7 @@ for n, combination in enumerate(combinations):
             f.write(cmd)
         cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', '{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year), '\n'])
         f.write(cmd)
-        cmd = ' '.join(['ncks -A', flux_file, ts_file + '.nc', '\n'])
+        cmd = ' '.join(['ncks -A', flux_file, '{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year), '\n'])
         f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
