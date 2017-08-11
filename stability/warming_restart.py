@@ -31,9 +31,6 @@ parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
 parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
                     help="calving", default='vonmises_calving')
-parser.add_argument("--ocean", dest="ocean",
-                    choices=['warming', 'const'],
-                    help="Ocean coupler", default='warming')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
                     help="sets the modeling domain", default='gris')
@@ -49,16 +46,13 @@ parser.add_argument("--o_dir", dest="odir",
                     help="output directory. Default: current directory", default='foo')
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', 'big_2d'],
-                    help="output size type", default='medium')
+                    help="output size type", default='small')
 parser.add_argument("-s", "--system", dest="system",
                     choices=list_systems(),
                     help="computer system to use.", default='pleiades_broadwell')
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
                     help="output size type", default='no_bath')
-parser.add_argument("--bed_deformation", dest="bed_deformation",
-                    choices=['off', 'lc', 'iso'],
-                    help="Bed deformation model.", default='off')
 parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
@@ -99,7 +93,6 @@ queue = options.queue
 walltime = options.walltime
 system = options.system
 
-bed_deformation = options.bed_deformation
 bed_type = options.bed_type
 calving = options.calving
 climate = 'warming'
@@ -109,7 +102,6 @@ forcing_type = options.forcing_type
 frontal_melt = True
 grid = options.grid
 hydrology = options.hydrology
-ocean = options.ocean
 stress_balance = options.stress_balance
 topg_delta_file = options.topg_delta_file
 test_climate_models = options.test_climate_models
@@ -123,13 +115,14 @@ do_fice = False
 do_fsnow = False
 do_firn = False
 do_lapse = False
-do_rcp = False
 do_sia_e = False
 do_sigma_max = False
-do_ocean_n = False
-do_ocean_m = False
+do_ocs = False
+do_ocm = False
 do_precip_scaling = False
 do_tct = False
+do_bed_def = False
+do_q = False
 if params_list is not None:
     params = params_list.split(',')
     if 'sia_e' in params:
@@ -144,18 +137,20 @@ if params_list is not None:
         do_firn = True    
     if 'lapse' in params:
         do_lapse = True    
-    if 'ocean_m' in params:
-        do_ocean_m = True
-    if 'ocean_n' in params:
-        do_ocean_n = True
+    if 'ocm' in params:
+        do_ocm = True
+    if 'ocs' in params:
+        do_ocs = True
     if 'precip_scaling' in params:
         do_precip_scaling = True
-    if 'rcp' in params:
-        do_rcp = True
     if 'sigma_max' in params:
         do_sigma_max = True
     if 'tct' in params:
         do_tct = True
+    if 'bed_def' in params:
+        do_bed_def = True
+    if 'q' in params:
+        do_q = True
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -205,23 +200,20 @@ if not os.path.isdir(odir_tmp):
 
 ssa_n = (3.25)
 ssa_e = (1.0)
+rcp_values = ['26', '45', '85']
 
 if do_sia_e:
     sia_e_values = [1.25, 1.5, 2, 3]
 else:
     sia_e_values = [1.25]
-if do_rcp:
-    rcp_values = ['26', '45', '85']
+if do_q:
+    ppq_values = [0.3, 0.6, 0.9]
 else:
-    rcp_values = ['ctrl']
+    ppq_values = [0.6]
 if do_lapse:
     lapse_rate_values = [0, 6]
 else:
     lapse_rate_values = [6]
-if do_eigen_calving_k:
-    eigen_calving_k_values = [1e15, 1e18]
-else:
-    eigen_calving_k_values = [1e18]
 if do_fice:    
     fice_values = [4, 6, 8]
 else:
@@ -235,44 +227,45 @@ if do_firn:
 else:
     firn_values = ['ctrl']
 if do_sigma_max:
-    sigma_max_values = [0.5e6, 0.75e6, 1e6]
+    sigma_max_values = [0.7e6, 1e6, 1.4e6]
 else:
     sigma_max_values = [1e6]
-if do_ocean_n:
-    ocean_n_values = ['low', 'high']
+if do_ocs:
+    ocs_values = ['off', 'low', 'mid', 'high']
 else:
-    ocean_n_values = ['low']
-if do_ocean_m:
-    ocean_m_values = ['low', 'high']
+    ocs_values = ['mid']
+if do_ocm:
+    ocm_values = ['low', 'mid', 'high']
 else:
-    ocean_m_values = ['low']
-ocean_melt_power_values = [1]
+    ocm_values = ['mid']
 if do_precip_scaling:
     precip_scaling_values = [0, 0.05, 0.07]
 else:
     precip_scaling_values = [0.05]
 if do_tct:
-    thickness_calving_threshold_values = ['low', 'high']
+    thickness_calving_threshold_values = ['low', 'mid', 'high']
 else:
-    thickness_calving_threshold_values = ['low']
-ppq_values = [0.6]
+    thickness_calving_threshold_values = ['mid']
+if do_bed_def:
+    bed_deformation_values = ['off', 'i0']
+else:
+    bed_deformation_values = ['i0']
 tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(ocean_n_values,
-                                      ocean_m_values,
+combinations = list(itertools.product(bed_deformation_values,
+                                      ocs_values,
+                                      ocm_values,
                                       sia_e_values,
                                       sigma_max_values,
                                       lapse_rate_values,
                                       precip_scaling_values,
                                       rcp_values,
-                                      eigen_calving_k_values,
                                       fice_values,
                                       fsnow_values,
                                       firn_values,
-                                      ocean_melt_power_values,
                                       thickness_calving_threshold_values,
                                       ppq_values,
                                       tefo_values,
@@ -302,19 +295,18 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    ocean_n, ocean_m, sia_e, sigma_max, lapse_rate, precip_scaling_factor, rcp, eigen_calving_k, fice, fsnow, firn, ocean_melt_power, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    bed_deformation, ocs, ocm, sia_e, sigma_max, lapse_rate, precip_scaling_factor, rcp, fice, fsnow, firn, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
+    name_options['rcp'] = rcp
     if do_sia_e:
         name_options['sia_e'] = sia_e
     if do_lapse:
         name_options['lapse'] = lapse_rate
     if do_precip_scaling:
         name_options['ps'] = precip_scaling_factor
-    if do_rcp:
-        name_options['rcp'] = rcp
     if do_fice:
         name_options['fice'] = fice
     if do_fsnow:
@@ -324,12 +316,12 @@ for n, combination in enumerate(combinations):
     name_options['bd'] = bed_deformation
     if do_sigma_max:
         name_options['sm'] = sigma_max
-    if do_ocean_n:
-        name_options['of'] = ocean_n
-    if do_ocean_m:
-        name_options['om'] = ocean_m
+    if do_ocs:
+        name_options['ocs'] = ocs
+    if do_ocm:
+        name_options['ocm'] = ocm
     if do_tct:
-        name_options['tct'] = thickness_calving_threshold
+        name_options['cav'] = thickness_calving_threshold
     if test_climate_models == True:
         name_options['test_climate'] = 'on'
     
@@ -406,8 +398,8 @@ for n, combination in enumerate(combinations):
                     general_params_dict['test_climate_models'] = ''
                     general_params_dict['no_mass'] = ''
                     
-                if bed_deformation not in ('off'):
-                    general_params_dict['bed_def'] = bed_deformation
+                if bed_deformation != 'off':
+                    general_params_dict['bed_def'] = 'lc'
                 if forcing_type in ('e_age'):
                     general_params_dict['e_age_coupling'] = ''
 
@@ -448,29 +440,37 @@ for n, combination in enumerate(combinations):
                                                           'temp_lapse_rate': lapse_rate,                                                          
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
-                
-                if ocean_m == 'low':
+                    
+                if ocm == 'low':
                     ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_70n_10myr_80n.nc'
-                elif ocean_m == 'med':
+                elif ocm == 'mid':
                     ocean_file = '../data_sets/ocean_forcing/ocean_forcing_400myr_70n_20myr_80n.nc'
-                elif ocean_m == 'high':
+                elif ocm == 'high':
                     ocean_file = '../data_sets/ocean_forcing/ocean_forcing_500myr_70n_30myr_80n.nc'
                 else:
                     print('not implemented')
+                    
                 if thickness_calving_threshold == 'low':
                     tct_file = '../data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
-                elif  thickness_calving_threshold == 'high':
+                elif  thickness_calving_threshold == 'mid':
                     tct_file = '../data_sets/ocean_forcing/tct_forcing_600myr_74n_100myr_76n.nc'
+                elif  thickness_calving_threshold == 'high':
+                    tct_file = '../data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'
                 else:
                     print('not implemented')
 
-                if ocean_n == 'low':
+                if ocs == 'off':
+                    ocean = 'given'
+                else:
+                    ocean = 'warming'
+
+                if ocs == 'low':
                     ocean_alpha = 0.5
                     ocean_beta = 1.0
-                elif ocean_n == 'med':
+                elif ocs == 'mid':
                     ocean_alpha = 0.55
                     ocean_beta = 1.1
-                elif ocean_n == 'high':
+                elif ocs == 'high':
                     ocean_alpha = 1.0
                     ocean_beta = 2.0
                 else:
@@ -487,7 +487,6 @@ for n, combination in enumerate(combinations):
                 if start == simulation_start_year:
                     calving_params_dict = generate_calving(calving,
                                                            **{'thickness_calving_threshold_file': tct_file,
-                                                              'eigen_calving_k': eigen_calving_k,
                                                               'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
                                                               'ocean_kill_file': input_file,
                                                               'frontal_melt': frontal_melt,
@@ -580,6 +579,9 @@ for n, combination in enumerate(combinations):
         cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', '{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year), '\n'])
         f.write(cmd)
         cmd = ' '.join(['ncks -A', flux_file, ts_file + '.nc', '\n'])
+        f.write(cmd)
+        moutfile = os.path.join(odir, state_dir, outfile)
+        cmd = ' '.join(['ncks -O -4 -L 3', moutfile, moutfile, '\n'])
         f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
