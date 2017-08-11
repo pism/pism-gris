@@ -129,7 +129,6 @@ def stability_spatial_ts_vars():
               'saccum',
               'smelt',
               'srunoff',
-              'tauc',
               'tempicethk_basal',
               'temppabase',
               'tempsurf',

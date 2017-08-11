@@ -459,11 +459,6 @@ for n, combination in enumerate(combinations):
                 else:
                     print('not implemented')
 
-                if ocs == 'off':
-                    ocean = 'given'
-                else:
-                    ocean = 'warming'
-
                 if ocs == 'low':
                     ocean_alpha = 0.5
                     ocean_beta = 1.0
@@ -476,12 +471,18 @@ for n, combination in enumerate(combinations):
                 else:
                     print('not implemented')
 
-                    
-                ocean_params_dict = generate_ocean(ocean,
+                if ocs == 'off':
+                    ocean = 'given'
+                    ocean_params_dict = generate_ocean(ocean,
+                                                   **{'ocean_given_file': ocean_file})
+                else:
+                    ocean = 'warming'
+                    ocean_params_dict = generate_ocean(ocean,
                                                    **{'ocean_given_file': ocean_file,
                                                       'ocean.runoff_to_ocean_melt_power_alpha': ocean_alpha,
                                                       'ocean.runoff_to_ocean_melt_power_beta': ocean_beta,
                                                       'ocean_runoff_smb_file': climate_modifier_file})
+                    
 
                 hydro_params_dict = generate_hydrology(hydrology)
                 if start == simulation_start_year:
