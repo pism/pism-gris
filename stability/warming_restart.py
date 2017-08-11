@@ -315,7 +315,7 @@ for n, combination in enumerate(combinations):
         name_options['firn'] = firn
     name_options['bd'] = bed_deformation
     if do_sigma_max:
-        name_options['sm'] = sigma_max
+        name_options['scm'] = sigma_max
     if do_ocs:
         name_options['ocs'] = ocs
     if do_ocm:
