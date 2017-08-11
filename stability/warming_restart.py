@@ -448,8 +448,8 @@ for n, combination in enumerate(combinations):
                 elif ocm == 'high':
                     ocean_file = '../data_sets/ocean_forcing/ocean_forcing_500myr_70n_30myr_80n.nc'
                 else:
-                    print('not implemented')
-                    
+                    pass
+                
                 if thickness_calving_threshold == 'low':
                     tct_file = '../data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
                 elif  thickness_calving_threshold == 'mid':
@@ -469,8 +469,8 @@ for n, combination in enumerate(combinations):
                     ocean_alpha = 1.0
                     ocean_beta = 2.0
                 else:
-                    print('not implemented')
-
+                    pass
+                
                 if ocs == 'off':
                     ocean = 'given'
                     ocean_params_dict = generate_ocean(ocean,
