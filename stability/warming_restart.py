@@ -227,15 +227,15 @@ if do_firn:
 else:
     firn_values = ['ctrl']
 if do_sigma_max:
-    sigma_max_values = [0.7e6, 1e6, 1.4e6]
+    sigma_max_values = [0.7e6, 1.4e6]
 else:
     sigma_max_values = [1e6]
 if do_ocs:
-    ocs_values = ['off', 'low', 'mid', 'high']
+    ocs_values = ['off', 'low', 'high']
 else:
     ocs_values = ['mid']
 if do_ocm:
-    ocm_values = ['low', 'mid', 'high']
+    ocm_values = ['low', 'high']
 else:
     ocm_values = ['mid']
 if do_precip_scaling:
@@ -243,7 +243,7 @@ if do_precip_scaling:
 else:
     precip_scaling_values = [0.05]
 if do_tct:
-    thickness_calving_threshold_values = ['low', 'mid', 'high']
+    thickness_calving_threshold_values = ['low', 'high']
 else:
     thickness_calving_threshold_values = ['mid']
 if do_bed_def:
@@ -315,13 +315,13 @@ for n, combination in enumerate(combinations):
         name_options['firn'] = firn
     name_options['bd'] = bed_deformation
     if do_sigma_max:
-        name_options['sm'] = sigma_max
+        name_options['vcm'] = sigma_max
     if do_ocs:
         name_options['ocs'] = ocs
     if do_ocm:
         name_options['ocm'] = ocm
     if do_tct:
-        name_options['cav'] = thickness_calving_threshold
+        name_options['tct'] = thickness_calving_threshold
     if test_climate_models == True:
         name_options['test_climate'] = 'on'
     
