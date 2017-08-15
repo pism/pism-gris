@@ -455,7 +455,7 @@ for n, combination in enumerate(combinations):
                 if thickness_calving_threshold == 'low':
                     tct_file = '../data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
                 elif  thickness_calving_threshold == 'mid':
-                    tct_file = '../data_sets/ocean_forcing/tct_forcing_600myr_74n_100myr_76n.nc'
+                    tct_file = '../data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc'
                 elif  thickness_calving_threshold == 'high':
                     tct_file = '../data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'
                 else:

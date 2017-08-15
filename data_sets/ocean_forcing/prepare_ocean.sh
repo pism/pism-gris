@@ -58,7 +58,7 @@ python tct_forcing.py --tct_0 ${tct_0} --tct_1 ${tct_1} --lat_0 ${lat_0} --lat_1
 ncatted -a grid_mapping,calving_threshold,o,c,"polar_stereographic" $outfile
 
 tct_0=600
-tct_1=100
+tct_1=150
 outfile=tct_forcing_${tct_0}myr_${lat_0}n_${tct_1}myr_${lat_1}n.nc
 ncks -6 -C -O -v x,y,mask,polar_stereographic $infile $outfile
 python tct_forcing.py --tct_0 ${tct_0} --tct_1 ${tct_1} --lat_0 ${lat_0} --lat_1 ${lat_1} $outfile
