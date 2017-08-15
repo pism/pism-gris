@@ -29,7 +29,7 @@ parser.add_argument("-w", '--wall_time', dest="walltime",
 parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
                     help='''queue. default=long.''', default='long')
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
+                    choices=['float_kill', 'ocean_kill', 'vonmises_calving'],
                     help="calving", default='vonmises_calving')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
@@ -127,8 +127,6 @@ if params_list is not None:
     params = params_list.split(',')
     if 'sia_e' in params:
         do_sia_e = True
-    if 'eigen_calving_k' in params:
-        do_eigen_calving_k = True
     if 'fice' in params:
         do_fice = True
     if 'fsnow' in params:
@@ -497,7 +495,6 @@ for n, combination in enumerate(combinations):
                 else:
                     calving_params_dict = generate_calving(calving,
                                                            **{'thickness_calving_threshold_file': tct_file,
-                                                              'eigen_calving_k': eigen_calving_k,
                                                               'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
                                                               'ocean_kill_file': regridfile,
                                                               'frontal_melt': frontal_melt,
