@@ -143,10 +143,10 @@ fsnow = 4
 fice = 8
 ssa_e = 1
 
-sia_e_values = [1.25, 1.5, 2, 3]
+sia_e_values = [1.25]
 sia_n_values = [3]
 ssa_n_values = [3.25]
-ppq_values = [0.6]
+ppq_values = [0.3, 0.6, 0.9]
 tefo_values = [0.020]
 
 phi_min_values = [5.0]
