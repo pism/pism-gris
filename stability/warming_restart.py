@@ -314,14 +314,10 @@ for n, combination in enumerate(combinations):
     if do_firn:
         name_options['firn'] = firn
     name_options['bd'] = bed_deformation
-    if do_sigma_max:
-        name_options['vcm'] = sigma_max / 1e6
-    if do_ocs:
-        name_options['ocs'] = ocs
-    if do_ocm:
-        name_options['ocm'] = ocm
-    if do_tct:
-        name_options['tct'] = thickness_calving_threshold
+    name_options['vcm'] = sigma_max / 1e6
+    name_options['ocs'] = ocs
+    name_options['ocm'] = ocm
+    name_options['tct'] = thickness_calving_threshold
     if test_climate_models == True:
         name_options['test_climate'] = 'on'
     
