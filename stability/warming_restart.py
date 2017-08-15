@@ -535,7 +535,7 @@ for n, combination in enumerate(combinations):
 
     scripts_combinded.append(script_combined)
 
-    script_post = 'warm_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
+    script_post = 'post_warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
     scripts_post.append(script_post)
 
     post_header = make_batch_post_header(system)
