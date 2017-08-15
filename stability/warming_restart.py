@@ -200,7 +200,7 @@ if not os.path.isdir(odir_tmp):
 
 ssa_n = (3.25)
 ssa_e = (1.0)
-rcp_values = ['26', '45', '85']
+rcp_values = ['ctrl', '26', '45', '85']
 
 if do_sia_e:
     sia_e_values = [1.25, 1.5, 2, 3]
