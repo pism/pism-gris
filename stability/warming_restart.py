@@ -227,11 +227,11 @@ if do_firn:
 else:
     firn_values = ['ctrl']
 if do_sigma_max:
-    sigma_max_values = [0.7e6, 1.4e6]
+    sigma_max_values = [0.7e6, 1.0e6, 1.4e6]
 else:
     sigma_max_values = [1e6]
 if do_ocs:
-    ocs_values = ['off', 'low', 'high']
+    ocs_values = ['off', 'low', 'mid', 'high']
 else:
     ocs_values = ['mid']
 if do_ocm:
@@ -303,6 +303,8 @@ for n, combination in enumerate(combinations):
     name_options['rcp'] = rcp
     if do_sia_e:
         name_options['sia_e'] = sia_e
+    if do_q:
+        name_options['q'] = ppq
     if do_lapse:
         name_options['lapse'] = lapse_rate
     if do_precip_scaling:
@@ -315,7 +317,7 @@ for n, combination in enumerate(combinations):
         name_options['firn'] = firn
     name_options['bd'] = bed_deformation
     if do_sigma_max:
-        name_options['vcm'] = sigma_max
+        name_options['vcm'] = sigma_max / 1e6
     if do_ocs:
         name_options['ocs'] = ocs
     if do_ocm:
@@ -503,7 +505,7 @@ for n, combination in enumerate(combinations):
                     
 
                 exvars = stability_spatial_ts_vars()
-                spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
+                spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=False)
                 scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
                                                     start=simulation_start_year,
                                                     end=simulation_end_year,
@@ -557,8 +559,8 @@ for n, combination in enumerate(combinations):
         myoutfile = '{}_{}_{}.nc'.format(extra_file, simulation_start_year, simulation_end_year)
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -4 -L 3 -h', myfiles, myoutfile, '\n'])
-        f.write(cmd)
-        cmd = ' '.join(['ncap2 -O -s "surface_accumulation_mass_flux=saccum*cell_area*sftgif*1e6/1e12;surface_melt_mass_flux=smelt*cell_area*sftgif*1e6/1e12;surface_runoff_mass_flux=srunoff*cell_area*sftgif*1e6/1e12;" ', myoutfile, myoutfile, '\n'])
+        # f.write(cmd)
+        cmd = ' '.join(['ncap2 -O -4 -L 3 -s "surface_accumulation_mass_flux=saccum*cell_area*sftgif*1e6/1e12;surface_melt_mass_flux=smelt*cell_area*sftgif*1e6/1e12;surface_runoff_mass_flux=srunoff*cell_area*sftgif*1e6/1e12;" ', myoutfile, myoutfile, '\n'])
         f.write(cmd)
         cmd = ' '.join(['ncatted -a units,surface_accumulation_mass_flux,o,c,"Gt year-1" -a units,surface_melt_mass_flux,o,c,"Gt year-1" -a units,surface_runoff_mass_flux,o,c,"Gt year-1"', myoutfile, '\n'])
         f.write(cmd)
