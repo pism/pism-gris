@@ -241,7 +241,7 @@ if do_precip_scaling:
 else:
     precip_scaling_values = [0.05]
 if do_tct:
-    thickness_calving_threshold_values = ['low', 'high']
+    thickness_calving_threshold_values = ['low', 'mid', 'high']
 else:
     thickness_calving_threshold_values = ['mid']
 if do_bed_def:
