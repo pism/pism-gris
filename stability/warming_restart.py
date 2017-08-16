@@ -46,7 +46,7 @@ parser.add_argument("--o_dir", dest="odir",
                     help="output directory. Default: current directory", default='foo')
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', 'big_2d'],
-                    help="output size type", default='small')
+                    help="output size type", default='medium')
 parser.add_argument("-s", "--system", dest="system",
                     choices=list_systems(),
                     help="computer system to use.", default='pleiades_broadwell')
@@ -233,7 +233,7 @@ if do_ocs:
 else:
     ocs_values = ['mid']
 if do_ocm:
-    ocm_values = ['low', 'high']
+    ocm_values = ['low', 'mid', 'high']
 else:
     ocm_values = ['mid']
 if do_precip_scaling:
