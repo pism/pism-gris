@@ -127,10 +127,8 @@ if params_list is not None:
     params = params_list.split(',')
     if 'sia_e' in params:
         do_sia_e = True
-    if 'fice' in params:
-        do_fice = True
-    if 'fsnow' in params:
-        do_fsnow = True    
+    if 'pdd' in params:
+        do_pdd = True
     if 'firn' in params:
         do_firn = True    
     if 'lapse' in params:
@@ -149,6 +147,8 @@ if params_list is not None:
         do_bed_def = True
     if 'q' in params:
         do_q = True
+    if 'refreeze' in params:
+        do_refreeze = True
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -208,18 +208,18 @@ if do_q:
     ppq_values = [0.3, 0.6, 0.9]
 else:
     ppq_values = [0.6]
+if do_refreeze:
+    refreeze_values = [0.30, 0.47, 0.60, 0.75]
+else:
+    refreeze_values = [0.60]
 if do_lapse:
     lapse_rate_values = [0, 6]
 else:
     lapse_rate_values = [6]
-if do_fice:    
-    fice_values = [4, 6, 8]
+if do_pdd:    
+    pdd_values = ['low', 'mid', 'high']
 else:
-    fice_values = [8]
-if do_fsnow:
-    fsnow_values = [3, 4]
-else:
-    fsnow_values = [4]
+    fice_values = ['mid']
 if do_firn:
     firn_values = ['off', 'ctrl']
 else:
@@ -253,7 +253,8 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(bed_deformation_values,
+combinations = list(itertools.product(refreeze_values,
+                                      bed_deformation_values,
                                       ocs_values,
                                       ocm_values,
                                       sia_e_values,
@@ -261,8 +262,7 @@ combinations = list(itertools.product(bed_deformation_values,
                                       lapse_rate_values,
                                       precip_scaling_values,
                                       rcp_values,
-                                      fice_values,
-                                      fsnow_values,
+                                      pdd_values,
                                       firn_values,
                                       thickness_calving_threshold_values,
                                       ppq_values,
@@ -293,7 +293,7 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    bed_deformation, ocs, ocm, sia_e, sigma_max, lapse_rate, precip_scaling_factor, rcp, fice, fsnow, firn, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    refreeze, bed_deformation, ocs, ocm, sia_e, sigma_max, lapse_rate, precip_scaling_factor, rcp, pdd, firn, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -307,17 +307,17 @@ for n, combination in enumerate(combinations):
         name_options['lapse'] = lapse_rate
     if do_precip_scaling:
         name_options['ps'] = precip_scaling_factor
-    if do_fice:
-        name_options['fice'] = fice
-    if do_fsnow:
-        name_options['fsnow'] = fsnow
+    if do_pdd:
+        name_options['pdd'] = pdd
+    if do_refreeze:
+        name_options['rf'] = refreeze
     if do_firn:
         name_options['firn'] = firn
-    name_options['bd'] = bed_deformation
     name_options['vcm'] = sigma_max / 1e6
     name_options['ocs'] = ocs
     name_options['ocm'] = ocm
     name_options['tct'] = thickness_calving_threshold
+    name_options['bd'] = bed_deformation
     if test_climate_models == True:
         name_options['test_climate'] = 'on'
     
@@ -424,10 +424,32 @@ for n, combination in enumerate(combinations):
                 else:
                     print("How did I get here?")
 
+                if pdd == 'mid':
+                    fice_w = 8
+                    fice_c = 6
+                    fsnow_w = 3
+                    fsnow_c = 1.5
+                elif pdd == 'low':
+                    fice_w = 6
+                    fice_c = 4
+                    fsnow_w = 2
+                    fsnow_c = 1
+                elif pdd == 'high':
+                    fice_w = 10
+                    fice_c = 8
+                    fsnow_w = 4
+                    fsnow_c = 2
+                else:
+                    pass
+                    
                 climate_params_dict = generate_climate(climate,
-                                                       **{'surface.pdd.factor_ice': (fice / ice_density),
-                                                          'surface.pdd.factor_snow': (fsnow / ice_density),
+                                                       **{'surface.pdd.aschwanden.beta_ice_c': fice_c / 1e3,
+                                                          'surface.pdd.aschwanden.beta_ice_w': fice_w / 1e3,
+                                                          'surface.pdd.aschwanden.beta_snow_c': fsnow_c / 1e3,
+                                                          'surface.pdd.aschwanden.beta_snow_w': fsnow_w / 1e3,
+                                                          'surface.pdd.refreeze': refreeze,
                                                           'pdd_firn_depth_file': firn_file,
+                                                          'surface.pdd.std_dev': 4.23,
                                                           'pdd_aschwanden': '',
                                                           'atmosphere_given_file': climate_file,
                                                           'atmosphere_given_period': 1,
