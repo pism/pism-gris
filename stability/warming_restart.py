@@ -82,6 +82,8 @@ parser.add_argument("--step", dest="step", type=int,
                     help="Step in years for restarting", default=1000)
 parser.add_argument("--test_climate_models", dest="test_climate_models", action="store_true",
                     help="Turn off ice dynamics and mass transport to test climate models", default=False)
+parser.add_argument("--calibrate", dest="calibrate", action="store_true",
+                    help="Run calibration mode (no spatial time series written)", default=False)
 
 options = parser.parse_args()
 
@@ -92,6 +94,8 @@ osize = options.osize
 queue = options.queue
 walltime = options.walltime
 system = options.system
+
+calibrate = options.calibrate
 
 bed_type = options.bed_type
 calving = options.calving
@@ -110,9 +114,8 @@ version = options.version
 
 # Check which parameters are used for sensitivity study
 params_list = options.params_list
-do_eigen_calving_k = False
-do_fice = False
-do_fsnow = False
+do_pdd = False
+do_refreeze = False
 do_firn = False
 do_lapse = False
 do_sia_e = False
@@ -198,7 +201,7 @@ if not os.path.isdir(odir_tmp):
 
 ssa_n = (3.25)
 ssa_e = (1.0)
-rcp_values = ['ctrl', '26', '45', '85']
+rcp_values = ['26', '45', '85']
 
 if do_sia_e:
     sia_e_values = [1.25, 1.5, 2, 3]
@@ -219,7 +222,7 @@ else:
 if do_pdd:    
     pdd_values = ['low', 'mid', 'high']
 else:
-    fice_values = ['mid']
+    pdd_values = ['mid']
 if do_firn:
     firn_values = ['off', 'ctrl']
 else:
@@ -519,22 +522,33 @@ for n, combination in enumerate(combinations):
                                                               'calving.vonmises.sigma_max': sigma_max})
                     
 
-                exvars = stability_spatial_ts_vars()
-                spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=False)
                 scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
                                                     start=simulation_start_year,
                                                     end=simulation_end_year,
                                                     odir=os.path.join(odir, scalar_dir))
 
-                all_params_dict = merge_dicts(general_params_dict,
-                                              grid_params_dict,
-                                              stress_balance_params_dict,
-                                              climate_params_dict,
-                                              ocean_params_dict,
-                                              hydro_params_dict,
-                                              calving_params_dict,
-                                              spatial_ts_dict,
-                                              scalar_ts_dict)
+                exvars = stability_spatial_ts_vars()
+                if not calibrate:
+                    spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=False)
+
+                    all_params_dict = merge_dicts(general_params_dict,
+                                                  grid_params_dict,
+                                                  stress_balance_params_dict,
+                                                  climate_params_dict,
+                                                  ocean_params_dict,
+                                                  hydro_params_dict,
+                                                  calving_params_dict,
+                                                  spatial_ts_dict,
+                                                  scalar_ts_dict)
+                else:
+                    all_params_dict = merge_dicts(general_params_dict,
+                                                  grid_params_dict,
+                                                  stress_balance_params_dict,
+                                                  climate_params_dict,
+                                                  ocean_params_dict,
+                                                  hydro_params_dict,
+                                                  calving_params_dict,
+                                                  scalar_ts_dict)
                 all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
 
                 if system in ('debug'):
@@ -568,42 +582,42 @@ for n, combination in enumerate(combinations):
             mexstep = 1. / 365
         else:
             mexstep = int(exstep)
+
             
-        extra_file_tmp = spatial_ts_dict['extra_file']
-        extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
-        extra_file = os.path.join(odir, spatial_dir, extra_file)
-        cmd = ' '.join(['ncap2 -O -4 -L 3 -s "surface_accumulation_mass_flux=saccum*cell_area*sftgif*1e6/1e12;surface_melt_mass_flux=smelt*cell_area*sftgif*1e6/1e12;surface_runoff_mass_flux=srunoff*cell_area*sftgif*1e6/1e12;" ', extra_file_tmp, extra_file, '\n'])
+        if not calibrate:
+            extra_file_tmp = spatial_ts_dict['extra_file']
+            extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
+            extra_file = os.path.join(odir, spatial_dir, extra_file)
+            cmd = ' '.join(['ncap2 -O -4 -L 3 -s "surface_accumulation_mass_flux=saccum*cell_area*sftgif*1e6/1e12;surface_melt_mass_flux=smelt*cell_area*sftgif*1e6/1e12;surface_runoff_mass_flux=srunoff*cell_area*sftgif*1e6/1e12;" ', extra_file_tmp, extra_file, '\n'])
+            f.write(cmd)
+            cmd = ' '.join(['ncatted -a units,surface_accumulation_mass_flux,o,c,"Gt year-1" -a units,surface_melt_mass_flux,o,c,"Gt year-1" -a units,surface_runoff_mass_flux,o,c,"Gt year-1"', extra_file, '\n'])
+            f.write(cmd)
+            flux_file = os.path.join(odir, scalar_dir, 'surface_flux_ts_{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
+            cmd = ' '.join(['cdo -O -L fldsum -selvar,surface_accumulation_mass_flux,surface_melt_mass_flux,surface_runoff_mass_flux', extra_file, flux_file, '\n'])
+            f.write(cmd)
+            cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', flux_file, '\n'])
+            f.write(cmd)
+            cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', extra_file, '\n'])
+            f.write(cmd)
+            cmd = ' '.join(['~/gris-analysis/scripts/nc_add_hillshade.py', extra_file, '\n'])
+            f.write(cmd)
+        ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=simulation_start_year, end=simulation_end_year))
+        cmd = ' '.join(['ncap2 -O -s "calib_params=0.d;"', '{}'.format(ts_file), '\n'])
+        cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', '{}'.format(ts_file), '\n'])
         f.write(cmd)
-        cmd = ' '.join(['rm', extra_file_tmp, '\n'])
-        f.write(cmd)
-        cmd = ' '.join(['ncatted -a units,surface_accumulation_mass_flux,o,c,"Gt year-1" -a units,surface_melt_mass_flux,o,c,"Gt year-1" -a units,surface_runoff_mass_flux,o,c,"Gt year-1"', extra_file, '\n'])
-        f.write(cmd)
-        flux_file = os.path.join(odir, scalar_dir, 'surface_flux_ts_{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
-        cmd = ' '.join(['cdo -O -L fldsum -selvar,surface_accumulation_mass_flux,surface_melt_mass_flux,surface_runoff_mass_flux', extra_file, flux_file, '\n'])
-        f.write(cmd)
-        cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', flux_file, '\n'])
-        f.write(cmd)
-        cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', extra_file, '\n'])
-        f.write(cmd)
-        cmd = ' '.join(['~/gris-analysis/scripts/nc_add_hillshade.py', extra_file, '\n'])
-        f.write(cmd)
-        ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
-        myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])
-        myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
-        cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', '{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year), '\n'])
-        f.write(cmd)
-        cmd = ' '.join(['ncks -A', flux_file, '{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year), '\n'])
-        f.write(cmd)
+        if not calibrate:
+            cmd = ' '.join(['ncks -A', flux_file, '{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year), '\n'])
+            f.write(cmd)
         state_file = os.path.join(odir, state_dir, outfile)
         cmd = ' '.join(['ncks -O -4 -L 3', state_file, state_file, '\n'])
         f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
-        cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,sub_shelf_ice_flux_cumulative@units=Gt,surface_mass_flux_cumulative@units=Gt -divc,1e12 -chname,mass_rate_of_change_glacierized,ice_mass,discharge_flux,discharge_cumulative,grounded_basal_ice_flux,grounded_basal_ice_flux_cumulative,sub_shelf_ice_flux,sub_shelf_ice_flux_cumulative,surface_ice_flux,surface_mass_flux_cumulative -timcumsum', myoutfile, cumsum_outfile, '\n'])
+        cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,sub_shelf_ice_flux_cumulative@units=Gt,surface_mass_flux_cumulative@units=Gt -divc,1e12 -chname,mass_rate_of_change_glacierized,ice_mass,discharge_flux,discharge_cumulative,grounded_basal_ice_flux,grounded_basal_ice_flux_cumulative,sub_shelf_ice_flux,sub_shelf_ice_flux_cumulative,surface_ice_flux,surface_mass_flux_cumulative -timcumsum', ts_file, cumsum_outfile, '\n'])
         f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'rel_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         rel_outfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
-        cmd = ' '.join(['cdo setattribute,rel_area_cold@units=1,rel_volume_cold@units=1 -expr,"rel_area_cold=area_glacierized_cold_base/area_glacierized;rel_volume_cold=volume_glacierized_cold/volume_glacierized;"', myoutfile, rel_outfile, '\n'])
+        cmd = ' '.join(['cdo setattribute,rel_area_cold@units=1,rel_volume_cold@units=1 -expr,"rel_area_cold=area_glacierized_cold_base/area_glacierized;rel_volume_cold=volume_glacierized_cold/volume_glacierized;"', ts_file, rel_outfile, '\n'])
         f.write(cmd)
 
 
