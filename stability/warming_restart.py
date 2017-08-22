@@ -115,14 +115,14 @@ version = options.version
 # Check which parameters are used for sensitivity study
 params_list = options.params_list
 do_pdd = False
-do_refreeze = False
+do_rfr = False
 do_firn = False
-do_lapse = False
+do_tlr = False
 do_sia_e = False
-do_sigma_max = False
+do_vcm = False
 do_ocs = False
 do_ocm = False
-do_precip_scaling = False
+do_prs = False
 do_tct = False
 do_bed_def = False
 do_q = False
@@ -134,24 +134,24 @@ if params_list is not None:
         do_pdd = True
     if 'firn' in params:
         do_firn = True    
-    if 'lapse' in params:
-        do_lapse = True    
+    if 'tlr' in params:
+        do_tlr = True    
     if 'ocm' in params:
         do_ocm = True
     if 'ocs' in params:
         do_ocs = True
-    if 'precip_scaling' in params:
-        do_precip_scaling = True
-    if 'sigma_max' in params:
-        do_sigma_max = True
+    if 'prs' in params:
+        do_prs = True
+    if 'vcm' in params:
+        do_vcm = True
     if 'tct' in params:
         do_tct = True
     if 'bed_def' in params:
         do_bed_def = True
     if 'q' in params:
         do_q = True
-    if 'refreeze' in params:
-        do_refreeze = True
+    if 'rfr' in params:
+        do_rfr = True
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -212,14 +212,14 @@ if do_q:
     ppq_values = [0.3, 0.6, 0.9]
 else:
     ppq_values = [0.6]
-if do_refreeze:
-    refreeze_values = [0.30, 0.47, 0.60, 0.75]
+if do_rfr:
+    rfr_values = [0.30, 0.60, 0.75]
 else:
-    refreeze_values = [0.60]
-if do_lapse:
-    lapse_rate_values = [0, 6]
+    rfr_values = [0.60]
+if do_tlr:
+    tlr_rate_values = [0, 6]
 else:
-    lapse_rate_values = [6]
+    tlr_rate_values = [6]
 if do_pdd:    
     pdd_values = ['low', 'mid', 'high']
 else:
@@ -228,10 +228,10 @@ if do_firn:
     firn_values = ['off', 'ctrl']
 else:
     firn_values = ['ctrl']
-if do_sigma_max:
-    sigma_max_values = [0.7e6, 1.0e6, 1.4e6]
+if do_vcm:
+    vcm_values = [0.7e6, 1.0e6, 1.4e6]
 else:
-    sigma_max_values = [1e6]
+    vcm_values = [1e6]
 if do_ocs:
     ocs_values = ['off', 'low', 'mid', 'high']
 else:
@@ -240,10 +240,10 @@ if do_ocm:
     ocm_values = ['low', 'mid', 'high']
 else:
     ocm_values = ['mid']
-if do_precip_scaling:
-    precip_scaling_values = [0, 0.05, 0.07]
+if do_prs:
+    prs_values = [0, 0.05, 0.07]
 else:
-    precip_scaling_values = [0.05]
+    prs_values = [0.05]
 if do_tct:
     thickness_calving_threshold_values = ['low', 'mid', 'high']
 else:
@@ -257,14 +257,14 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(refreeze_values,
+combinations = list(itertools.product(rfr_values,
                                       bed_deformation_values,
                                       ocs_values,
                                       ocm_values,
                                       sia_e_values,
-                                      sigma_max_values,
-                                      lapse_rate_values,
-                                      precip_scaling_values,
+                                      vcm_values,
+                                      tlr_rate_values,
+                                      prs_values,
                                       rcp_values,
                                       pdd_values,
                                       firn_values,
@@ -297,27 +297,23 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    refreeze, bed_deformation, ocs, ocm, sia_e, sigma_max, lapse_rate, precip_scaling_factor, rcp, pdd, firn, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    rfr, bed_deformation, ocs, ocm, sia_e, vcm, lapse_rate, prs_factor, rcp, pdd, firn, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
     name_options['rcp'] = rcp
-    if do_sia_e:
-        name_options['sia_e'] = sia_e
-    if do_q:
-        name_options['q'] = ppq
-    if do_lapse:
-        name_options['lapse'] = lapse_rate
-    if do_precip_scaling:
-        name_options['ps'] = precip_scaling_factor
-    if do_pdd:
-        name_options['pdd'] = pdd
-    if do_refreeze:
-        name_options['rf'] = refreeze
+    if do_tlr:
+        name_options['tlr'] = lapse_rate
+    name_options['prs'] = prs_factor
+    name_options['pdd'] = pdd
+    name_options['rfr'] = rfr
     if do_firn:
         name_options['firn'] = firn
-    name_options['vcm'] = sigma_max / 1e6
+    if do_sia_e:
+        name_options['sia_e'] = sia_e
+    name_options['ppq'] = ppq
+    name_options['vcm'] = vcm / 1e6
     name_options['ocs'] = ocs
     name_options['ocm'] = ocm
     name_options['tct'] = thickness_calving_threshold
@@ -327,7 +323,7 @@ for n, combination in enumerate(combinations):
     
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
-    full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
+    full_outfile = 'g{grid}m_{experiment}.nc'.format(grid=grid, experiment=full_exp_name)
     if rcp == 'ctrl':
         climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0)
     elif rcp == '26':
@@ -340,7 +336,7 @@ for n, combination in enumerate(combinations):
         print("How did I get here")
         
     # All runs in one script file for coarse grids that fit into max walltime
-    script_combined = os.path.join(odir, script_dir, 'warm_{}_g{}m_{}_j.sh'.format(domain.lower(), grid, full_exp_name))
+    script_combined = os.path.join(odir, script_dir, 'warm_g{}m_{}_j.sh'.format(grid, full_exp_name))
     with open(script_combined, 'w') as f_combined:
 
         outfiles = []
@@ -352,7 +348,7 @@ for n, combination in enumerate(combinations):
 
             experiment =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
-            script = os.path.join(odir, script_dir, 'warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment))
+            script = os.path.join(odir, script_dir, 'warm_g{}m_{}.sh'.format(grid, experiment))
             scripts.append(script)
 
             for filename in (script):
@@ -451,14 +447,14 @@ for n, combination in enumerate(combinations):
                                                           'surface.pdd.aschwanden.beta_ice_w': fice_w / 1e3,
                                                           'surface.pdd.aschwanden.beta_snow_c': fsnow_c / 1e3,
                                                           'surface.pdd.aschwanden.beta_snow_w': fsnow_w / 1e3,
-                                                          'surface.pdd.refreeze': refreeze,
+                                                          'surface.pdd.refreeze': rfr,
                                                           'pdd_firn_depth_file': firn_file,
                                                           'surface.pdd.std_dev': 4.23,
                                                           'pdd_aschwanden': '',
                                                           'atmosphere_given_file': climate_file,
                                                           'atmosphere_given_period': 1,
                                                           'atmosphere_lapse_rate_file': climate_file,
-                                                          'atmosphere.precip_exponential_factor_for_temperature': precip_scaling_factor,
+                                                          'atmosphere.precip_exponential_factor_for_temperature': prs_factor,
                                                           'temp_lapse_rate': lapse_rate,                                                          
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
@@ -513,14 +509,14 @@ for n, combination in enumerate(combinations):
                                                               'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
                                                               'ocean_kill_file': input_file,
                                                               'frontal_melt': frontal_melt,
-                                                              'calving.vonmises.sigma_max': sigma_max})
+                                                              'calving.vonmises.sigma_max': vcm})
                 else:
                     calving_params_dict = generate_calving(calving,
                                                            **{'thickness_calving_threshold_file': tct_file,
                                                               'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
                                                               'ocean_kill_file': regridfile,
                                                               'frontal_melt': frontal_melt,
-                                                              'calving.vonmises.sigma_max': sigma_max})
+                                                              'calving.vonmises.sigma_max': vcm})
                     
 
                 scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
@@ -568,7 +564,7 @@ for n, combination in enumerate(combinations):
 
     scripts_combinded.append(script_combined)
 
-    script_post = os.path.join(odir, script_dir, 'post_warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name))
+    script_post = os.path.join(odir, script_dir, 'post_warm_g{}m_{}.sh'.format(grid, full_exp_name))
     scripts_post.append(script_post)
 
     post_header = make_batch_post_header(system)
