@@ -188,7 +188,8 @@ state_dir = 'state'
 scalar_dir = 'scalar'
 spatial_dir = 'spatial'
 snap_dir = 'snap'
-for tsdir in (perf_dir, scalar_dir, spatial_dir, snap_dir, state_dir):
+script_dir = 'run_scripts'
+for tsdir in (perf_dir, scalar_dir, spatial_dir, snap_dir, state_dir, script_dir):
     if not os.path.isdir(os.path.join(odir, tsdir)):
         os.mkdir(os.path.join(odir, tsdir))
 odir_tmp = '_'.join([odir, 'tmp'])
@@ -339,7 +340,7 @@ for n, combination in enumerate(combinations):
         print("How did I get here")
         
     # All runs in one script file for coarse grids that fit into max walltime
-    script_combined = 'warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
+    script_combined = os.path.join(odir, script_dir, 'warm_{}_g{}m_{}_j.sh'.format(domain.lower(), grid, full_exp_name))
     with open(script_combined, 'w') as f_combined:
 
         outfiles = []
@@ -351,7 +352,7 @@ for n, combination in enumerate(combinations):
 
             experiment =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
-            script = 'warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
+            script = os.path.join(odir, script_dir, 'warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment))
             scripts.append(script)
 
             for filename in (script):
@@ -567,7 +568,7 @@ for n, combination in enumerate(combinations):
 
     scripts_combinded.append(script_combined)
 
-    script_post = 'post_warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
+    script_post = os.path.join(odir, script_dir, 'post_warm_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name))
     scripts_post.append(script_post)
 
     post_header = make_batch_post_header(system)
