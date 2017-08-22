@@ -351,6 +351,8 @@ def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None,
     if split is True:
         outfile, ext = os.path.splitext(outfile)
         params_dict['extra_split'] = ''
+    else:
+        params_dict['extra_append'] = ''        
     if odir is None:
         params_dict['extra_file'] = 'ex_' + outfile
     else:
@@ -391,6 +393,7 @@ def generate_scalar_ts(outfile, step, start=None, end=None, odir=None):
     else:
         times = step
     params_dict['ts_times'] = times
+    params_dict['ts_append'] = ''
 
     return params_dict
 
