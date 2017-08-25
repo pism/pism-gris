@@ -605,17 +605,20 @@ for n, combination in enumerate(combinations):
         if not calibrate:
             cmd = ' '.join(['ncks -A', flux_file, '{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year), '\n'])
             f.write(cmd)
-        state_file = os.path.join(odir, state_dir, outfile)
-        cmd = ' '.join(['ncks -O -4 -L 3', state_file, state_file, '\n'])
-        f.write(cmd)
-        ts_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
-        cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
+        cumsum_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
+        cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(cumsum_file, simulation_start_year, simulation_end_year)])
         cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,sub_shelf_ice_flux_cumulative@units=Gt,surface_mass_flux_cumulative@units=Gt -divc,1e12 -chname,mass_rate_of_change_glacierized,ice_mass,discharge_flux,discharge_cumulative,grounded_basal_ice_flux,grounded_basal_ice_flux_cumulative,sub_shelf_ice_flux,sub_shelf_ice_flux_cumulative,surface_ice_flux,surface_mass_flux_cumulative -timcumsum', ts_file, cumsum_outfile, '\n'])
         f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'rel_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         rel_outfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
         cmd = ' '.join(['cdo setattribute,rel_area_cold@units=1,rel_volume_cold@units=1 -expr,"rel_area_cold=area_glacierized_cold_base/area_glacierized;rel_volume_cold=volume_glacierized_cold/volume_glacierized;"', ts_file, rel_outfile, '\n'])
         f.write(cmd)
+        for start in range(simulation_start_year, simulation_end_year, restart_step):
+            end = start + restart_step
+            outfile = '{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=start, end=end)
+            state_file = os.path.join(odir, state_dir, outfile)
+            cmd = ' '.join(['ncks -O -4 -L 3', state_file, state_file, '\n'])
+            f.write(cmd)
 
 
     
