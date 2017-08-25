@@ -125,7 +125,7 @@ do_ocm = False
 do_prs = False
 do_tct = False
 do_bed_def = False
-do_q = False
+do_ppq = False
 if params_list is not None:
     params = params_list.split(',')
     if 'sia_e' in params:
@@ -148,8 +148,8 @@ if params_list is not None:
         do_tct = True
     if 'bed_def' in params:
         do_bed_def = True
-    if 'q' in params:
-        do_q = True
+    if 'ppq' in params:
+        do_ppq = True
     if 'rfr' in params:
         do_rfr = True
 
@@ -208,7 +208,7 @@ if do_sia_e:
     sia_e_values = [1.25, 1.5, 2, 3]
 else:
     sia_e_values = [1.25]
-if do_q:
+if do_ppq:
     ppq_values = [0.3, 0.6, 0.9]
 else:
     ppq_values = [0.6]
