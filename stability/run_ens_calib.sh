@@ -40,14 +40,14 @@ done
 # Evaluate
 
 cd $odir
-mkdir plots
+mkdir -p plots
 cd plots
 # PDD
 python /Volumes/zachariae/gris-analysis/plotting/plotting.py -o ens_pdd --title PDD --plot rcp_ens_mass ../scalar/cumsum_ts_gris_g${grid}m_v3a_rcp_*_prs_0.05_pdd_*_rfr_0.6_ppq_0.6_vcm_1.0_ocs_mid_ocm_mid_tct_mid_bd_i0_0_1000.nc
 # RFR
 python /Volumes/zachariae/gris-analysis/plotting/plotting.py -o ens_rfr --title RFR --plot rcp_ens_mass ../scalar/cumsum_ts_gris_g${grid}m_v3a_rcp_*_prs_0.05_pdd_mid_rfr_0.*_ppq_0.6_vcm_1.0_ocs_mid_ocm_mid_tct_mid_bd_i0_0_1000.nc
 # PRS
-python /Volumes/zachariae/gris-analysis/plotting/plotting.py -o ens_prs --title PRS --plot rcp_ens_mass ../scalar/cumsum_ts_gris_g${grid}m_v3a_rcp_*_prs_*_pdd_mid_rfr_0.6_ppq_0.6_vcm_1.0_ocs_mid_ocm_mid_tct_mid_bd_i0_0_1000.nc
+python /Volumes/zachariae/gris-analysis/plotting/plotting.py -o ens_prs --title PRS --plot rcp_ens_mass ../scalar/cumsum_ts_gris_g${grid}m_v3a_rcp_*_prs_0.*_pdd_mid_rfr_0.6_ppq_0.6_vcm_1.0_ocs_mid_ocm_mid_tct_mid_bd_i0_0_1000.nc
 # TLR
 python /Volumes/zachariae/gris-analysis/plotting/plotting.py -o ens_tlr --title TLR --plot rcp_ens_mass ../scalar/ccumsum_ts_gris_g${grid}m_v3a_rcp_*_tlr_*_prs_0.05_pdd_mid_rfr_0.6_ppq_0.6_vcm_1.0_ocs_mid_ocm_mid_tct_mid_bd_i0_0_1000.nc
 # PPQ

@@ -524,9 +524,15 @@ for n, combination in enumerate(combinations):
                                                     end=simulation_end_year,
                                                     odir=os.path.join(odir, scalar_dir))
 
+                if start != simulation_start_year:
+                    scalar_ts_dict['ts_append'] = ''
+                    
                 exvars = stability_spatial_ts_vars()
                 if not calibrate:
                     spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=False)
+                    if start != simulation_start_year:
+                        spatial_ts_dict['extra_append'] = ''
+
 
                     all_params_dict = merge_dicts(general_params_dict,
                                                   grid_params_dict,
