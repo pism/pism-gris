@@ -237,7 +237,7 @@ if do_ocs:
 else:
     ocs_values = ['mid']
 if do_ocm:
-    ocm_values = ['low', 'mid', 'high']
+    ocm_values = ['low', 'mid', 'high', 'extr']
 else:
     ocm_values = ['mid']
 if do_prs:
@@ -465,6 +465,8 @@ for n, combination in enumerate(combinations):
                     ocean_file = '../data_sets/ocean_forcing/ocean_forcing_400myr_70n_20myr_80n.nc'
                 elif ocm == 'high':
                     ocean_file = '../data_sets/ocean_forcing/ocean_forcing_500myr_70n_30myr_80n.nc'
+                elif ocm == 'extr':
+                    ocean_file = '../data_sets/ocean_forcing/ocean_forcing_10000myr_70n_500myr_80n.nc'
                 else:
                     pass
                 
