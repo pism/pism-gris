@@ -17,6 +17,11 @@ ncks -6 -C -O -v x,y,mask,polar_stereographic,surface $infile $outfile
 python firn_forcing.py $outfile
 ncatted -a grid_mapping,firn_depth,o,c,"polar_stereographic" $outfile
 
+outfile=firn_forcing_lat.nc
+ncks -6 -C -O -v x,y,mask,polar_stereographic,surface $infile $outfile
+python firn_forcing.py $outfile
+ncatted -a grid_mapping,firn_depth,o,c,"polar_stereographic" $outfile
+
 
 outfile=firn_forcing_off.nc
 ncks -6 -C -O -v x,y,mask,polar_stereographic,surface $infile $outfile

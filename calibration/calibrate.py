@@ -276,6 +276,75 @@ for n, combination in enumerate(combinations):
 
         f.write(cmd)
         f.write('\n\n')
+
+        infile = os.path.join(odir, state_dir, outfile)
+
+        relax_start = 0
+        relax_end = 25
+        experiment =  '_'.join([climate_relax, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(relax_start), '{}'.format(relax_end)])
+
+        outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+        general_params_dict = OrderedDict()
+        general_params_dict['i'] = infile
+        general_params_dict['ys'] = relax_start
+        general_params_dict['ye'] = relax_end
+        general_params_dict['o'] = os.path.join(odir, state_dir, outfile)
+        general_params_dict['o_format'] = oformat
+        general_params_dict['o_size'] = osize
+        general_params_dict['config_override'] = pism_config_nc
+        general_params_dict['backup_interval'] = 100
+            
+        grid_params_dict = generate_grid_description(grid, domain)
+        
+        sb_params_dict = OrderedDict()
+        sb_params_dict['sia_e'] = sia_e
+        sb_params_dict['sia_n'] = sia_n
+        sb_params_dict['ssa_e'] = ssa_e
+        sb_params_dict['ssa_n'] = ssa_n
+        sb_params_dict['pseudo_plastic_q'] = ppq
+        sb_params_dict['till_effective_fraction_overburden'] = tefo
+        sb_params_dict['topg_to_phi'] = ttphi
+        sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
+
+        stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
+        ice_density = 910.
+        climate_params_dict = generate_climate(climate_relax,
+                                               **{'surface.pdd.factor_ice': (fice / ice_density),
+                                                  'surface.pdd.factor_snow': (fsnow / ice_density),
+                                                  'atmosphere_given_file': climate_file,
+                                                  'atmosphere_given_period': 1})
+        ocean_params_dict = generate_ocean(ocean,
+                                           ocean_given_file=ocean_file)
+        hydro_params_dict = generate_hydrology(hydrology)
+        calving_params_dict = generate_calving(calving + ',ocean_kill',
+                                               ocean_kill_file=pism_dataname)
+
+
+        exvars = default_spatial_ts_vars()
+        spatial_ts_dict = generate_spatial_ts(full_outfile_relax, exvars, 1, odir=odir_tmp, split=True)
+
+        all_params_dict = merge_dicts(general_params_dict,
+                                      grid_params_dict,
+                                      stress_balance_params_dict,
+                                      climate_params_dict,
+                                      ocean_params_dict,
+                                      hydro_params_dict,
+                                      calving_params_dict,
+                                      spatial_ts_dict)
+        if 'sia_flow_law' in all_params_dict:
+            del all_params_dict['sia_flow_law']
+        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+
+        if system in ('debug'):
+            cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job_2.${batch}'.format(outdir=odir, batch=batch_system['job_id'])])
+        else:
+            cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job_2.${batch}  2>&1'.format(outdir=odir, batch=batch_system['job_id'])])
+
+
+        f.write(cmd)
+
+        f.write('\n\n')
+
         scripts.append(script)
 
 scripts = uniquify_list(scripts)

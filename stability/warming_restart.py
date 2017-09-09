@@ -428,17 +428,17 @@ for n, combination in enumerate(combinations):
                     fice_w = 8
                     fice_c = 6
                     fsnow_w = 3
-                    fsnow_c = 1.5
+                    fsnow_c = 2.5
                 elif pdd == 'low':
                     fice_w = 6
                     fice_c = 4
-                    fsnow_w = 2
-                    fsnow_c = 1
+                    fsnow_w = 2.5
+                    fsnow_c = 2
                 elif pdd == 'high':
                     fice_w = 10
                     fice_c = 8
                     fsnow_w = 4
-                    fsnow_c = 2
+                    fsnow_c = 3
                 else:
                     pass
                     
@@ -595,12 +595,12 @@ for n, combination in enumerate(combinations):
             extra_file = os.path.join(odir, spatial_dir, extra_file)
             cmd = ' '.join(['ncks -O -4 -L 3 ', extra_file_tmp, extra_file, '\n'])
             f.write(cmd)
-            cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', extra_file, '\n'])
+            cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', extra_file, '\n'])
             f.write(cmd)
-            cmd = ' '.join(['~/gris-analysis/scripts/nc_add_hillshade.py', extra_file, '\n'])
+            cmd = ' '.join(['~/gris-analysis/scripts/nc_add_hillshade.py -z 2 ', extra_file, '\n'])
             f.write(cmd)
         ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=simulation_start_year, end=simulation_end_year))
-        cmd = ' '.join(['adjust_timeline.py -p yearly -a 2009-1-1 -u seconds -d 2008-1-1', '{}'.format(ts_file), '\n'])
+        cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', '{}'.format(ts_file), '\n'])
         f.write(cmd)
         cumsum_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(cumsum_file, simulation_start_year, simulation_end_year)])

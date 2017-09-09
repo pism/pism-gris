@@ -37,7 +37,7 @@ ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1. $climate_ext $climate_sm
 
 ncatted -a _FillValue,climatic_mass_balance,o,d,-2e9 $climate_melt
 ncks -A -v mask ../data_sets/bed_dem/pism_Greenland_4500m_mcb_jpl_v3a_ctrl.nc $climate_melt
-ncap2 -6 -O -s "where(mask!=2) climatic_mass_balance=-2e9;" $climate_melt $climate_melt
+ncap2 -6 -O -s "where(climatic_mass_balance<0) climatic_mass_balance=-2e9 ;where(mask!=2) climatic_mass_balance=-2e9;" $climate_melt $climate_melt
 cdo setattribute,climatic_mass_balance@units="Gt year-1"  -divc,1e12 -mulc,4500 -mulc,4500 -fldsum $climate_melt $climate_melt_sum
 
 rmsd_dir=cmb_rmsd
