@@ -1,9 +1,9 @@
 #!/bin/bash
 
-odir=2017_08_pdd_calib
+odir=2017_09_pdd_calib
 grid=4500
 
-./warming_restart.py --o_size big --o_dir $odir --test_climate_models --exstep 1 --params refreeze,pdd -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+./warming_restart.py --o_size big --o_dir $odir --test_climate_models --exstep 1 --params rfr,pdd -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 sh warm_gris_g4500m_v3a_fice_8_bd_off_test_climate_on.sh
 
@@ -37,7 +37,7 @@ ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1. $climate_ext $climate_sm
 
 ncatted -a _FillValue,climatic_mass_balance,o,d,-2e9 $climate_melt
 ncks -A -v mask ../data_sets/bed_dem/pism_Greenland_4500m_mcb_jpl_v3a_ctrl.nc $climate_melt
-ncap2 -6 -O -s "where(climatic_mass_balance<0) climatic_mass_balance=-2e9 ;where(mask!=2) climatic_mass_balance=-2e9;" $climate_melt $climate_melt
+ncap2 -6 -O -s "where(climatic_mass_balance>0) climatic_mass_balance=-2e9; where(mask!=2) climatic_mass_balance=-2e9;" $climate_melt $climate_melt
 cdo setattribute,climatic_mass_balance@units="Gt year-1"  -divc,1e12 -mulc,4500 -mulc,4500 -fldsum $climate_melt $climate_melt_sum
 
 rmsd_dir=cmb_rmsd

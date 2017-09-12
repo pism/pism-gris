@@ -205,7 +205,7 @@ ssa_e = (1.0)
 rcp_values = ['26', '45', '85']
 
 if do_sia_e:
-    sia_e_values = [1.25, 1.5, 2, 3]
+    sia_e_values = [1, 1.25, 3]
 else:
     sia_e_values = [1.25]
 if do_ppq:
@@ -237,7 +237,7 @@ if do_ocs:
 else:
     ocs_values = ['mid']
 if do_ocm:
-    ocm_values = ['low', 'mid', 'high', 'extr']
+    ocm_values = ['low', 'mid', 'high']
 else:
     ocm_values = ['mid']
 if do_prs:
