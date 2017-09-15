@@ -604,7 +604,7 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         cumsum_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(cumsum_file, simulation_start_year, simulation_end_year)])
-        cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,sub_shelf_ice_flux_cumulative@units=Gt,surface_mass_flux_cumulative@units=Gt -divc,1e12 -chname,mass_rate_of_change_glacierized,ice_mass,discharge_flux,discharge_cumulative,grounded_basal_ice_flux,grounded_basal_ice_flux_cumulative,sub_shelf_ice_flux,sub_shelf_ice_flux_cumulative,surface_ice_flux,surface_mass_flux_cumulative -timcumsum', ts_file, cumsum_outfile, '\n'])
+        cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,sub_shelf_ice_flux_cumulative@units=Gt,surface_mass_flux_cumulative@units=Gt -divc,1e12 -chname tendency_of_ice_mass,ice_mass,tendency_of_ice_mass_due_to_flow,flow_cumulative,tendency_of_ice_mass_due_to_conservation_error,conservation_error_cumulative,tendency_of_ice_mass_due_to_basal_mass_flux,basal_mass_flux_cumulative,tendency_of_ice_mass_due_to_surface_mass_flux,surface_mass_flux_cumulative,tendency_of_ice_mass_due_to_discharge,discharge_cumulative -timcumsum', ts_file, cumsum_outfile, '\n'])
         f.write(cmd)
         rel_file = os.path.join(odir, scalar_dir, 'rel_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         rel_outfile = '_'.join(['{}_{}_{}.nc'.format(rel_file, simulation_start_year, simulation_end_year)])
