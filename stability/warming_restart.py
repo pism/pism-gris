@@ -249,9 +249,9 @@ if do_tct:
 else:
     thickness_calving_threshold_values = ['mid']
 if do_bed_def:
-    bed_deformation_values = ['off', 'i0']
+    bed_deformation_values = ['off', 'i0', 'ip']
 else:
-    bed_deformation_values = ['i0']
+    bed_deformation_values = ['ip']
 tefo_values = [0.020]
 phi_min_values = [5.0]
 phi_max_values = [40.]
@@ -396,6 +396,8 @@ for n, combination in enumerate(combinations):
                     
                 if bed_deformation != 'off':
                     general_params_dict['bed_def'] = 'lc'
+                if bed_deformation == 'ip':
+                    general_params_dict['bed_deformation.bed_uplift_file'] = 'uplift_g{}m.nc'.format(grid)
                 if forcing_type in ('e_age'):
                     general_params_dict['e_age_coupling'] = ''
 
