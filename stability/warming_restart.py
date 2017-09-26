@@ -397,7 +397,7 @@ for n, combination in enumerate(combinations):
                 if bed_deformation != 'off':
                     general_params_dict['bed_def'] = 'lc'
                 if bed_deformation == 'ip':
-                    general_params_dict['bed_deformation.bed_uplift_file'] = 'uplift_g{}m.nc'.format(grid)
+                    general_params_dict['bed_deformation.bed_uplift_file'] = '../data_sets/uplift/uplift_g{}m.nc'.format(grid)
                 if forcing_type in ('e_age'):
                     general_params_dict['e_age_coupling'] = ''
 
@@ -606,7 +606,7 @@ for n, combination in enumerate(combinations):
         f.write(cmd)
         cumsum_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(cumsum_file, simulation_start_year, simulation_end_year)])
-        cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,sub_shelf_ice_flux_cumulative@units=Gt,surface_mass_flux_cumulative@units=Gt -divc,1e12 -chname tendency_of_ice_mass,ice_mass,tendency_of_ice_mass_due_to_flow,flow_cumulative,tendency_of_ice_mass_due_to_conservation_error,conservation_error_cumulative,tendency_of_ice_mass_due_to_basal_mass_flux,basal_mass_flux_cumulative,tendency_of_ice_mass_due_to_surface_mass_flux,surface_mass_flux_cumulative,tendency_of_ice_mass_due_to_discharge,discharge_cumulative -timcumsum', ts_file, cumsum_outfile, '\n'])
+        cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,basal_mass_flux_grounded_cumulative@units=Gt,basal_mass_flux_floating_cumulative@units=Gt,,surface_mass_flux_cumulative@units=Gt -divc,1e12 -chname,mass_rate_of_change_glacierized,ice_mass,tendency_of_ice_mass_due_to_flow,flow_cumulative,tendency_of_ice_mass_due_to_conservation_error,conservation_error_cumulative,basal_mass_flux_floating,basal_mass_flux_floating_cumulative,basal_mass_flux_grounded,basal_mass_flux_grounded_cumulative,tendency_of_ice_mass_due_to_surface_mass_balance,surface_mass_flux_cumulative,tendency_of_ice_mass_due_to_discharge,discharge_cumulative -timcumsum', ts_file, cumsum_outfile, '\n'])
         f.write(cmd)
         rel_file = os.path.join(odir, scalar_dir, 'rel_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
         rel_outfile = '_'.join(['{}_{}_{}.nc'.format(rel_file, simulation_start_year, simulation_end_year)])
