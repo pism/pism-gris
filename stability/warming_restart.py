@@ -15,6 +15,12 @@ import sys
 sys.path.append('../resources/')
 from resources import *
 
+def map_dict(val, mdict):
+    try:
+        return mdict[val]
+    except:
+        return val
+
 grid_choices = [18000, 9000, 6000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900, 600, 450, 300, 150]
 
 # set up the option parser
@@ -84,6 +90,8 @@ parser.add_argument("--test_climate_models", dest="test_climate_models", action=
                     help="Turn off ice dynamics and mass transport to test climate models", default=False)
 parser.add_argument("--calibrate", dest="calibrate", action="store_true",
                     help="Run calibration mode (no spatial time series written)", default=False)
+parser.add_argument("-e", "--ensemble_file", dest="ensemble_file",
+                    help="File that has all combinations for ensemble study", default=None)
 
 options = parser.parse_args()
 
@@ -112,9 +120,12 @@ test_climate_models = options.test_climate_models
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 
+ensemble_file = options.ensemble_file
+
 # Check which parameters are used for sensitivity study
 params_list = options.params_list
-do_pdd = False
+do_pdd_ice = False
+do_pdd_snow = False
 do_rfr = False
 do_firn = False
 do_tlr = False
@@ -130,8 +141,10 @@ if params_list is not None:
     params = params_list.split(',')
     if 'sia_e' in params:
         do_sia_e = True
-    if 'pdd' in params:
-        do_pdd = True
+    if 'fice' in params:
+        do_pdd_ice = True
+    if 'fsnow' in params:
+        do_pdd_snow = True
     if 'firn' in params:
         do_firn = True    
     if 'tlr' in params:
@@ -200,8 +213,14 @@ if not os.path.isdir(odir_tmp):
 # set up model initialization
 # ########################################################
 
-ssa_n = (3.25)
-ssa_e = (1.0)
+ssa_n = 3.25
+ssa_e = 1.0
+tefo = 0.020
+phi_min  = 5.0
+phi_max = 40.
+topg_min = -700
+topg_max = 700
+
 rcp_values = ['26', '45', '85']
 
 if do_sia_e:
@@ -220,10 +239,14 @@ if do_tlr:
     tlr_rate_values = [0, 6]
 else:
     tlr_rate_values = [6]
-if do_pdd:    
-    pdd_values = ['low', 'mid', 'high']
+if do_pdd_ice:    
+    pdd_ice_values = [4, 8, 12]
 else:
-    pdd_values = ['mid']
+    pdd_ice_values = [8]
+if do_pdd_snow:    
+    pdd_snow_values = [2, 3, 4]
+else:
+    pdd_snow_values = [3]
 if do_firn:
     firn_values = ['off', 'ctrl']
 else:
@@ -252,30 +275,32 @@ if do_bed_def:
     bed_deformation_values = ['off', 'i0', 'ip']
 else:
     bed_deformation_values = ['ip']
-tefo_values = [0.020]
-phi_min_values = [5.0]
-phi_max_values = [40.]
-topg_min_values = [-700]
-topg_max_values = [700]
-combinations = list(itertools.product(rfr_values,
-                                      bed_deformation_values,
-                                      ocs_values,
-                                      ocm_values,
-                                      sia_e_values,
-                                      vcm_values,
-                                      tlr_rate_values,
-                                      prs_values,
-                                      rcp_values,
-                                      pdd_values,
-                                      firn_values,
-                                      thickness_calving_threshold_values,
-                                      ppq_values,
-                                      tefo_values,
-                                      phi_min_values,
-                                      phi_max_values,
-                                      topg_min_values,
-                                      topg_max_values))
 
+if ensemble_file is not None:
+    my_combinations = np.loadtxt(ensemble_file, delimiter=',')
+    print my_combinations
+else:
+    combinations = list(itertools.product(rcp_values,
+                                      pdd_ice_values,
+                                      pdd_snow_values,
+                                      prs_values,
+                                      rfr_values,
+                                      ocm_values,
+                                      ocs_values,
+                                      thickness_calving_threshold_values,
+                                      vcm_values,
+                                      ppq_values,
+                                      sia_e_values,
+                                      bed_deformation_values,
+                                      tlr_rate_values,
+                                      firn_values))
+print combinations
+
+firn_dict = {-1: 'low', 0: 'off', 1: 'ctrl'} 
+ocs_dict = {-1: 'low', 0: 'mid', 1: 'high'}
+ocm_dict = {-1: 'low', 0: 'mid', 1: 'high'}
+tct_dict = {-1: 'low', 0: 'mid', 1: 'high'}
+bd_dict = {-1: 'off', 0: 'i0', 1: 'ip'}
 
 tsstep = 'yearly'
 
@@ -297,7 +322,7 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    rfr, bed_deformation, ocs, ocm, sia_e, vcm, lapse_rate, prs_factor, rcp, pdd, firn, thickness_calving_threshold, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    rcp, fice, fsnow, prs, rfr, ocm, ocs, tct, vcm, ppq, sia_e, bed_deformation, lapse_rate, firn = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -305,8 +330,9 @@ for n, combination in enumerate(combinations):
     name_options['rcp'] = rcp
     if do_tlr:
         name_options['tlr'] = lapse_rate
-    name_options['prs'] = prs_factor
-    name_options['pdd'] = pdd
+    name_options['prs'] = prs
+    name_options['fice'] = fice
+    name_options['fsnow'] = fsnow
     name_options['rfr'] = rfr
     if do_firn:
         name_options['firn'] = firn
@@ -314,9 +340,9 @@ for n, combination in enumerate(combinations):
         name_options['sia_e'] = sia_e
     name_options['ppq'] = ppq
     name_options['vcm'] = vcm / 1e6
-    name_options['ocs'] = ocs
-    name_options['ocm'] = ocm
-    name_options['tct'] = thickness_calving_threshold
+    name_options['ocs'] = map_dict(ocs, ocs_dict)
+    name_options['ocm'] = map_dict(ocm, ocm_dict)
+    name_options['tct'] = map_dict(tct, tct_dict)
     name_options['bd'] = bed_deformation
     if test_climate_models == True:
         name_options['test_climate'] = 'on'
@@ -426,38 +452,18 @@ for n, combination in enumerate(combinations):
                 else:
                     print("How did I get here?")
 
-                if pdd == 'mid':
-                    fice_w = 8
-                    fice_c = 6
-                    fsnow_w = 3
-                    fsnow_c = 2.5
-                elif pdd == 'low':
-                    fice_w = 6
-                    fice_c = 4
-                    fsnow_w = 2.5
-                    fsnow_c = 2
-                elif pdd == 'high':
-                    fice_w = 10
-                    fice_c = 8
-                    fsnow_w = 4
-                    fsnow_c = 3
-                else:
-                    pass
                     
                 climate_params_dict = generate_climate(climate,
-                                                       **{'surface.pdd.aschwanden.beta_ice_c': fice_c / 1e3,
-                                                          'surface.pdd.aschwanden.beta_ice_w': fice_w / 1e3,
-                                                          'surface.pdd.aschwanden.beta_snow_c': fsnow_c / 1e3,
-                                                          'surface.pdd.aschwanden.beta_snow_w': fsnow_w / 1e3,
+                                                       **{'surface.pdd.factor_ice': fice / ice_density,
+                                                          'surface.pdd.factor_snow': fsnow / ice_density,
                                                           'surface.pdd.refreeze': rfr,
                                                           'pdd_firn_depth_file': firn_file,
                                                           'surface.pdd.std_dev': 4.23,
-                                                          'pdd_aschwanden': '',
                                                           'atmosphere_given_file': climate_file,
                                                           'atmosphere_given_period': 1,
                                                           'atmosphere_lapse_rate_file': climate_file,
-                                                          'atmosphere.precip_exponential_factor_for_temperature': prs_factor,
-                                                          'temp_lapse_rate': lapse_rate,                                                          
+                                                          'atmosphere.precip_exponential_factor_for_temperature': prs,
+                                                          'temp_lapse_rate': lapse_rate,
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
                     
@@ -472,11 +478,11 @@ for n, combination in enumerate(combinations):
                 else:
                     pass
                 
-                if thickness_calving_threshold == 'low':
+                if tct == 'low':
                     tct_file = '../data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
-                elif  thickness_calving_threshold == 'mid':
+                elif  tct == 'mid':
                     tct_file = '../data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc'
-                elif  thickness_calving_threshold == 'high':
+                elif tct == 'high':
                     tct_file = '../data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'
                 else:
                     print('not implemented')

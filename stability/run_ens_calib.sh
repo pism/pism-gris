@@ -53,10 +53,12 @@ for file in ${odir}_*/run_scripts/warm_*j.sh; do
 done
 
 # Evaluate
+mkdir -p $odir/plots
+cd $odir/plots
+for var in pdd rfr prs tlr ppq vcm ocm ocs tct sia reb; do
+    python ${gap}/gris-analysis/plotting/plotting.py -o ens_${var} --time_bounds 2008 2508 --title ${var} --no_legend --plot rcp_ens_mass ../../${odir}_${var}/scalar/cumsum_ts_gris_g${grid}m_v3a_rcp_*.nc
+done
 
-cd $odir
-mkdir -p plots
-cd plots
 # PDD
 python ${gap}/gris-analysis/plotting/plotting.py -o ens_pdd --title PDD --no_legend --plot rcp_ens_mass ../scalar/cumsum_ts_gris_g${grid}m_v3a_rcp_*_prs_0.05_pdd_*_rfr_0.6_ppq_0.6_vcm_1.0_ocs_mid_ocm_mid_tct_mid_bd_i0_0_1000.nc
 # RFR
