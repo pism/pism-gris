@@ -137,6 +137,7 @@ do_prs = False
 do_tct = False
 do_bed_def = False
 do_ppq = False
+do_std_dev = False
 if params_list is not None:
     params = params_list.split(',')
     if 'sia_e' in params:
@@ -165,6 +166,8 @@ if params_list is not None:
         do_ppq = True
     if 'rfr' in params:
         do_rfr = True
+    if 'std_dev' in params:
+        do_std_dev = True
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -221,8 +224,12 @@ phi_max = 40.
 topg_min = -700
 topg_max = 700
 
-rcp_values = ['26', '45', '85']
+rcp_values = ['26', '45', '85', 'ctrl']
 
+if do_std_dev:
+    std_dev_values = [2.5, 4.23, 5.5]
+else:
+    std_dev_values = [4.23]
 if do_sia_e:
     sia_e_values = [1, 1.25, 3]
 else:
@@ -281,20 +288,20 @@ if ensemble_file is not None:
     print my_combinations
 else:
     combinations = list(itertools.product(rcp_values,
-                                      pdd_ice_values,
-                                      pdd_snow_values,
-                                      prs_values,
-                                      rfr_values,
-                                      ocm_values,
-                                      ocs_values,
-                                      thickness_calving_threshold_values,
-                                      vcm_values,
-                                      ppq_values,
-                                      sia_e_values,
-                                      bed_deformation_values,
-                                      tlr_rate_values,
-                                      firn_values))
-print combinations
+                                          pdd_ice_values,
+                                          pdd_snow_values,
+                                          std_dev_values,
+                                          prs_values,
+                                          rfr_values,
+                                          ocm_values,
+                                          ocs_values,
+                                          thickness_calving_threshold_values,
+                                          vcm_values,
+                                          ppq_values,
+                                          sia_e_values,
+                                          bed_deformation_values,
+                                          tlr_rate_values,
+                                          firn_values))
 
 firn_dict = {-1: 'low', 0: 'off', 1: 'ctrl'} 
 ocs_dict = {-1: 'low', 0: 'mid', 1: 'high'}
@@ -322,28 +329,27 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    rcp, fice, fsnow, prs, rfr, ocm, ocs, tct, vcm, ppq, sia_e, bed_deformation, lapse_rate, firn = combination
+    rcp, fice, fsnow, std_dev, prs, rfr, ocm, ocs, tct, vcm, ppq, sia_e, bed_deformation, lapse_rate, firn = combination
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
     name_options['rcp'] = rcp
-    if do_tlr:
-        name_options['tlr'] = lapse_rate
     name_options['prs'] = prs
     name_options['fice'] = fice
     name_options['fsnow'] = fsnow
+    name_options['stddev'] = std_dev
     name_options['rfr'] = rfr
-    if do_firn:
-        name_options['firn'] = firn
-    if do_sia_e:
-        name_options['sia_e'] = sia_e
+    name_options['firn'] = firn
+    name_options['sia_e'] = sia_e
     name_options['ppq'] = ppq
     name_options['vcm'] = vcm / 1e6
     name_options['ocs'] = map_dict(ocs, ocs_dict)
     name_options['ocm'] = map_dict(ocm, ocm_dict)
     name_options['tct'] = map_dict(tct, tct_dict)
     name_options['bd'] = bed_deformation
+    if do_tlr:
+        name_options['tlr'] = lapse_rate
     if test_climate_models == True:
         name_options['test_climate'] = 'on'
     
@@ -458,7 +464,7 @@ for n, combination in enumerate(combinations):
                                                           'surface.pdd.factor_snow': fsnow / ice_density,
                                                           'surface.pdd.refreeze': rfr,
                                                           'pdd_firn_depth_file': firn_file,
-                                                          'surface.pdd.std_dev': 4.23,
+                                                          'surface.pdd.std_dev': std_dev,
                                                           'atmosphere_given_file': climate_file,
                                                           'atmosphere_given_period': 1,
                                                           'atmosphere_lapse_rate_file': climate_file,
