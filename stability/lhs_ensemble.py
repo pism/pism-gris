@@ -212,6 +212,8 @@ if restart_step > (simulation_end_year - simulation_start_year):
 for n, combination in enumerate(combinations):
 
     run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e = combination
+    keys = ['FICE','FSNOW','PRS','RFR','OCM','OCS','TCT','VCM','PPQ','SIA']
+
     ocm = ocs_dict[ocm_v]
     ocs = ocs_dict[ocs_v]
     tct = ocs_dict[tct_v]
@@ -394,14 +396,14 @@ for n, combination in enumerate(combinations):
                                                               'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
                                                               'ocean_kill_file': input_file,
                                                               'frontal_melt': frontal_melt,
-                                                              'calving.vonmises.sigma_max': vcm})
+                                                              'calving.vonmises.sigma_max': vcm * 1e6})
                 else:
                     calving_params_dict = generate_calving(calving,
                                                            **{'thickness_calving_threshold_file': tct_file,
                                                               'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
                                                               'ocean_kill_file': regridfile,
                                                               'frontal_melt': frontal_melt,
-                                                              'calving.vonmises.sigma_max': vcm})
+                                                              'calving.vonmises.sigma_max': vcm * 1e6})
                     
 
                 scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
