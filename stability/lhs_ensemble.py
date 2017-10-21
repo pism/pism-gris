@@ -222,7 +222,7 @@ for n, combination in enumerate(combinations):
 
     name_options = OrderedDict()
     name_options['rcp'] = rcp
-    name_options['id'] = int(run_id)
+    name_options['id'] = '{:03d}'.format(int(run_id))
     
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
