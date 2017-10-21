@@ -122,53 +122,6 @@ version = options.version
 
 ensemble_file = options.ensemble_file
 
-# Check which parameters are used for sensitivity study
-params_list = options.params_list
-do_pdd_ice = False
-do_pdd_snow = False
-do_rfr = False
-do_firn = False
-do_tlr = False
-do_sia_e = False
-do_vcm = False
-do_ocs = False
-do_ocm = False
-do_prs = False
-do_tct = False
-do_bed_def = False
-do_ppq = False
-do_std_dev = False
-if params_list is not None:
-    params = params_list.split(',')
-    if 'sia_e' in params:
-        do_sia_e = True
-    if 'fice' in params:
-        do_pdd_ice = True
-    if 'fsnow' in params:
-        do_pdd_snow = True
-    if 'firn' in params:
-        do_firn = True    
-    if 'tlr' in params:
-        do_tlr = True    
-    if 'ocm' in params:
-        do_ocm = True
-    if 'ocs' in params:
-        do_ocs = True
-    if 'prs' in params:
-        do_prs = True
-    if 'vcm' in params:
-        do_vcm = True
-    if 'tct' in params:
-        do_tct = True
-    if 'bed_def' in params:
-        do_bed_def = True
-    if 'ppq' in params:
-        do_ppq = True
-    if 'rfr' in params:
-        do_rfr = True
-    if 'std_dev' in params:
-        do_std_dev = True
-
 domain = options.domain
 pism_exec = generate_domain(domain)
 
@@ -224,84 +177,13 @@ phi_max = 40.
 topg_min = -700
 topg_max = 700
 
-rcp_values = ['26', '45', '85', 'ctrl']
+rcp = '45'
+std_dev = 4.23
+firn = 'ctrl'
+lapse_rate = 6
+bed_deformation  = 'ip'
 
-if do_std_dev:
-    std_dev_values = [2.5, 4.23, 5.5]
-else:
-    std_dev_values = [4.23]
-if do_sia_e:
-    sia_e_values = [1, 1.25, 3]
-else:
-    sia_e_values = [1.25]
-if do_ppq:
-    ppq_values = [0.3, 0.6, 0.9]
-else:
-    ppq_values = [0.6]
-if do_rfr:
-    rfr_values = [0.30, 0.60, 0.75]
-else:
-    rfr_values = [0.60]
-if do_tlr:
-    tlr_rate_values = [0, 6]
-else:
-    tlr_rate_values = [6]
-if do_pdd_ice:    
-    pdd_ice_values = [4, 8, 12]
-else:
-    pdd_ice_values = [8]
-if do_pdd_snow:    
-    pdd_snow_values = [2, 3, 4]
-else:
-    pdd_snow_values = [3]
-if do_firn:
-    firn_values = ['off', 'ctrl']
-else:
-    firn_values = ['ctrl']
-if do_vcm:
-    vcm_values = [0.7e6, 1.0e6, 1.4e6]
-else:
-    vcm_values = [1e6]
-if do_ocs:
-    ocs_values = ['off', 'low', 'mid', 'high']
-else:
-    ocs_values = ['mid']
-if do_ocm:
-    ocm_values = ['low', 'mid', 'high']
-else:
-    ocm_values = ['mid']
-if do_prs:
-    prs_values = [0, 0.05, 0.07]
-else:
-    prs_values = [0.05]
-if do_tct:
-    thickness_calving_threshold_values = ['low', 'mid', 'high']
-else:
-    thickness_calving_threshold_values = ['mid']
-if do_bed_def:
-    bed_deformation_values = ['off', 'i0', 'ip']
-else:
-    bed_deformation_values = ['ip']
-
-if ensemble_file is not None:
-    my_combinations = np.loadtxt(ensemble_file, delimiter=',', skiprows=1)
-    print my_combinations
-else:
-    combinations = list(itertools.product(rcp_values,
-                                          pdd_ice_values,
-                                          pdd_snow_values,
-                                          std_dev_values,
-                                          prs_values,
-                                          rfr_values,
-                                          ocm_values,
-                                          ocs_values,
-                                          thickness_calving_threshold_values,
-                                          vcm_values,
-                                          ppq_values,
-                                          sia_e_values,
-                                          bed_deformation_values,
-                                          tlr_rate_values,
-                                          firn_values))
+combinations = np.loadtxt(ensemble_file, delimiter=',', skiprows=1)
 
 firn_dict = {-1.0: 'low', 0.0: 'off', 1.0: 'ctrl'} 
 ocs_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
@@ -329,29 +211,16 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 for n, combination in enumerate(combinations):
 
-    rcp, fice, fsnow, std_dev, prs, rfr, ocm, ocs, tct, vcm, ppq, sia_e, bed_deformation, lapse_rate, firn = combination
+    run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e = combination
+    ocm = ocs_dict[ocm_v]
+    ocs = ocs_dict[ocs_v]
+    tct = ocs_dict[tct_v]
 
     ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
     name_options = OrderedDict()
     name_options['rcp'] = rcp
-    name_options['prs'] = prs
-    name_options['fice'] = fice
-    name_options['fsnow'] = fsnow
-    name_options['stddev'] = std_dev
-    name_options['rfr'] = rfr
-    name_options['firn'] = firn
-    name_options['sia_e'] = sia_e
-    name_options['ppq'] = ppq
-    name_options['vcm'] = vcm / 1e6
-    name_options['ocs'] = map_dict(ocs, ocs_dict)
-    name_options['ocm'] = map_dict(ocm, ocm_dict)
-    name_options['tct'] = map_dict(tct, tct_dict)
-    name_options['bd'] = bed_deformation
-    if do_tlr:
-        name_options['tlr'] = lapse_rate
-    if test_climate_models == True:
-        name_options['test_climate'] = 'on'
+    name_options['id'] = int(run_id)
     
     vversion = 'v' + str(version)
     full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
@@ -368,7 +237,7 @@ for n, combination in enumerate(combinations):
         print("How did I get here")
         
     # All runs in one script file for coarse grids that fit into max walltime
-    script_combined = os.path.join(odir, script_dir, 'warm_g{}m_{}_j.sh'.format(grid, full_exp_name))
+    script_combined = os.path.join(odir, script_dir, 'lhs_g{}m_{}_j.sh'.format(grid, full_exp_name))
     with open(script_combined, 'w') as f_combined:
 
         outfiles = []
@@ -380,7 +249,7 @@ for n, combination in enumerate(combinations):
 
             experiment =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
-            script = os.path.join(odir, script_dir, 'warm_g{}m_{}.sh'.format(grid, experiment))
+            script = os.path.join(odir, script_dir, 'lhs_g{}m_{}.sh'.format(grid, experiment))
             scripts.append(script)
 
             for filename in (script):
@@ -586,7 +455,7 @@ for n, combination in enumerate(combinations):
 
     scripts_combinded.append(script_combined)
 
-    script_post = os.path.join(odir, script_dir, 'post_warm_g{}m_{}.sh'.format(grid, full_exp_name))
+    script_post = os.path.join(odir, script_dir, 'post_lhs_g{}m_{}.sh'.format(grid, full_exp_name))
     scripts_post.append(script_post)
 
     post_header = make_batch_post_header(system)
