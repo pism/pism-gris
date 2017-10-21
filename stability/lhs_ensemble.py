@@ -339,7 +339,7 @@ for n, combination in enumerate(combinations):
                                                           'atmosphere_given_file': climate_file,
                                                           'atmosphere_given_period': 1,
                                                           'atmosphere_lapse_rate_file': climate_file,
-                                                          'atmosphere.precip_exponential_factor_for_temperature': prs,
+                                                          'atmosphere.precip_exponential_factor_for_temperature': prs / 100,
                                                           'temp_lapse_rate': lapse_rate,
                                                           'atmosphere_paleo_precip_file': climate_modifier_file,
                                                           'atmosphere_delta_T_file': climate_modifier_file})
