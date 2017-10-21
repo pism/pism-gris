@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import numpy as np
 import pandas as pd
 from pyDOE import lhs
@@ -29,7 +31,11 @@ dist_sample = np.zeros_like(unif_sample)
 
 # For each variable, transform with the inverse of the CDF (inv(CDF)=ppf)
 for i,key in enumerate(keys):
-    dist_sample[:,i] = distributions[key].ppf(unif_sample[:,i])
+    if key == 'VCM':        
+        dist_sample[:,i] = distributions[key].ppf(unif_sample[:,i]) * 1e6  # Convert to MPa to Pa
+    else:
+        dist_sample[:,i] = distributions[key].ppf(unif_sample[:,i])
+
 
 # Convert to Pandas dataframe, append column headers, output as csv
 df = pd.DataFrame(dist_sample)

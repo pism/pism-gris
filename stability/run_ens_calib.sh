@@ -8,7 +8,7 @@ grid=3600
 gap=~/base/
 gap=/Volumes/zachariae
 
-./lhs_ensemble.py -e ../../latin_hypercube/lhs_samples_20171020.csv --calibrate --o_dir ${odir}_ctrl --exstep 1 -n ${n} -w 6:00:00 -g ${grid} -s ${s} -q ${q} --step 500 --duration 500 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+./lhs_ensemble.py -e ../../latin_hypercube/lhs_samples_20171021.csv --calibrate --o_dir ${odir}_ctrl --exstep 1 -n ${n} -w 6:00:00 -g ${grid} -s ${s} -q ${q} --step 500 --duration 500 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
 exit 
