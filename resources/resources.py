@@ -934,6 +934,7 @@ cd $PBS_O_WORKDIR
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
+#PBS -W group_list=s1878
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=ivy
 #PBS -j oe
@@ -949,6 +950,7 @@ cd $PBS_O_WORKDIR
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
+#PBS -W group_list=s1878
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=bro
 #PBS -j oe
@@ -964,6 +966,7 @@ cd $PBS_O_WORKDIR
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
+#PBS -W group_list=s1878
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=has
 #PBS -j oe
@@ -979,6 +982,7 @@ cd $PBS_O_WORKDIR
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
+#PBS -W group_list=s1878
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=ivy
 #PBS -j oe
