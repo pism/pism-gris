@@ -443,15 +443,15 @@ def generate_grid_description(grid_resolution, domain, restart=False):
 
         if grid_resolution < 1200:
             skip_max = 200
-            mz = 501
-            mzb = 41
+            mz = 201
+            mzb = 21
         elif (grid_resolution >= 1200) and (grid_resolution < 4500):
             skip_max = 100
-            mz = 251
+            mz = 201
             mzb = 21
         elif (grid_resolution >= 4500) and (grid_resolution < 18000):
             skip_max = 50
-            mz = 251
+            mz = 201
             mzb = 21
         else:
             skip_max = 20

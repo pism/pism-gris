@@ -51,8 +51,8 @@ parser.add_argument("-g", "--grid", dest="grid", type=int,
 parser.add_argument("--o_dir", dest="odir",
                     help="output directory. Default: current directory", default='foo')
 parser.add_argument("--o_size", dest="osize",
-                    choices=['small', 'medium', 'big', 'big_2d'],
-                    help="output size type", default='medium')
+                    choices=['small', 'medium', 'big', 'big_2d', 'custom'],
+                    help="output size type", default='custom')
 parser.add_argument("-s", "--system", dest="system",
                     choices=list_systems(),
                     help="computer system to use.", default='pleiades_broadwell')
@@ -155,15 +155,10 @@ if not os.path.isdir(odir):
 perf_dir = 'performance'
 state_dir = 'state'
 scalar_dir = 'scalar'
-spatial_dir = 'spatial'
-snap_dir = 'snap'
 script_dir = 'run_scripts'
-for tsdir in (perf_dir, scalar_dir, spatial_dir, snap_dir, state_dir, script_dir):
+for tsdir in (perf_dir, scalar_dir, state_dir, script_dir):
     if not os.path.isdir(os.path.join(odir, tsdir)):
         os.mkdir(os.path.join(odir, tsdir))
-odir_tmp = '_'.join([odir, 'tmp'])
-if not os.path.isdir(odir_tmp):
-    os.mkdir(odir_tmp)
 
 # ########################################################
 # set up model initialization
@@ -291,7 +286,11 @@ for n, combination in enumerate(combinations):
 
                     general_params_dict['o'] = os.path.join(odir, state_dir, outfile)
                     general_params_dict['o_format'] = oformat
-                    general_params_dict['o_size'] = osize
+                    if osize != 'custom':
+                        general_params_dict['o_size'] = osize
+                    else:
+                        general_params_dict['output.sizes.medium'] = 'sftgif,velsurf_mag'
+                        
                     general_params_dict['config_override'] = pism_config_nc
                     if test_climate_models == True:
                         general_params_dict['test_climate_models'] = ''
@@ -486,14 +485,6 @@ for n, combination in enumerate(combinations):
                 f.write(cmd)
             ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=simulation_start_year, end=simulation_end_year))
             cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', '{}'.format(ts_file), '\n'])
-            f.write(cmd)
-            cumsum_file = os.path.join(odir, scalar_dir, 'cumsum_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
-            cumsum_outfile = '_'.join(['{}_{}_{}.nc'.format(cumsum_file, simulation_start_year, simulation_end_year)])
-            cmd = ' '.join(['cdo setattribute,ice_mass@units=Gt,discharge_cumulative@units=Gt,basal_mass_flux_grounded_cumulative@units=Gt,basal_mass_flux_floating_cumulative@units=Gt,,surface_mass_flux_cumulative@units=Gt -divc,1e12 -chname,mass_rate_of_change_glacierized,ice_mass,tendency_of_ice_mass_due_to_flow,flow_cumulative,tendency_of_ice_mass_due_to_conservation_error,conservation_error_cumulative,basal_mass_flux_floating,basal_mass_flux_floating_cumulative,basal_mass_flux_grounded,basal_mass_flux_grounded_cumulative,tendency_of_ice_mass_due_to_surface_mass_balance,surface_mass_flux_cumulative,tendency_of_ice_mass_due_to_discharge,discharge_cumulative -timcumsum', ts_file, cumsum_outfile, '\n'])
-            f.write(cmd)
-            rel_file = os.path.join(odir, scalar_dir, 'rel_ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
-            rel_outfile = '_'.join(['{}_{}_{}.nc'.format(rel_file, simulation_start_year, simulation_end_year)])
-            cmd = ' '.join(['cdo setattribute,rel_area_cold@units=1,rel_volume_cold@units=1 -expr,"rel_area_cold=area_glacierized_cold_base/area_glacierized;rel_volume_cold=volume_glacierized_cold/volume_glacierized;"', ts_file, rel_outfile, '\n'])
             f.write(cmd)
             for start in range(simulation_start_year, simulation_end_year, restart_step):
                 end = start + restart_step
