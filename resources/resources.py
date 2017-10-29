@@ -564,7 +564,7 @@ def generate_stress_balance(stress_balance, additional_params_dict):
         params_dict['kill_icebergs'] = ''
         params_dict['part_grid'] = ''
         params_dict['part_redist'] = ''
-        params_dict['sia_flow_law'] = 'gpbld3'
+        params_dict['sia_flow_law'] = 'gpbld'
         params_dict['pseudo_plastic'] = ''
         params_dict['tauc_slippery_grounding_lines'] = ''
 

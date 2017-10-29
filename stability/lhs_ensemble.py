@@ -324,7 +324,7 @@ for n, combination in enumerate(combinations):
                     if firn == 'off':
                         firn_file = '../data_sets/climate_forcing/firn_forcing_off.nc'
                     elif firn == 'ctrl':
-                        firn_file = '../data_sets/climate_forcing/firn_forcing_ctrl.nc'
+                        firn_file = '../data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'
                     else:
                         print("How did I get here?")
 
