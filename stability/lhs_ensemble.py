@@ -155,10 +155,16 @@ if not os.path.isdir(odir):
 perf_dir = 'performance'
 state_dir = 'state'
 scalar_dir = 'scalar'
+spatial_dir = 'spatial'
+snap_dir = 'snap'
 script_dir = 'run_scripts'
-for tsdir in (perf_dir, scalar_dir, state_dir, script_dir):
+for tsdir in (perf_dir, scalar_dir, spatial_dir, snap_dir, state_dir, script_dir):
     if not os.path.isdir(os.path.join(odir, tsdir)):
         os.mkdir(os.path.join(odir, tsdir))
+if not calibrate:
+    odir_tmp = '_'.join([odir, 'tmp'])
+    if not os.path.isdir(odir_tmp):
+        os.mkdir(odir_tmp)
 
 # ########################################################
 # set up model initialization
@@ -178,7 +184,12 @@ firn = 'ctrl'
 lapse_rate = 6
 bed_deformation  = 'ip'
 
-combinations = np.loadtxt(ensemble_file, delimiter=',', skiprows=1)
+try:
+    combinations = np.loadtxt(ensemble_file, delimiter=',', skiprows=1)
+except:
+    combinations = np.genfromtxt(ensemble_file, dtype=None, delimiter=',', skip_header=1)
+
+print combinations
 
 firn_dict = {-1.0: 'low', 0.0: 'off', 1.0: 'ctrl'} 
 ocs_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
@@ -207,7 +218,12 @@ if restart_step > (simulation_end_year - simulation_start_year):
 for n, combination in enumerate(combinations):
 
     for rcp in rcps:
-        run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e = combination
+        m_bd = None
+        try:
+            run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e, m_bd = combination
+            bed_deformation = bd_dict[m_bd]
+        except:
+            run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e = combination
 
         ocm = ocs_dict[ocm_v]
         ocs = ocs_dict[ocs_v]
@@ -217,7 +233,11 @@ for n, combination in enumerate(combinations):
 
         name_options = OrderedDict()
         name_options['rcp'] = rcp
-        name_options['id'] = '{:03d}'.format(int(run_id))
+        try:
+            name_options['id'] = '{:03d}'.format(int(run_id))
+        except:
+            name_options['id'] = '{}'.format(run_id)
+            
 
         vversion = 'v' + str(version)
         full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
@@ -416,6 +436,7 @@ for n, combination in enumerate(combinations):
                     exvars = stability_spatial_ts_vars()
                     if not calibrate:
                         spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=False)
+                        snap_dict = generate_snap_shots(outfile, '92,192,492,992', odir=os.path.join(odir, snap_dir))
                         if start != simulation_start_year:
                             spatial_ts_dict['extra_append'] = ''
 
@@ -428,7 +449,8 @@ for n, combination in enumerate(combinations):
                                                       hydro_params_dict,
                                                       calving_params_dict,
                                                       spatial_ts_dict,
-                                                      scalar_ts_dict)
+                                                      scalar_ts_dict,
+                                                      snap_dict)
                     else:
                         all_params_dict = merge_dicts(general_params_dict,
                                                       grid_params_dict,
