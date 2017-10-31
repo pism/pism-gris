@@ -125,6 +125,8 @@ ensemble_file = options.ensemble_file
 domain = options.domain
 pism_exec = generate_domain(domain)
 
+save_times = [92, 192, 492, 992]
+
 if options.FILE is None:
     print('Missing input file')
     import sys
@@ -220,8 +222,10 @@ for n, combination in enumerate(combinations):
     for rcp in rcps:
         m_bd = None
         try:
-            run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e, m_bd = combination
+            run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn = combination
             bed_deformation = bd_dict[m_bd]
+            firn = firn_dict[m_firn]
+            lapse_rate = m_tlr
         except:
             run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e = combination
 
@@ -436,7 +440,7 @@ for n, combination in enumerate(combinations):
                     exvars = stability_spatial_ts_vars()
                     if not calibrate:
                         spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=False)
-                        snap_dict = generate_snap_shots(outfile, '92,192,492,992', odir=os.path.join(odir, snap_dir))
+                        snap_dict = generate_snap_shots(outfile, save_times, odir=os.path.join(odir, snap_dir))
                         if start != simulation_start_year:
                             spatial_ts_dict['extra_append'] = ''
 
