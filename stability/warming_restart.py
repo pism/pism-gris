@@ -281,7 +281,7 @@ else:
 if do_bed_def:
     bed_deformation_values = ['off', 'i0', 'ip']
 else:
-    bed_deformation_values = ['off]
+    bed_deformation_values = ['off']
 
 if ensemble_file is not None:
     my_combinations = np.loadtxt(ensemble_file, delimiter=',', skiprows=1)
