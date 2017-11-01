@@ -277,7 +277,7 @@ else:
 if do_bed_def:
     bed_deformation_values = ['off', 'i0', 'ip']
 else:
-    bed_deformation_values = ['off'
+    bed_deformation_values = ['off']
 
 combinations = list(itertools.product(rcp_values,
                                       pdd_ice_values,
