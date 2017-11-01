@@ -3,11 +3,9 @@
 odir=2017_10_pdd_calib
 grid=4500
 
-./warming_restart.py --o_size big --o_dir $odir --test_climate_models --exstep 1 --params fice,fsnow,std_dev,rfr -n 24 -w 0:15:00 -g 4500 -s chinook -q t2small  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+./warming_restart.py --o_size big --o_dir $odir --test_climate_models --exstep 1 --params fice,fsnow,rfr -n 24 -w 0:10:00 -g 4500 -s chinook -q t2small  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
-./warming_restart.py --o_size big --o_dir $odir --test_climate_models --exstep 1 --params fice,fsnow,std_dev,rfr -n 4 -w 1:00:00 -g 4500 -s debug  --step 2 --duration 2  ../calibration/2017_06_vc/state/gris_g4500m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
-
-for file in $odir/run_scripts/warm_g4500m_v3a_rcp_26_prs_0.05_fice_*_j.sh; do sh $file; done
+for file in $odir/run_scripts/warm_g4500m_v3a_rcp_ctrl_prs_0.05_fice_*_j.sh; do sbatch $file; done
 
 e0=-638000
 n0=-3349600
@@ -45,7 +43,7 @@ cdo setattribute,climatic_mass_balance@units="Gt year-1"  -divc,1e12 -mulc,4500 
 rmsd_dir=cmb_rmsd
 mkdir -p $odir/$rmsd_dir
 cd  $odir/state/
-for file in *${grid}*.nc; do
+for file in *${grid}*0.47*.nc; do
     ncks -6 -O -v climatic_mass_balance $file ../$rmsd_dir/$file
     ncks -6 -A -v mask  ../../$climate_melt ../$rmsd_dir/$file
     ncap2 -O -s "where(mask!=2) climatic_mass_balance=-2e9;" ../$rmsd_dir/$file ../$rmsd_dir/$file

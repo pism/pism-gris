@@ -90,8 +90,6 @@ parser.add_argument("--test_climate_models", dest="test_climate_models", action=
                     help="Turn off ice dynamics and mass transport to test climate models", default=False)
 parser.add_argument("--calibrate", dest="calibrate", action="store_true",
                     help="Run calibration mode (no spatial time series written)", default=False)
-parser.add_argument("-e", "--ensemble_file", dest="ensemble_file",
-                    help="File that has all combinations for ensemble study", default=None)
 
 options = parser.parse_args()
 
@@ -119,8 +117,6 @@ topg_delta_file = options.topg_delta_file
 test_climate_models = options.test_climate_models
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
-
-ensemble_file = options.ensemble_file
 
 # Check which parameters are used for sensitivity study
 params_list = options.params_list
@@ -283,25 +279,21 @@ if do_bed_def:
 else:
     bed_deformation_values = ['off'
 
-if ensemble_file is not None:
-    my_combinations = np.loadtxt(ensemble_file, delimiter=',', skiprows=1)
-    print my_combinations
-else:
-    combinations = list(itertools.product(rcp_values,
-                                          pdd_ice_values,
-                                          pdd_snow_values,
-                                          std_dev_values,
-                                          prs_values,
-                                          rfr_values,
-                                          ocm_values,
-                                          ocs_values,
-                                          thickness_calving_threshold_values,
-                                          vcm_values,
-                                          ppq_values,
-                                          sia_e_values,
-                                          bed_deformation_values,
-                                          tlr_rate_values,
-                                          firn_values))
+combinations = list(itertools.product(rcp_values,
+                                      pdd_ice_values,
+                                      pdd_snow_values,
+                                      std_dev_values,
+                                      prs_values,
+                                      rfr_values,
+                                      ocm_values,
+                                      ocs_values,
+                                      thickness_calving_threshold_values,
+                                      vcm_values,
+                                      ppq_values,
+                                      sia_e_values,
+                                      bed_deformation_values,
+                                      tlr_rate_values,
+                                      firn_values))
 
 firn_dict = {-1.0: 'low', 0.0: 'off', 1.0: 'ctrl'} 
 ocs_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
