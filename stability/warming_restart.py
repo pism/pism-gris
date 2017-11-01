@@ -281,7 +281,7 @@ else:
 if do_bed_def:
     bed_deformation_values = ['off', 'i0', 'ip']
 else:
-    bed_deformation_values = ['off']
+    bed_deformation_values = ['off'
 
 if ensemble_file is not None:
     my_combinations = np.loadtxt(ensemble_file, delimiter=',', skiprows=1)
@@ -454,7 +454,7 @@ for n, combination in enumerate(combinations):
                 if firn == 'off':
                     firn_file = '../data_sets/climate_forcing/firn_forcing_off.nc'
                 elif firn == 'ctrl':
-                    firn_file = '../data_sets/climate_forcing/hirham_firn_forcing_ctrl.nc'
+                    firn_file = '../data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'
                 else:
                     print("How did I get here?")
 
