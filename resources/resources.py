@@ -1023,8 +1023,8 @@ cd $PBS_O_WORKDIR
 """
     elif system in ('chinook'):
         header = """#!/bin/bash
-#PBS -q t2small
-#PBS -l walltime=12:00:00
+#PBS -q analysis
+#PBS -l walltime=24:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -j oe
 

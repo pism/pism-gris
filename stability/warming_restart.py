@@ -239,7 +239,7 @@ if do_ppq:
 else:
     ppq_values = [0.6]
 if do_rfr:
-    rfr_values = [0.30, 0.60, 0.75]
+    rfr_values = [0.30, 0.47, 0.60, 0.75]
 else:
     rfr_values = [0.60]
 if do_tlr:
@@ -247,11 +247,11 @@ if do_tlr:
 else:
     tlr_rate_values = [6]
 if do_pdd_ice:    
-    pdd_ice_values = [4, 8, 12]
+    pdd_ice_values = [4, 8, 12, 16]
 else:
     pdd_ice_values = [8]
 if do_pdd_snow:    
-    pdd_snow_values = [2, 3, 4]
+    pdd_snow_values = [3, 4, 5]
 else:
     pdd_snow_values = [3]
 if do_firn:
@@ -281,7 +281,7 @@ else:
 if do_bed_def:
     bed_deformation_values = ['off', 'i0', 'ip']
 else:
-    bed_deformation_values = ['ip']
+    bed_deformation_values = ['off]
 
 if ensemble_file is not None:
     my_combinations = np.loadtxt(ensemble_file, delimiter=',', skiprows=1)
@@ -454,7 +454,7 @@ for n, combination in enumerate(combinations):
                 if firn == 'off':
                     firn_file = '../data_sets/climate_forcing/firn_forcing_off.nc'
                 elif firn == 'ctrl':
-                    firn_file = '../data_sets/climate_forcing/firn_forcing_ctrl.nc'
+                    firn_file = '../data_sets/climate_forcing/hirham_firn_forcing_ctrl.nc'
                 else:
                     print("How did I get here?")
 
