@@ -11,6 +11,26 @@ grid=3600
 
 exit 
 
+for id in `seq 0 9`;
+do
+for rcp in 26 45 85;
+do
+sbatch 2017_11_lhs/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_00${id}_j.sh;
+done
+done
+
+for id1 in `seq 1 9`;
+do
+for id in `seq 0 9`;
+do
+for rcp in 26 45 85;
+do
+sbatch 2017_11_lhs/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_0${id1}${id}_j.sh;
+done
+done
+done
+
+
 odir=2017_10_lhs
 cd $odir/state
 for file in gris_g*00m_v3a_rcp_*_id_*1000.nc; do
