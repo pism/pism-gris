@@ -160,7 +160,8 @@ scalar_dir = 'scalar'
 spatial_dir = 'spatial'
 snap_dir = 'snap'
 script_dir = 'run_scripts'
-for tsdir in (perf_dir, scalar_dir, spatial_dir, snap_dir, state_dir, script_dir):
+job_dir = 'jobs'
+for tsdir in (perf_dir, job_dir, scalar_dir, spatial_dir, snap_dir, state_dir, script_dir):
     if not os.path.isdir(os.path.join(odir, tsdir)):
         os.mkdir(os.path.join(odir, tsdir))
 if not calibrate:
@@ -191,8 +192,6 @@ try:
 except:
     combinations = np.genfromtxt(ensemble_file, dtype=None, delimiter=',', skip_header=1)
 
-print combinations
-
 firn_dict = {-1.0: 'low', 0.0: 'off', 1.0: 'ctrl'} 
 ocs_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
 ocm_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
@@ -221,6 +220,7 @@ for n, combination in enumerate(combinations):
 
     for rcp in rcps:
         m_bd = None
+        m_pdd = 0.0
         try:
             run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn, m_pdd = combination
             bed_deformation = bd_dict[m_bd]
@@ -470,9 +470,9 @@ for n, combination in enumerate(combinations):
                     all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
 
                     if system in ('debug'):
-                        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job_{job_no}.${batch}'.format(outdir=odir, job_no=job_no, batch=batch_system['job_id'])])
+                        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/{job_dir}/job_{job_no}.${batch}'.format(outdir=odir, job_dir=job_dir, job_no=job_no, batch=batch_system['job_id'])])
                     else:
-                        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job_{job_no}.${batch}  2>&1'.format(outdir=odir, job_no=job_no, batch=batch_system['job_id'])])
+                        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/{job_dir}/job_{job_no}.${batch}  2>&1'.format(outdir=odir, job_dir=job_dir, job_no=job_no, batch=batch_system['job_id'])])
 
                     f.write(cmd)
                     f.write('\n')
