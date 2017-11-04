@@ -222,7 +222,7 @@ for n, combination in enumerate(combinations):
     for rcp in rcps:
         m_bd = None
         try:
-            run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn = combination
+            run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn, m_pdd = combination
             bed_deformation = bd_dict[m_bd]
             firn = firn_dict[m_firn]
             lapse_rate = m_tlr
@@ -366,6 +366,9 @@ for n, combination in enumerate(combinations):
                                                               'temp_lapse_rate': lapse_rate,
                                                               'atmosphere_paleo_precip_file': climate_modifier_file,
                                                               'atmosphere_delta_T_file': climate_modifier_file})
+
+                    if m_pdd == 1.0:
+                        setattr(climate_params_dict, 'pdd_aschwanden', '')
 
                     if ocm == 'low':
                         ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_70n_10myr_80n.nc'

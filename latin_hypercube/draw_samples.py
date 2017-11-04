@@ -16,9 +16,9 @@ distributions = {'FICE':  truncnorm(-4/4.,4./4,loc=8,scale=4),
                  'OCM':   randint(-1,2),
                  'OCS':   randint(-1,2),
                  'TCT':   randint(-1,2),
-                 'VCM':   truncnorm(-0.6/0.35,0.6/0.35,loc=1,scale=0.35),
+                 'VCM':   truncnorm(-0.35/0.2,0.35/0.2,loc=1,scale=0.2),
                  'PPQ':   truncnorm(-0.35/0.2,0.35/0.2,loc=0.6,scale=0.2),
-                 'SIAE':   gamma(1.5,scale=0.8, loc=1)}
+                 'SIAE':  gamma(1.5,scale=0.8, loc=1)}
 
 # Names of all the variables
 keys = ['FICE','FSNOW','PRS','RFR','OCM','OCS','TCT','VCM','PPQ','SIAE']
