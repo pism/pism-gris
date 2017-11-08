@@ -1013,8 +1013,6 @@ def make_batch_post_header(system):
 #PBS -lwalltime=8:00:00
 #PBS -q ldan
 
-module list
-
 cd $PBS_O_WORKDIR
 
 """
@@ -1024,8 +1022,6 @@ cd $PBS_O_WORKDIR
 #PBS -l walltime=24:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -j oe
-
-module list
 
 #cd $PBS_O_WORKDIR
 
