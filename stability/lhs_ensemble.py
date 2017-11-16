@@ -261,7 +261,7 @@ for n, combination in enumerate(combinations):
         if m_ohc == 0:
             ocean_modifier_file = climate_modifier_file
         else:
-            ocean_modifier_file = 'pism_step_warmin_{}K.nc'.format(m_ohc)
+            ocean_modifier_file = 'pism_step_warming_{}K.nc'.format(m_ohc)
 
         # All runs in one script file for coarse grids that fit into max walltime
         script_combined = os.path.join(odir, script_dir, 'lhs_g{}m_{}_j.sh'.format(grid, full_exp_name))
