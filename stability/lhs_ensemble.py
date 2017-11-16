@@ -221,8 +221,9 @@ for n, combination in enumerate(combinations):
     for rcp in rcps:
         m_bd = None
         m_pdd = 0.0
+        m_ohc = 0.0
         try:
-            run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn, m_pdd = combination
+            run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn, m_pdd, m_ohc = combination
             bed_deformation = bd_dict[m_bd]
             firn = firn_dict[m_firn]
             lapse_rate = m_tlr
@@ -256,6 +257,11 @@ for n, combination in enumerate(combinations):
             climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'
         else:
             print("How did I get here")
+
+        if m_ohc == 0:
+            ocean_modifier_file = climate_modifier_file
+        else:
+            ocean_modifier_file = 'pism_step_warmin_{}K.nc'.format(m_ohc)
 
         # All runs in one script file for coarse grids that fit into max walltime
         script_combined = os.path.join(odir, script_dir, 'lhs_g{}m_{}_j.sh'.format(grid, full_exp_name))
@@ -394,11 +400,17 @@ for n, combination in enumerate(combinations):
                         ocean_alpha = 0.5
                         ocean_beta = 1.0
                     elif ocs == 'mid':
-                        ocean_alpha = 0.55
-                        ocean_beta = 1.1
+                        ocean_alpha = 0.54
+                        ocean_beta = 1.17
                     elif ocs == 'high':
-                        ocean_alpha = 1.0
-                        ocean_beta = 2.0
+                        ocean_alpha = 0.85
+                        ocean_beta = 1.61
+                    # elif ocs == 'mid':
+                    #     ocean_alpha = 0.54
+                    #     ocean_beta = 1.17
+                    # elif ocs == 'high':
+                    #     ocean_alpha = 0.85
+                    #     ocean_beta = 1.61
                     else:
                         pass
 
@@ -412,7 +424,7 @@ for n, combination in enumerate(combinations):
                                                        **{'ocean_given_file': ocean_file,
                                                           'ocean.runoff_to_ocean_melt_power_alpha': ocean_alpha,
                                                           'ocean.runoff_to_ocean_melt_power_beta': ocean_beta,
-                                                          'ocean_runoff_smb_file': climate_modifier_file})
+                                                          'ocean_runoff_smb_file': ocean_modifier_file})
 
 
                     hydro_params_dict = generate_hydrology(hydrology)
