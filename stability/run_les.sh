@@ -33,7 +33,7 @@ for id in `seq 0 9`;
 do
 for rcp in 26 45 85;
 do
-sbatch 2017_11_lhs/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_4${id1}${id}_j.sh;
+ctrlsbatch 2017_11_lhs/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_4${id1}${id}_j.sh;
 done
 done
 done
@@ -53,12 +53,13 @@ for rcp in 26 45 85; do
 done
 
 # Cumulative contribution LES and CTRL
-~/base/gris-analysis/plotting/plotting.py -o les --time_bounds 2008 3000 --ctrl_file 2017_11_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
+~/base/gris-analysis/plotting/plotting.py  -n 4 -o les --time_bounds 2008 3000 --ctrl_file 2017_11_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
 # Rates of GMSL rise LES and CTRL
-~/base/gris-analysis/plotting/plotting.py -o les --time_bounds 2008 3000 --no_legend --ctrl_file 2017_11_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
-
+~/base/gris-analysis/plotting/plotting.py -n 4 -o les --time_bounds 2008 3000 --no_legend --ctrl_file 2017_11_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
+# Trajectory plots
 ~/base/gris-analysis/plotting/plotting.py -o les --time_bounds 2008 3000 --plot rcp_traj 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
 ~/base/gris-analysis/plotting/plotting.py -o les_flux --time_bounds 2008 3000 --no_legend --plot rcp_fluxes 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
+# Plot fluxes for each basin
 for rcp in 26 45 85; do
     ~/base/gris-analysis/plotting/plotting.py -o basins_rcp_${rcp} --time_bounds 2008 3000 --no_legend --plot basin_mass 2017_11_ctrl/basins/scalar/ts_b_*_ex_g3600m_v3a_rcp_${rcp}_id_CTRL_0_1000/ts_b_*_ex_g3600m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
 done
@@ -68,7 +69,7 @@ done
 ~/base/gris-analysis/plotting/plotting.py -o ctrl --time_bounds 2008 3000 --no_legend --plot per_basin_flux 2017_11_ctrl/basins/scalar/ts_b_*_ex_g3600m_v3a_rcp_*_id_CTRL_0_1000.nc
 
 odir=2017_11_ctrl
-grid=1800
+grid=900
 mkdir -p $odir/final_states
 cd $odir/state
 for file in gris_g${grid}m*0_1000.nc; do
@@ -104,9 +105,9 @@ done
 odir=2017_11_ctrl
 mkdir -p $odir/dgmsl
 for rcp in 26 45 85; do
-    for year in 2100 2200 3000; do
-        for run in CTRL NISO NFRN; do
-            cdo divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g3600m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar/ts_gris_g3600m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgms_rcp_${rcp}_${run}_${year}.nc
+    for year in 2100 2200 2500 3000; do
+        for run in CTRL NISO NFRN HOTH8; do
+            cdo divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g3600m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar/ts_gris_g3600m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgms_g3600m_rcp_${rcp}_${run}_${year}.nc
         done
     done
 done
@@ -114,9 +115,19 @@ done
 odir=2017_11_ctrl
 mkdir -p $odir/dgmsl
 for rcp in 26 45 85; do
-    for year in 2100 2200 3000; do
+    for year in 2100 2200 2500 3000; do
         for run in CTRL; do
-            cdo divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g1800m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar/ts_gris_g1800m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgms_rcp_${rcp}_${run}_${year}.nc
+            cdo divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g1800m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar/ts_gris_g1800m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgms_g1800m_rcp_${rcp}_${run}_${year}.nc
+        done
+    done
+done
+
+odir=2017_11_ctrl
+mkdir -p $odir/dgmsl
+for rcp in 26 45 85; do
+    for year in 2100 2200 2500 3000; do
+        for run in CTRL; do
+            cdo divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g900m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar/ts_gris_g900m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgms_g900m_rcp_${rcp}_${run}_${year}.nc
         done
     done
 done
@@ -135,7 +146,7 @@ done
 cd ../../
 for rcp in 26 45 85; do
     cdo -O enssum $odir/sftgif/gris_g${grid}m_v3a_rcp_${rcp}_id_*_0_1000.nc $odir/sftgif_pctl/sum_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
-    cdo divc,5 $odir/sftgif_pctl/sum_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/sftgif_pctl/percent_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+    cdo divc,4.95 $odir/sftgif_pctl/sum_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/sftgif_pctl/percent_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
 done 
 
 mkdir -p $odir/velsurf_mag
