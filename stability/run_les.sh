@@ -55,7 +55,7 @@ done
 # Cumulative contribution LES and CTRL
 ~/base/gris-analysis/plotting/plotting.py  -n 4 -o les --time_bounds 2008 3000 --ctrl_file 2017_11_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
 # Rates of GMSL rise LES and CTRL
-~/base/gris-analysis/plotting/plotting.py -n 4 -o les --time_bounds 2008 3000 --no_legend --ctrl_file 2017_11_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
+~/base/gris-analysis/plotting/plotting.py -n 4 -o les --time_bounds 2008 3000 --no_legend --ctrl_file 2017_11_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
 # Trajectory plots
 ~/base/gris-analysis/plotting/plotting.py -o les --time_bounds 2008 3000 --plot rcp_traj 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
 ~/base/gris-analysis/plotting/plotting.py -o les_flux --time_bounds 2008 3000 --no_legend --plot rcp_fluxes 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
@@ -80,6 +80,20 @@ for file in gris_g${grid}m*0_1000.nc; do
     gdaldem hillshade ../final_states/usurf_$file.tif ../final_states/hs_usurf_$file.tif
 done
 cd ../../
+
+odir=2017_11_ctrl
+grid=900
+basin=NW
+mkdir -p $odir/basins_processed
+for rcp in 26 45 85; do
+    for year in 2100 2200 2300 2400 2500; do
+        cdo -L selvar,thk,velsurf_mag,usurf -selyear,$year $odir/basins/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc $odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc
+        ncap2 -O -s "where(thk<10) {velsurf_mag=-2e9; usurf=1.e20;};" $odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc $odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc
+    gdal_translate NETCDF:$odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc:velsurf_mag $odir/basins_processed/velsurf_mag_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+    gdal_translate -a_nodata 1e20 NETCDF:$odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc:usurf $odir/basins_processed/usurf_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+    gdaldem hillshade $odir/basins_processed/usurf_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif $odir/basins_processed/hs_usurf_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+    done
+done
 
 
 odir=2017_11_ctrl
@@ -106,7 +120,7 @@ odir=2017_11_ctrl
 mkdir -p $odir/dgmsl
 for rcp in 26 45 85; do
     for year in 2100 2200 2500 3000; do
-        for run in CTRL NISO NFRN HOTH8; do
+        for run in CTRL NISO NFRN HOTH8 ISO0; do
             cdo divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g3600m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar/ts_gris_g3600m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgms_g3600m_rcp_${rcp}_${run}_${year}.nc
         done
     done
@@ -212,7 +226,7 @@ gdal_translate -a_nodata 0 NETCDF:2017_11_lhs/usurf_pctl/pctl84_gris_g3600m_v3a_
 gdaldem hillshade 2017_11_lhs/usurf_pctl/pctl84_gris_g3600m_v3a_rcp_${rcp}_0_1000.tif 2017_11_lhs/usurf_pctl/pctl84_gris_g3600m_v3a_rcp_${rcp}_0_1000_hs.tif
 done
 
-odir=2017_11_ctrl
+odir=2017_11_t
 s=chinook
 q=t2standard
 n=72
@@ -237,103 +251,55 @@ grid=900
 
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 168:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
-
-odir=2017_10_lhs
-cd $odir/state
-for file in gris_g*00m_v3a_rcp_*_id_*1000.nc; do
-    for var in sftgif thk; do
-        mkdir -p ../$var
-        if [ ! -f "../$var/$var_$file" ]; then
-            echo $file;
-            cdo -f nc4 selvar,$var $file ../$var/$var_$file;
-        fi;
-    done
-done
-cd ../../
-
-for rcp in 26; do
-cdo -f nc4 enssum $odir/sftgif/*gris_g*00m_v3a_rcp_${rcp}_*.nc $odir/sftgif_sum/sftgif_gris_g3600m_v3a_rcp_${rcp}.nc
-done
-
-odir=2017_10_calib
+odir=2017_11_ctrl
 s=chinook
 q=t2standard
-n=72
-grid=1200
-gap=~/base/
-gap=/Volumes/zachariae
+n=480
+grid=600
 
-./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 03:00:00 -g ${grid} -s ${s} -q ${q} --step 8 --duration 8 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
-
-odir=2017_10_ctrl
-s=chinook
-q=t2small
-n=24
-grid=4500
-gap=~/base/
-gap=/Volumes/zachariae
-
-./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 04:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 168:00:00 -g ${grid} -s ${s} -q ${q} --step 100 --duration 100 ../calibration/2017_06_vc/state/gris_g900m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
 
-for file in ${odir}/run_scripts/lhs_*j.sh; do
-    sbatch $file;
-done
-
-# Evaluate
-mkdir -p $odir/plots
-cd $odir/plots
-for var in pdd rfr prs tlr ppq vcm ocm ocs tct sia reb; do
-    python ${gap}/gris-analysis/plotting/plotting.py -o ens_${var} --time_bounds 2008 2508 --title ${var} --no_legend --plot rcp_ens_mass ../../${odir}_${var}/scalar/cumsum_ts_gris_g${grid}m_v3a_rcp_*.nc
-done
+odir=2017_11_ctrl
+cd $odir/snap
+for file in save_gris_g900m*; do
+    gdal_translate 
 
 # 300 members
+
+~/base/gris-analysis/plotting/plotting.py  -n 4 -o les --time_bounds 2008 3000 --ctrl_file 2017_11_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_0*.nc 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_1*.nc 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_2*.nc
 
 Reading files for RCP 8.5
 Year 2100: 0.11 - 0.19 - 0.28 m SLE
          CTRL 0.21 m SLE
-Year 2200: 0.50 - 0.76 - 1.04 m SLE
+Year 2200: 0.50 - 0.75 - 1.04 m SLE
          CTRL 0.72 m SLE
-Year 2500: 2.56 - 3.43 - 4.33 m SLE
+Year 2500: 2.52 - 3.40 - 4.31 m SLE
          CTRL 3.05 m SLE
-Year 3000: 5.64 - 6.64 - 7.18 m SLE
+Year 3000: 5.58 - 6.64 - 7.17 m SLE
          CTRL 6.05 m SLE
 Reading files for RCP 4.5
 Year 2100: 0.06 - 0.13 - 0.20 m SLE
          CTRL 0.16 m SLE
-Year 2200: 0.21 - 0.37 - 0.55 m SLE
+Year 2200: 0.20 - 0.36 - 0.55 m SLE
          CTRL 0.39 m SLE
-Year 2500: 0.89 - 1.38 - 1.90 m SLE
+Year 2500: 0.87 - 1.36 - 1.89 m SLE
          CTRL 1.27 m SLE
-Year 3000: 2.27 - 3.31 - 4.25 m SLE
+Year 3000: 2.24 - 3.27 - 4.24 m SLE
          CTRL 2.95 m SLE
 Reading files for RCP 2.6
-Year 2100: 0.04 - 0.10 - 0.16 m SLE
+Year 2100: 0.03 - 0.10 - 0.16 m SLE
          CTRL 0.12 m SLE
-Year 2200: 0.08 - 0.20 - 0.34 m SLE
+Year 2200: 0.08 - 0.20 - 0.33 m SLE
          CTRL 0.23 m SLE
-Year 2500: 0.17 - 0.44 - 0.74 m SLE
+Year 2500: 0.16 - 0.42 - 0.73 m SLE
          CTRL 0.48 m SLE
-Year 3000: 0.28 - 0.75 - 1.28 m SLE
+Year 3000: 0.24 - 0.72 - 1.27 m SLE
          CTRL 0.75 m SLE
   - writing image les_rcp_limnsw.pdf ...
 
-Reading files for RCP 8.5
-Year 2100: 0.28 - 0.42 - 0.59 cm SLE year-1
-Year 2200: 0.53 - 0.74 - 0.96 cm SLE year-1
-Year 2500: 0.82 - 0.99 - 1.08 cm SLE year-1
-Reading files for RCP 4.5
-Year 2100: 0.11 - 0.21 - 0.30 cm SLE year-1
-Year 2200: 0.18 - 0.29 - 0.42 cm SLE year-1
-Year 2500: 0.28 - 0.39 - 0.52 cm SLE year-1
-Reading files for RCP 2.6
-Year 2100: 0.04 - 0.11 - 0.18 cm SLE year-1
-Year 2200: 0.05 - 0.11 - 0.18 cm SLE year-1
-Year 2500: 0.01 - 0.06 - 0.10 cm SLE year-1
-  - writing image les_rcp_tendency_of_ice_mass_glacierized.pdf ...
-
-  # 500 members
+# 500 members
   Reading files for RCP 8.5
 Year 2100: 0.11 - 0.19 - 0.28 m SLE
          CTRL 0.21 m SLE
@@ -362,3 +328,33 @@ Year 2500: 0.18 - 0.44 - 0.74 m SLE
 Year 3000: 0.30 - 0.75 - 1.27 m SLE
          CTRL 0.75 m SLE
   - writing image les_rcp_limnsw.pdf ...
+
+
+Reading files for RCP 8.5
+Year 2100: 0.28 - 0.42 - 0.58 cm SLE year-1
+Year 2200: 0.54 - 0.73 - 0.96 cm SLE year-1
+Year 2500: 0.83 - 0.99 - 1.08 cm SLE year-1
+Max loss rate 50th pctl in Year 2457: 1.020 cm SLE year-1
+Max loss rate 16th pctl in Year 2457: 1.212 cm SLE year-1
+Max loss rate 84th pctl in Year 2496: 0.827 cm SLE year-1
+Max loss rate ctrl in Year 2496: 0.927 cm SLE year-1
+Reading files for RCP 4.5
+Year 2100: 0.12 - 0.21 - 0.30 cm SLE year-1
+Year 2200: 0.18 - 0.29 - 0.42 cm SLE year-1
+Year 2500: 0.28 - 0.39 - 0.51 cm SLE year-1
+Max loss rate 50th pctl in Year 2739: 0.397 cm SLE year-1
+Max loss rate 16th pctl in Year 2739: 0.525 cm SLE year-1
+Max loss rate 84th pctl in Year 2988: 0.279 cm SLE year-1
+Max loss rate ctrl in Year 2988: 0.333 cm SLE year-1
+Reading files for RCP 2.6
+Year 2100: 0.05 - 0.11 - 0.18 cm SLE year-1
+Year 2200: 0.05 - 0.11 - 0.17 cm SLE year-1
+Year 2500: 0.01 - 0.06 - 0.10 cm SLE year-1
+Max loss rate 50th pctl in Year 2041: 0.132 cm SLE year-1
+Max loss rate 16th pctl in Year 2041: 0.210 cm SLE year-1
+Max loss rate 84th pctl in Year 2041: 0.062 cm SLE year-1
+Max loss rate ctrl in Year 2041: 0.155 cm SLE year-1
+  - writing image les_rcp_tendency_of_ice_mass_glacierized.pdf ...
+
+
+  
