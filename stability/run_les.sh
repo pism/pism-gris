@@ -81,18 +81,39 @@ for file in gris_g${grid}m*0_1000.nc; do
 done
 cd ../../
 
+
+odir=2017_11_ctrl
+grid=900
+mkdir -p $odir/spatial_processed
+mkdir -p $odir/ice_extend
+for rcp in 26 45 85; do
+    cdo selvar,mask -selyear,2008,2100,2200,2300,2400,2500 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
+    extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_1000.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
+    # for year in 2008 2100 2200 2300 2400 2500; do
+    #     cdo selvar,velsurf_mag,usurf_hs -selyear,$year $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc
+    #     gdal_translate NETCDF:$odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc:velsurf_mag $odir/spatial_processed/velsurf_mag_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+    #     gdal_translate NETCDF:$odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc:usurf_hs $odir/spatial_processed/hs_usurf_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+    # done
+done
+
+
+
 odir=2017_11_ctrl
 grid=900
 basin=NW
 mkdir -p $odir/basins_processed
 for rcp in 26 45 85; do
-    for year in 2100 2200 2300 2400 2500; do
+    for year in 2008 2100 2200 2300 2400 2500; do    
         cdo -L selvar,thk,velsurf_mag,usurf -selyear,$year $odir/basins/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc $odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc
         ncap2 -O -s "where(thk<10) {velsurf_mag=-2e9; usurf=1.e20;};" $odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc $odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc
-    gdal_translate NETCDF:$odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc:velsurf_mag $odir/basins_processed/velsurf_mag_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
-    gdal_translate -a_nodata 1e20 NETCDF:$odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc:usurf $odir/basins_processed/usurf_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
-    gdaldem hillshade $odir/basins_processed/usurf_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif $odir/basins_processed/hs_usurf_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+        gdal_translate NETCDF:$odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc:velsurf_mag $odir/basins_processed/velsurf_mag_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+        gdal_translate -a_nodata 1e20 NETCDF:$odir/basins_processed/b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc:usurf $odir/basins_processed/usurf_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+        gdaldem hillshade $odir/basins_processed/usurf_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif $odir/basins_processed/hs_usurf_b_${basin}_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
     done
+done
+
+for rcp in 26 45 85; do
+    extract_interface.py -t grounding_line -o 2017_11_ctrl/basins/ice_extend/gl_b_NW_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_1000.shp 2017_11_ctrl/basins/b_NW_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_1000/b_NW_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
 done
 
 
