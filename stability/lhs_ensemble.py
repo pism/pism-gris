@@ -194,7 +194,7 @@ except:
 
 firn_dict = {-1.0: 'low', 0.0: 'off', 1.0: 'ctrl'} 
 ocs_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
-ocm_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
+ocm_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high', 2.0: 'm1000', 3.0: 'm1500'}
 tct_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
 bd_dict = {-1.0: 'off', 0.0: 'i0', 1.0: 'ip'}
 
@@ -382,8 +382,10 @@ for n, combination in enumerate(combinations):
                         ocean_file = '../data_sets/ocean_forcing/ocean_forcing_400myr_70n_20myr_80n.nc'
                     elif ocm == 'high':
                         ocean_file = '../data_sets/ocean_forcing/ocean_forcing_500myr_70n_30myr_80n.nc'
-                    elif ocm == 'extr':
-                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_10000myr_70n_500myr_80n.nc'
+                    elif ocm == 'm1000':
+                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_1000myr_70n_60myr_80n.nc'
+                    elif ocm == 'm1500':
+                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_1500myr_70n_90myr_80n.nc'
                     else:
                         pass
 
