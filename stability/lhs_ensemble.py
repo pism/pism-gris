@@ -194,7 +194,7 @@ except:
 
 firn_dict = {-1.0: 'low', 0.0: 'off', 1.0: 'ctrl'} 
 ocs_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
-ocm_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high', 2.0: 'm1000', 3.0: 'm1500'}
+ocm_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high', 2.0: 'm10', 3.0: 'm15'}
 tct_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
 bd_dict = {-1.0: 'off', 0.0: 'i0', 1.0: 'ip'}
 
@@ -230,7 +230,7 @@ for n, combination in enumerate(combinations):
         except:
             run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e = combination
 
-        ocm = ocs_dict[ocm_v]
+        ocm = ocm_dict[ocm_v]
         ocs = ocs_dict[ocs_v]
         tct = ocs_dict[tct_v]
 
@@ -375,16 +375,16 @@ for n, combination in enumerate(combinations):
 
                     if m_pdd == 1.0:
                         setattr(climate_params_dict, 'pdd_aschwanden', '')
-
+                    print ocm
                     if ocm == 'low':
                         ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_70n_10myr_80n.nc'
                     elif ocm == 'mid':
                         ocean_file = '../data_sets/ocean_forcing/ocean_forcing_400myr_70n_20myr_80n.nc'
                     elif ocm == 'high':
                         ocean_file = '../data_sets/ocean_forcing/ocean_forcing_500myr_70n_30myr_80n.nc'
-                    elif ocm == 'm1000':
+                    elif ocm == 'm10':
                         ocean_file = '../data_sets/ocean_forcing/ocean_forcing_1000myr_70n_60myr_80n.nc'
-                    elif ocm == 'm1500':
+                    elif ocm == 'm15':
                         ocean_file = '../data_sets/ocean_forcing/ocean_forcing_1500myr_70n_90myr_80n.nc'
                     else:
                         pass
