@@ -375,7 +375,6 @@ for n, combination in enumerate(combinations):
 
                     if m_pdd == 1.0:
                         setattr(climate_params_dict, 'pdd_aschwanden', '')
-                    print ocm
                     if ocm == 'low':
                         ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_70n_10myr_80n.nc'
                     elif ocm == 'mid':
