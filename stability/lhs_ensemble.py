@@ -376,15 +376,15 @@ for n, combination in enumerate(combinations):
                     if m_pdd == 1.0:
                         setattr(climate_params_dict, 'pdd_aschwanden', '')
                     if ocm == 'low':
-                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_70n_10myr_80n.nc'
+                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc'
                     elif ocm == 'mid':
-                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_400myr_70n_20myr_80n.nc'
+                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc'
                     elif ocm == 'high':
-                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_500myr_70n_30myr_80n.nc'
+                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc'
                     elif ocm == 'm10':
-                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_1000myr_70n_60myr_80n.nc'
+                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc'
                     elif ocm == 'm15':
-                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_1500myr_70n_90myr_80n.nc'
+                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc'
                     else:
                         pass
 
@@ -523,7 +523,14 @@ for n, combination in enumerate(combinations):
                 f.write(cmd)
                 cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', extra_file, '\n'])
                 f.write(cmd)
-                cmd = ' '.join(['~/gris-analysis/scripts/nc_add_hillshade.py -z 2 ', extra_file, '\n'])
+                cmd = ' '.join(['~/base/gris-analysis/scripts/nc_add_hillshade.py -z 1 ', extra_file, '\n'])
+                f.write(cmd)
+                basin_dir = 'basins'
+                cmd = ' '.join(['mkdir -p', os.path.join([odir, basin_dir])])
+                f.write(cmd)
+                cmd = ' '.join(['cd', os.path.join([odir, spatial_dir])])
+                f.write(cmd)
+                cmd = ' '.join(['~/base/gris-analysis/basins/', os.path.join([odir, spatial_dir])])
                 f.write(cmd)
             ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=simulation_start_year, end=simulation_end_year))
             cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', '{}'.format(ts_file), '\n'])

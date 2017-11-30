@@ -10,7 +10,7 @@ infile=../bed_dem/pism_Greenland_ext_${GRID}m_mcb_jpl_v3a_ctrl.nc
 # Ocean forcing
 # #####################################
 
-lat_0=70
+lat_0=71
 lat_1=80
 
 bmelt_0=300

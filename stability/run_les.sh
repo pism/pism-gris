@@ -78,6 +78,8 @@ for file in gris_g${grid}m*0_1000.nc; do
     gdal_translate NETCDF:../final_states/$file:velsurf_mag ../final_states/velsurf_mag_$file.tif
     gdal_translate -a_nodata 0 NETCDF:../final_states/$file:usurf ../final_states/usurf_$file.tif
     gdaldem hillshade ../final_states/usurf_$file.tif ../final_states/hs_usurf_$file.tif
+    gdal_translate NETCDF:../final_states/$file:topg ../final_states/topg_$file.tif
+    gdaldem hillshade ../final_states/topg_$file.tif ../final_states/hs_topg_$file.tif
 done
 cd ../../
 
