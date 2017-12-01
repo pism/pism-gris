@@ -515,23 +515,6 @@ for n, combination in enumerate(combinations):
                 mexstep = int(exstep)
 
 
-            if not calibrate:
-                extra_file_tmp = spatial_ts_dict['extra_file']
-                extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
-                extra_file = os.path.join(odir, spatial_dir, extra_file)
-                cmd = ' '.join(['ncks -O -4 -L 3 ', extra_file_tmp, extra_file, '\n'])
-                f.write(cmd)
-                cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', extra_file, '\n'])
-                f.write(cmd)
-                cmd = ' '.join(['~/base/gris-analysis/scripts/nc_add_hillshade.py -z 1 ', extra_file, '\n'])
-                f.write(cmd)
-                basin_dir = 'basins'
-                # cmd = ' '.join(['mkdir -p', os.path.join([odir, basin_dir])])
-                # f.write(cmd)
-                # cmd = ' '.join(['cd', os.path.join([odir, spatial_dir])])
-                # f.write(cmd)
-                # cmd = ' '.join(['~/base/gris-analysis/basins/', os.path.join([odir, spatial_dir])])
-                # f.write(cmd)
             ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=simulation_start_year, end=simulation_end_year))
             cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', '{}'.format(ts_file), '\n'])
             f.write(cmd)
@@ -541,6 +524,26 @@ for n, combination in enumerate(combinations):
                 state_file = os.path.join(odir, state_dir, outfile)
                 cmd = ' '.join(['ncks -O -4 -L 3', state_file, state_file, '\n'])
                 f.write(cmd)
+            if not calibrate:
+                extra_file_tmp = spatial_ts_dict['extra_file']
+                extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
+                extra_file_wd = os.path.join(odir, spatial_dir, extra_file)
+                cmd = ' '.join(['ncks -O -4 -L 3 ', extra_file_tmp, extra_file_wd, '\n'])
+                f.write(cmd)
+                cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', extra_file, '\n'])
+                f.write(cmd)
+                cmd = ' '.join(['~/base/gris-analysis/scripts/nc_add_hillshade.py -z 1 ', extra_file, '\n'])
+                f.write(cmd)
+                basin_dir = 'basins'
+                basin_odir =os.path.join(odir, basin_dir)
+                if not os.path.isdir(basin_odir):
+                    os.mkdir(basin_odir)
+                cmd = ' '.join(['cd', os.path.join(odir, spatial_dir), '\n'])
+                f.write(cmd)
+                for basin in ('CW', 'NE', 'NO', 'NW', 'SE', 'SW'):
+                    cmd = ' '.join(['~/base/gris-analysis/basins/extract_basins.py --basins ', basin, '--o_dir ../{}'.format(basin_dir),  extra_file, '\n'])
+                    f.write(cmd)
+                f.write('cd ../../ \n')
 
 
     

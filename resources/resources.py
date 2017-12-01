@@ -1009,8 +1009,8 @@ def make_batch_post_header(system):
     if system in ('electra_broadwell', 'pleiades', 'pleiades_ivy', 'pleiades_broadwell', 'pleiades_haswell'):
 
         header = """#PBS -S /bin/bash
-#PBS -lselect=1:mem=94GB
-#PBS -lwalltime=8:00:00
+#PBS -l select=1:mem=94GB
+#PBS -l walltime=8:00:00
 #PBS -q ldan
 
 cd $PBS_O_WORKDIR
@@ -1018,12 +1018,13 @@ cd $PBS_O_WORKDIR
 """
     elif system in ('chinook'):
         header = """#!/bin/bash
-#PBS -q analysis
-#PBS -l walltime=24:00:00
-#PBS -l nodes=1:ppn=1
-#PBS -j oe
+#SBATCH -q analysis
+#SBATCH -l walltime=24:00:00
+#SBATCH -l nodes=1:ppn=1
+#SBATCH -j oe
+#SBATCH --mem=214G
 
-#cd $PBS_O_WORKDIR
+cd $SLURM_SUBMIT_DIR
 
 """
     else:

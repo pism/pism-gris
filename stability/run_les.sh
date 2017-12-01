@@ -1,6 +1,6 @@
 #!/bin/bash
 
-odir=2017_11_lhs
+odir=2017_12_les
 s=chinook
 q=t2standard
 n=72
@@ -27,17 +27,20 @@ sbatch 2017_11_lhs/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_00${id}_j.sh;
 done
 done
 
+for id2 in `seq 0 4`;
+do
 for id1 in `seq 0 9`;
 do
 for id in `seq 0 9`;
 do
 for rcp in 26 45 85;
 do
-ctrlsbatch 2017_11_lhs/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_4${id1}${id}_j.sh;
+JOBID=$(sbatch 2017_12_les/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_j.sh | sed 's/[^0-9]*//g')
+sbatch --dependency=afterok:$JOBID 2017_12_les/run_scripts/post_lhs_g3600m_v3a_rcp_${rcp}_id_${id2}${id1}${id}.sh;
 done
 done
 done
-
+done
 
 for rcp in 26 45 85; do
     cdo -O enspctl,16 $odir/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc $odir/thk_pctl/pctl16_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
@@ -249,7 +252,24 @@ gdal_translate -a_nodata 0 NETCDF:2017_11_lhs/usurf_pctl/pctl84_gris_g3600m_v3a_
 gdaldem hillshade 2017_11_lhs/usurf_pctl/pctl84_gris_g3600m_v3a_rcp_${rcp}_0_1000.tif 2017_11_lhs/usurf_pctl/pctl84_gris_g3600m_v3a_rcp_${rcp}_0_1000_hs.tif
 done
 
-odir=2017_11_t
+
+odir=2017_12_ctrl
+s=chinook
+q=t2small
+n=24
+grid=9000
+
+./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 2:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+odir=2017_12_ctrl
+s=chinook
+q=t2small
+n=48
+grid=4500
+
+./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 6:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+odir=2017_12_ctrl
 s=chinook
 q=t2standard
 n=72
@@ -258,7 +278,7 @@ grid=3600
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 10:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
-odir=2017_11_ctrl
+odir=2017_12_ctrl
 s=chinook
 q=t2standard
 n=144
