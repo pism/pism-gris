@@ -1018,10 +1018,11 @@ cd $PBS_O_WORKDIR
 """
     elif system in ('chinook'):
         header = """#!/bin/bash
-#SBATCH -q analysis
-#SBATCH -l walltime=24:00:00
-#SBATCH -l nodes=1:ppn=1
-#SBATCH -j oe
+#SBATCH --partition=analysis
+#SBATCH --ntasks=1
+#SBATCH --tasks-per-node=1
+#SBATCH --time=48:00:00
+#SBATCH --output=pism.%j
 #SBATCH --mem=214G
 
 cd $SLURM_SUBMIT_DIR
