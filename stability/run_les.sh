@@ -51,7 +51,7 @@ grid=3600
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_20171104.csv --calibrate --o_dir ${odir} --exstep 1 -n ${n} -w 10:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
-for id2 in `seq 5 9`;
+for id2 in `seq 5 6`;
 do
 for id1 in `seq 0 9`;
 do
@@ -59,8 +59,9 @@ for id in `seq 0 9`;
 do
 for rcp in 26 45 85;
 do
-JOBID=$(sbatch 2017_12_les/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_j.sh | sed 's/[^0-9]*//g')
-qsub -W depend=afterok:$JOBID 2017_12_les/run_scripts/post_lhs_g3600m_v3a_rcp_${rcp}_id_${id2}${id1}${id}.sh;
+qsub 2017_12_les/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_j.sh
+#JOBID=$(qsub 2017_12_les/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_j.sh | sed 's/[^0-9]*//g')
+#qsub -W depend=afterok:$JOBID 2017_12_les/run_scripts/post_lhs_g3600m_v3a_rcp_${rcp}_id_${id2}${id1}${id}.sh;
 done
 done
 done
@@ -322,6 +323,14 @@ n=360
 grid=900
 
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 168:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+odir=2017_12_ctrl
+s=chinook
+q=t2standard
+n=360
+grid=900
+
+./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 168:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 2000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 odir=2017_11_ocean
 s=chinook

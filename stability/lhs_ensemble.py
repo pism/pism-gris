@@ -181,7 +181,7 @@ phi_max = 40.
 topg_min = -700
 topg_max = 700
 
-rcps = ['26', '45', '85']
+rcps = ['ctrl', '26', '45', '85']
 std_dev = 4.23
 firn = 'ctrl'
 lapse_rate = 6
