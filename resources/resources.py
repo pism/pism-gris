@@ -891,7 +891,6 @@ def make_batch_header(system, cores, walltime, queue):
 #SBATCH --ntasks={cores}
 #SBATCH --tasks-per-node={ppn}
 #SBATCH --time={walltime}
-#SBATCH --mail-user=aaschwanden@alaska.edu
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
