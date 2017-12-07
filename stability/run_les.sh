@@ -116,6 +116,15 @@ for file in gris_g${grid}m*0_1000.nc; do
 done
 cd ../../
 
+odir=2017_11_ctrl
+grid=900
+mkdir -p $odir/elevation_change
+cd $odir/spatial
+for file in ex_gris_g${grid}m*0_1000.nc; do
+    extract_profiles.py -v usurf ~/Google\ Drive/data/GreenlandIceCoreSites/ice-core-sites.shp $file ../elevation_change/usurf_$file
+done
+cd ../../
+
 
 odir=2017_11_ctrl
 grid=900
