@@ -51,7 +51,7 @@ grid=3600
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_20171104.csv --calibrate --o_dir ${odir} --exstep 1 -n ${n} -w 10:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
-for id2 in `seq 5 6`;
+for id2 in `seq 7 9`;
 do
 for id1 in `seq 0 9`;
 do
@@ -68,9 +68,34 @@ done
 done
 
 
+
+
+odir=2017_12_ctrl
+mkdir -p $odir/dgmsl
+for grid in 9000 4500 3600 1800 900; do
+    for rcp in 26 45 85; do
+        for year in 2100 2200 2500 3000; do
+            for run in CTRL; do
+                cdo mulc,-1 -divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgms_g${grid}m_rcp_${rcp}_${run}_${year}.nc
+            done
+        done
+    done
+done
+
+odir=2017_12_ctrl
+grid=900
+mkdir -p $odir/elevation_change
+cd $odir/spatial
+for file in ex_g${grid}m*0_1000.nc; do
+    extract_profiles.py -v usurf,thk ~/Google\ Drive/data/GreenlandIceCoreSites/ice-core-sites.shp $file ../elevation_change/usurf_$file
+done
+cd ../../
+
+
 for rcp in 26 45 85; do
     cdo -O enspctl,16 $odir/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc $odir/thk_pctl/pctl16_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
 done 
+
 
 # NISO-CTRL
 odir=2017_11_ctrl
@@ -120,8 +145,8 @@ odir=2017_11_ctrl
 grid=900
 mkdir -p $odir/elevation_change
 cd $odir/spatial
-for file in ex_gris_g${grid}m*0_1000.nc; do
-    extract_profiles.py -v usurf ~/Google\ Drive/data/GreenlandIceCoreSites/ice-core-sites.shp $file ../elevation_change/usurf_$file
+for file in ex_g${grid}m*0_1000.nc; do
+    extract_profiles.py -v usurf,thk ~/Google\ Drive/data/GreenlandIceCoreSites/ice-core-sites.shp $file ../elevation_change/usurf_$file
 done
 cd ../../
 
