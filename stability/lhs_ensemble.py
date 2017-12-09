@@ -181,7 +181,7 @@ phi_max = 40.
 topg_min = -700
 topg_max = 700
 
-rcps = ['26', '45', '85']
+rcps = ['ctrl', '26', '45', '85']
 std_dev = 4.23
 firn = 'ctrl'
 lapse_rate = 6
@@ -328,7 +328,7 @@ for n, combination in enumerate(combinations):
 
                     if bed_deformation != 'off':
                         general_params_dict['bed_def'] = 'lc'
-                    if bed_deformation == 'ip':
+                    if (bed_deformation == 'ip') and (start == simulation_start_year):
                         general_params_dict['bed_deformation.bed_uplift_file'] = '../data_sets/uplift/uplift_g{}m.nc'.format(grid)
                     if forcing_type in ('e_age'):
                         general_params_dict['e_age_coupling'] = ''
@@ -358,20 +358,35 @@ for n, combination in enumerate(combinations):
                     else:
                         print("How did I get here?")
 
+                    if start == simulation_start_year:
 
-                    climate_params_dict = generate_climate(climate,
-                                                           **{'surface.pdd.factor_ice': fice / ice_density,
-                                                              'surface.pdd.factor_snow': fsnow / ice_density,
-                                                              'surface.pdd.refreeze': rfr,
-                                                              'pdd_firn_depth_file': firn_file,
-                                                              'surface.pdd.std_dev': std_dev,
-                                                              'atmosphere_given_file': climate_file,
-                                                              'atmosphere_given_period': 1,
-                                                              'atmosphere_lapse_rate_file': climate_file,
-                                                              'atmosphere.precip_exponential_factor_for_temperature': prs / 100,
-                                                              'temp_lapse_rate': lapse_rate,
-                                                              'atmosphere_paleo_precip_file': climate_modifier_file,
-                                                              'atmosphere_delta_T_file': climate_modifier_file})
+                        climate_params_dict = generate_climate(climate,
+                                                               **{'surface.pdd.factor_ice': fice / ice_density,
+                                                                  'surface.pdd.factor_snow': fsnow / ice_density,
+                                                                  'surface.pdd.refreeze': rfr,
+                                                                  'pdd_firn_depth_file': firn_file,
+                                                                  'surface.pdd.std_dev': std_dev,
+                                                                  'atmosphere_given_file': climate_file,
+                                                                  'atmosphere_given_period': 1,
+                                                                  'atmosphere_lapse_rate_file': climate_file,
+                                                                  'atmosphere.precip_exponential_factor_for_temperature': prs / 100,
+                                                                  'temp_lapse_rate': lapse_rate,
+                                                                  'atmosphere_paleo_precip_file': climate_modifier_file,
+                                                                  'atmosphere_delta_T_file': climate_modifier_file})
+                    else:
+                        climate_params_dict = generate_climate(climate,
+                                                               **{'surface.pdd.factor_ice': fice / ice_density,
+                                                                  'surface.pdd.factor_snow': fsnow / ice_density,
+                                                                  'surface.pdd.refreeze': rfr,
+                                                                  'surface.pdd.std_dev': std_dev,
+                                                                  'atmosphere_given_file': climate_file,
+                                                                  'atmosphere_given_period': 1,
+                                                                  'atmosphere_lapse_rate_file': climate_file,
+                                                                  'atmosphere.precip_exponential_factor_for_temperature': prs / 100,
+                                                                  'temp_lapse_rate': lapse_rate,
+                                                                  'atmosphere_paleo_precip_file': climate_modifier_file,
+                                                                  'atmosphere_delta_T_file': climate_modifier_file})
+
 
                     if m_pdd == 1.0:
                         setattr(climate_params_dict, 'pdd_aschwanden', '')
@@ -449,9 +464,6 @@ for n, combination in enumerate(combinations):
                                                         start=simulation_start_year,
                                                         end=simulation_end_year,
                                                         odir=os.path.join(odir, scalar_dir))
-
-                    if start != simulation_start_year:
-                        scalar_ts_dict['ts_append'] = ''
 
                     exvars = stability_spatial_ts_vars()
                     if not calibrate:
@@ -534,16 +546,16 @@ for n, combination in enumerate(combinations):
                 f.write(cmd)
                 cmd = ' '.join(['~/base/gris-analysis/scripts/nc_add_hillshade.py -z 1 ', extra_file, '\n'])
                 f.write(cmd)
-                basin_dir = 'basins'
-                basin_odir =os.path.join(odir, basin_dir)
-                if not os.path.isdir(basin_odir):
-                    os.mkdir(basin_odir)
-                cmd = ' '.join(['cd', os.path.join(odir, spatial_dir), '\n'])
-                f.write(cmd)
-                for basin in ('CW', 'NE', 'NO', 'NW', 'SE', 'SW'):
-                    cmd = ' '.join(['~/base/gris-analysis/basins/extract_basins.py --basins ', basin, '--o_dir ../{}'.format(basin_dir),  extra_file, '\n'])
-                    f.write(cmd)
-                f.write('cd ../../ \n')
+                # basin_dir = 'basins'
+                # basin_odir = os.path.join(odir, basin_dir)
+                # if not os.path.isdir(basin_odir):
+                #     os.mkdir(basin_odir)
+                # cmd = ' '.join(['cd', os.path.join(odir, spatial_dir), '\n'])
+                # f.write(cmd)
+                # for basin in ('CW', 'NE', 'NO', 'NW', 'SE', 'SW'):
+                #     cmd = ' '.join(['~/base/gris-analysis/basins/extract_basins.py --basins ', basin, '--o_dir ../{}'.format(basin_dir),  extra_file, '\n'])
+                #     f.write(cmd)
+                # f.write('cd ../../ \n')
 
 
     
