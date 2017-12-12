@@ -10,7 +10,7 @@ Provides:
 
 from collections import OrderedDict
 import os, math
-
+import os.path
 
 def generate_prefix_str(pism_exec):
     '''
@@ -19,12 +19,7 @@ def generate_prefix_str(pism_exec):
     Returns: string
     '''
 
-    try:
-        p = os.environ['PISM_PREFIX']  + pism_exec
-    except:
-        p  = pism_exec
-    
-    return p
+    return os.path.join(os.environ.get("PISM_PREFIX", ""), pism_exec)
 
 
 def generate_domain(domain):
