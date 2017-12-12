@@ -5,7 +5,7 @@ import itertools
 from collections import OrderedDict
 import numpy as np
 import os, sys, shlex
-from os.path import join, abspath
+from os.path import join, abspath, realpath, dirname
 
 try:
     import subprocess32 as sub
@@ -14,7 +14,15 @@ except:
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import sys
-sys.path.append('../resources/')
+
+def current_script_directory():
+    import inspect
+    filename = inspect.stack(0)[0][1]
+    return realpath(dirname(filename))
+
+script_directory = current_script_directory()
+
+sys.path.append(join(script_directory, "../resources"))
 from resources import *
 
 def map_dict(val, mdict):
@@ -50,8 +58,10 @@ parser.add_argument("-f", "--o_format", dest="oformat",
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
                     help="horizontal grid resolution", default=9000)
+parser.add_argument("--i_dir", dest="input_dir",
+                    help="input directory", default=abspath(join(script_directory, "..")))
 parser.add_argument("--o_dir", dest="output_dir",
-                    help="output directory. Default: current directory", default='.')
+                    help="output directory", default='.')
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', 'big_2d', 'custom'],
                     help="output size type", default='custom')
@@ -98,7 +108,7 @@ parser.add_argument("-e", "--ensemble_file", dest="ensemble_file",
 options = parser.parse_args()
 
 nn = options.n
-input_dir = abspath("..")
+input_dir = options.input_dir
 output_dir = options.output_dir
 oformat = options.oformat
 osize = options.osize
@@ -149,7 +159,9 @@ regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume,thk
 pism_config = 'init_config'
 pism_config_nc = abspath("./" + pism_config + ".nc")
 
-cmd = "ncgen -o {output} ../config/{config}.cdl".format(output=pism_config_nc, config=pism_config)
+cmd = "ncgen -o {output} {script_directory}/../config/{config}.cdl".format(output=pism_config_nc,
+                                                                           script_directory=script_directory,
+                                                                           config=pism_config)
 sub.call(shlex.split(cmd))
 
 dirs = {"output": "$output_dir"}
