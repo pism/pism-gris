@@ -775,27 +775,27 @@ def list_bed_types():
 # information about systems
 systems = {}
 
-systems['debug'] = {'mpido' : 'mpiexec -n {cores}',
-                    'submit': 'echo',
+systems['debug'] = {'mpido'  : 'mpiexec -n {cores}',
+                    'submit' : 'echo',
                     'job_id' : 'PBS_JOBID',
-                    'queue' : {}}
+                    'queue'  : {}}
 
-systems['chinook'] = {'mpido' : 'mpirun -np {cores} -machinefile ./nodes_$SLURM_JOBID',
-                      'submit' : 'sbatch',
+systems['chinook'] = {'mpido'    : 'mpirun -np {cores} -machinefile ./nodes_$SLURM_JOBID',
+                      'submit'   : 'sbatch',
                       'work_dir' : 'SLURM_SUBMIT_DIR',
-                      'job_id' : 'SLURM_JOBID',
+                      'job_id'   : 'SLURM_JOBID',
                       'queue' : {
                           't1standard' : 24,
-                          't1small' : 24,
+                          't1small'    : 24,
                           't2standard' : 24,
-                          't2small' : 24,
-                          'debug' : 24}}
+                          't2small'    : 24,
+                          'debug'      : 24}}
 
-systems['pleiades'] = {'mpido' : 'mpiexec -n {cores}',
-                       'submit' : 'qsub',
+systems['pleiades'] = {'mpido'    : 'mpiexec -n {cores}',
+                       'submit'   : 'qsub',
                        'work_dir' : 'PBS_O_WORKDIR',
-                       'job_id' : 'PBS_JOBID',
-                       'queue' : {'long' : 20, 'normal': 20}}
+                       'job_id'   : 'PBS_JOBID',
+                       'queue'    : {'long' : 20, 'normal': 20}}
 
 systems['pleiades_haswell'] = systems['pleiades'].copy()
 systems['pleiades_haswell']['queue'] = {'long' : 24, 'normal': 24}
@@ -838,7 +838,7 @@ cd $SLURM_SUBMIT_DIR
 # Generate a list of compute node hostnames reserved for this job,
 # this ./nodes file is necessary for slurm to spawn mpi processes
 # across multiple compute nodes
-srun -l /bin/hostname | sort -n | awk \'{{print $2}}\' > ./nodes_$SLURM_JOBID
+srun -l /bin/hostname | sort -n | awk '{{print $2}}' > ./nodes_$SLURM_JOBID
 
 ulimit -l unlimited
 ulimit -s unlimited
