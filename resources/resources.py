@@ -840,6 +840,11 @@ ulimit -s unlimited
 
 """
 
+systems['chinook']['footer'] =  """
+# clean up the list of hostnames
+rm -rf ./nodes_$SLURM_JOBID
+"""
+
 systems['electra_broadwell']['header'] = """#PBS -S /bin/bash
 #PBS -N cfd
 #PBS -l walltime={walltime}

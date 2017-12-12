@@ -528,12 +528,15 @@ for n, combination in enumerate(combinations):
 
                     f.write(cmd)
                     f.write('\n')
+                    f.write(batch_system.get("footer", ""))
 
                     f_combined.write(cmd)
                     f_combined.write('\n\n')
 
                     regridfile = join(dirs["state"], outfile)
                     outfiles.append(outfile)
+
+            f_combined.write(batch_system.get("footer", ""))
 
         scripts_combinded.append(script_combined)
 
