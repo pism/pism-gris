@@ -145,8 +145,8 @@ regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume,thk
 
     
 pism_config = 'init_config'
-pism_config_nc = '.'.join([pism_config, 'nc'])
-pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
+pism_config_nc = pism_config + ".nc"
+pism_config_cdl = os.path.join('../config', pism_config + ".cdl")
 ncgen = 'ncgen'
 cmd = [ncgen, '-o',
        pism_config_nc, pism_config_cdl]
