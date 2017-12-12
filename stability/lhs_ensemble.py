@@ -4,7 +4,9 @@
 import itertools
 from collections import OrderedDict
 import numpy as np
-import os
+import os, sys, shlex
+from os.path import join
+
 try:
     import subprocess32 as sub
 except:
@@ -135,39 +137,55 @@ else:
     input_file = options.FILE[0]
 
 if domain.lower() in ('greenland_ext', 'gris_ext'):
-    pism_dataname = '${{root}}/data_sets/bed_dem/pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
+    pism_dataname = '$root/data_sets/bed_dem/pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 else:
-    pism_dataname = '${{root}}/data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
+    pism_dataname = '$root/data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
-climate_file = '${{root}}/data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)
+climate_file = '$root/data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume,thk'
 
-    
 pism_config = 'init_config'
 pism_config_nc = pism_config + ".nc"
-pism_config_cdl = os.path.join('../config', pism_config + ".cdl")
 ncgen = 'ncgen'
-cmd = [ncgen, '-o',
-       pism_config_nc, pism_config_cdl]
-sub.call(cmd)
-if not os.path.isdir(odir):
-    os.mkdir(odir)
+cmd = "{ncgen} -o {output} ../config/{config}.cdl".format(ncgen=ncgen, output=pism_config_nc, config=pism_config)
+sub.call(shlex.split(cmd))
 
-perf_dir = 'performance'
-state_dir = 'state'
-scalar_dir = 'scalar'
-spatial_dir = 'spatial'
-snap_dir = 'snap'
-script_dir = 'run_scripts'
-job_dir = 'jobs'
-for tsdir in (perf_dir, job_dir, scalar_dir, spatial_dir, snap_dir, state_dir, script_dir):
-    if not os.path.isdir(os.path.join(odir, tsdir)):
-        os.mkdir(os.path.join(odir, tsdir))
+dirs = {"output": "$output"}
+for d in ["performance", "state", "scalar", "spatial", "snap", "jobs"]:
+    dirs[d] = "$output/{dir}".format(dir=d)
+
 if not calibrate:
-    odir_tmp = '_'.join([odir, 'tmp'])
-    if not os.path.isdir(odir_tmp):
-        os.mkdir(odir_tmp)
+    dirs["output_tmp"] = "${output}_tmp"
+
+# use the actual path of the run scripts directory (we need it now and
+# not during the simulation)
+scripts_dir = join(odir, "run_scripts")
+try:
+    os.makedirs(scripts_dir)
+except OSError:
+    pass
+
+# these Bash commands are added to the beginning of the run scrips
+run_header = """# stop if a variable is not defined
+set -u
+# stop on errors
+set -e
+# print commands before exe
+set -x
+
+# path to the root directory (input files are relative to this)
+root=".."
+# root output directory
+output="{output}"
+
+# create required output directories
+for each in {dirs};
+do
+  mkdir -p $each
+done
+
+""".format(output=odir, dirs=" ".join(dirs.values()))
 
 # ########################################################
 # set up model initialization
@@ -250,11 +268,11 @@ for n, combination in enumerate(combinations):
         if rcp == 'ctrl':
             climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0)
         elif rcp == '26':
-            climate_modifier_file = '${{root}}/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'
+            climate_modifier_file = '$root/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'
         elif rcp == '45':
-            climate_modifier_file = '${{root}}/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'
+            climate_modifier_file = '$root/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'
         elif rcp == '85':
-            climate_modifier_file = '${{root}}/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'
+            climate_modifier_file = '$root/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'
         else:
             print("How did I get here")
 
@@ -264,7 +282,7 @@ for n, combination in enumerate(combinations):
             ocean_modifier_file = 'pism_step_climate_{}K.nc'.format(m_ohc)
 
         # All runs in one script file for coarse grids that fit into max walltime
-        script_combined = os.path.join(odir, script_dir, 'lhs_g{}m_{}_j.sh'.format(grid, full_exp_name))
+        script_combined = join(scripts_dir, 'lhs_g{}m_{}_j.sh'.format(grid, full_exp_name))
         with open(script_combined, 'w') as f_combined:
 
             outfiles = []
@@ -276,7 +294,7 @@ for n, combination in enumerate(combinations):
 
                 experiment =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
 
-                script = os.path.join(odir, script_dir, 'lhs_g{}m_{}.sh'.format(grid, experiment))
+                script = join(scripts_dir, 'lhs_g{}m_{}.sh'.format(grid, experiment))
                 scripts.append(script)
 
                 for filename in (script):
@@ -288,19 +306,19 @@ for n, combination in enumerate(combinations):
                 batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
                 if (start == simulation_start_year):
                     f_combined.write(batch_header)
+                    f_combined.write(run_header)
 
                 with open(script, 'w') as f:
 
                     f.write(batch_header)
-
-                    f.write('# root directory (paths to inputs files are relative to this)\nroot=".."\n\n')
+                    f.write(run_header)
 
                     outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
-                    prefix = generate_prefix_str(pism_exec)
+                    pism = generate_prefix_str(pism_exec)
 
                     general_params_dict = OrderedDict()
-                    general_params_dict['profile'] = os.path.join(odir, perf_dir, 'profile_${}.py'.format(batch_system['job_id'].split('.')[0]))
+                    general_params_dict['profile'] = join(dirs["performance"], 'profile_${job_id}.py'.format(**batch_system))
                     if start == simulation_start_year:
                         general_params_dict['bootstrap'] = ''
                         general_params_dict['i'] = pism_dataname
@@ -316,7 +334,7 @@ for n, combination in enumerate(combinations):
                     general_params_dict['calendar'] = '365_day'
                     general_params_dict['climate_forcing_buffer_size'] = 365
 
-                    general_params_dict['o'] = os.path.join(odir, state_dir, outfile)
+                    general_params_dict['o'] = join(dirs["state"], outfile)
                     general_params_dict['o_format'] = oformat
                     if osize != 'custom':
                         general_params_dict['o_size'] = osize
@@ -331,7 +349,7 @@ for n, combination in enumerate(combinations):
                     if bed_deformation != 'off':
                         general_params_dict['bed_def'] = 'lc'
                     if (bed_deformation == 'ip') and (start == simulation_start_year):
-                        general_params_dict['bed_deformation.bed_uplift_file'] = '${{root}}/data_sets/uplift/uplift_g{}m.nc'.format(grid)
+                        general_params_dict['bed_deformation.bed_uplift_file'] = '$root/data_sets/uplift/uplift_g{}m.nc'.format(grid)
                     if forcing_type in ('e_age'):
                         general_params_dict['e_age_coupling'] = ''
 
@@ -354,9 +372,9 @@ for n, combination in enumerate(combinations):
                     ice_density = 910.
 
                     if firn == 'off':
-                        firn_file = '${{root}}/data_sets/climate_forcing/firn_forcing_off.nc'
+                        firn_file = '$root/data_sets/climate_forcing/firn_forcing_off.nc'
                     elif firn == 'ctrl':
-                        firn_file = '${{root}}/data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'
+                        firn_file = '$root/data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'
                     else:
                         print("How did I get here?")
 
@@ -393,24 +411,24 @@ for n, combination in enumerate(combinations):
                     if m_pdd == 1.0:
                         setattr(climate_params_dict, 'pdd_aschwanden', '')
                     if ocm == 'low':
-                        ocean_file = '${{root}}/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc'
+                        ocean_file = '$root/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc'
                     elif ocm == 'mid':
-                        ocean_file = '${{root}}/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc'
+                        ocean_file = '$root/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc'
                     elif ocm == 'high':
-                        ocean_file = '${{root}}/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc'
+                        ocean_file = '$root/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc'
                     elif ocm == 'm10':
-                        ocean_file = '${{root}}/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc'
+                        ocean_file = '$root/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc'
                     elif ocm == 'm15':
-                        ocean_file = '${{root}}/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc'
+                        ocean_file = '$root/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc'
                     else:
                         pass
 
                     if tct == 'low':
-                        tct_file = '${{root}}/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
+                        tct_file = '$root/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
                     elif  tct == 'mid':
-                        tct_file = '${{root}}/data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc'
+                        tct_file = '$root/data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc'
                     elif tct == 'high':
-                        tct_file = '${{root}}/data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'
+                        tct_file = '$root/data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'
                     else:
                         print('not implemented')
 
@@ -465,12 +483,12 @@ for n, combination in enumerate(combinations):
                     scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
                                                         start=simulation_start_year,
                                                         end=simulation_end_year,
-                                                        odir=os.path.join(odir, scalar_dir))
+                                                        odir=dirs["scalar"])
 
                     exvars = stability_spatial_ts_vars()
                     if not calibrate:
-                        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=False)
-                        snap_dict = generate_snap_shots(outfile, save_times, odir=os.path.join(odir, snap_dir))
+                        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=dirs["output_tmp"], split=False)
+                        snap_dict = generate_snap_shots(outfile, save_times, odir=dirs["snap"])
                         if start != simulation_start_year:
                             spatial_ts_dict['extra_append'] = ''
 
@@ -496,10 +514,17 @@ for n, combination in enumerate(combinations):
                                                       scalar_ts_dict)
                     all_params = ' \\\n  '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
 
-                    if system in ('debug'):
-                        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/{job_dir}/job_{job_no}.${batch}'.format(outdir=odir, job_dir=job_dir, job_no=job_no, batch=batch_system['job_id'])])
+                    if system == 'debug':
+                        redirect = '2>&1 | tee {jobs}/job_{job_no}.${job_id}'
                     else:
-                        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/{job_dir}/job_{job_no}.${batch}  2>&1'.format(outdir=odir, job_dir=job_dir, job_no=job_no, batch=batch_system['job_id'])])
+                        redirect = '> {jobs}/job_{job_no}.${job_id} 2>&1'
+
+                    template = "{mpido} {pism} {params}" + redirect
+
+                    context = merge_dicts(batch_system,
+                                          dirs,
+                                          {"job_no" : job_no, "pism" : pism, "params" : all_params})
+                    cmd = template.format(**context)
 
                     f.write(cmd)
                     f.write('\n')
@@ -507,12 +532,12 @@ for n, combination in enumerate(combinations):
                     f_combined.write(cmd)
                     f_combined.write('\n\n')
 
-                    regridfile = os.path.join(odir, state_dir, outfile)
+                    regridfile = join(dirs["state"], outfile)
                     outfiles.append(outfile)
 
         scripts_combinded.append(script_combined)
 
-        script_post = os.path.join(odir, script_dir, 'post_lhs_g{}m_{}.sh'.format(grid, full_exp_name))
+        script_post = join(scripts_dir, 'post_lhs_g{}m_{}.sh'.format(grid, full_exp_name))
         scripts_post.append(script_post)
 
         post_header = make_batch_post_header(system)
@@ -528,20 +553,19 @@ for n, combination in enumerate(combinations):
             else:
                 mexstep = int(exstep)
 
-
-            ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=simulation_start_year, end=simulation_end_year))
+            ts_file = join(dirs["scalar"], 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=simulation_start_year, end=simulation_end_year))
             cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', '{}'.format(ts_file), '\n'])
             f.write(cmd)
             for start in range(simulation_start_year, simulation_end_year, restart_step):
                 end = start + restart_step
                 outfile = '{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=start, end=end)
-                state_file = os.path.join(odir, state_dir, outfile)
+                state_file = join(dirs["state"], outfile)
                 cmd = ' '.join(['ncks -O -4 -L 3', state_file, state_file, '\n'])
                 f.write(cmd)
             if not calibrate:
                 extra_file_tmp = spatial_ts_dict['extra_file']
                 extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
-                extra_file_wd = os.path.join(odir, spatial_dir, extra_file)
+                extra_file_wd = join(dirs["spatial"], extra_file)
                 cmd = ' '.join(['ncks -O -4 -L 3 ', extra_file_tmp, extra_file_wd, '\n'])
                 f.write(cmd)
                 cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', extra_file, '\n'])
@@ -559,8 +583,6 @@ for n, combination in enumerate(combinations):
                 #     f.write(cmd)
                 # f.write('cd ../../ \n')
 
-
-    
 scripts = uniquify_list(scripts)
 scripts_combinded = uniquify_list(scripts_combinded)
 scripts_post = uniquify_list(scripts_post)
