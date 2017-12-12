@@ -135,11 +135,11 @@ else:
     input_file = options.FILE[0]
 
 if domain.lower() in ('greenland_ext', 'gris_ext'):
-    pism_dataname = '../data_sets/bed_dem/pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
+    pism_dataname = '${{root}}/data_sets/bed_dem/pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 else:
-    pism_dataname = '../data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
+    pism_dataname = '${{root}}/data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
-climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)    
+climate_file = '${{root}}/data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume,thk'
 
@@ -250,11 +250,11 @@ for n, combination in enumerate(combinations):
         if rcp == 'ctrl':
             climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0)
         elif rcp == '26':
-            climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'
+            climate_modifier_file = '${{root}}/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'
         elif rcp == '45':
-            climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'
+            climate_modifier_file = '${{root}}/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'
         elif rcp == '85':
-            climate_modifier_file = '../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'
+            climate_modifier_file = '${{root}}/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'
         else:
             print("How did I get here")
 
@@ -293,6 +293,8 @@ for n, combination in enumerate(combinations):
 
                     f.write(batch_header)
 
+                    f.write('# root directory (paths to inputs files are relative to this)\nroot=".."\n\n')
+
                     outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
 
                     prefix = generate_prefix_str(pism_exec)
@@ -329,7 +331,7 @@ for n, combination in enumerate(combinations):
                     if bed_deformation != 'off':
                         general_params_dict['bed_def'] = 'lc'
                     if (bed_deformation == 'ip') and (start == simulation_start_year):
-                        general_params_dict['bed_deformation.bed_uplift_file'] = '../data_sets/uplift/uplift_g{}m.nc'.format(grid)
+                        general_params_dict['bed_deformation.bed_uplift_file'] = '${{root}}/data_sets/uplift/uplift_g{}m.nc'.format(grid)
                     if forcing_type in ('e_age'):
                         general_params_dict['e_age_coupling'] = ''
 
@@ -352,9 +354,9 @@ for n, combination in enumerate(combinations):
                     ice_density = 910.
 
                     if firn == 'off':
-                        firn_file = '../data_sets/climate_forcing/firn_forcing_off.nc'
+                        firn_file = '${{root}}/data_sets/climate_forcing/firn_forcing_off.nc'
                     elif firn == 'ctrl':
-                        firn_file = '../data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'
+                        firn_file = '${{root}}/data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'
                     else:
                         print("How did I get here?")
 
@@ -391,24 +393,24 @@ for n, combination in enumerate(combinations):
                     if m_pdd == 1.0:
                         setattr(climate_params_dict, 'pdd_aschwanden', '')
                     if ocm == 'low':
-                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc'
+                        ocean_file = '${{root}}/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc'
                     elif ocm == 'mid':
-                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc'
+                        ocean_file = '${{root}}/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc'
                     elif ocm == 'high':
-                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc'
+                        ocean_file = '${{root}}/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc'
                     elif ocm == 'm10':
-                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc'
+                        ocean_file = '${{root}}/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc'
                     elif ocm == 'm15':
-                        ocean_file = '../data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc'
+                        ocean_file = '${{root}}/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc'
                     else:
                         pass
 
                     if tct == 'low':
-                        tct_file = '../data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
+                        tct_file = '${{root}}/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
                     elif  tct == 'mid':
-                        tct_file = '../data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc'
+                        tct_file = '${{root}}/data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc'
                     elif tct == 'high':
-                        tct_file = '../data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'
+                        tct_file = '${{root}}/data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'
                     else:
                         print('not implemented')
 
