@@ -971,8 +971,10 @@ def make_batch_header(system_name, n_cores, walltime, queue):
         ppn = n_cores
         nodes = 1
     else:
-        assert queue in system['queue'].keys()
-        ppn = system['queue'][queue]
+        try:
+            ppn = system['queue'][queue]
+        except:
+            raise ValueError("There is no queue {} on {}. Pick one of {}.".format(queue, system_name, system['queue'].keys()))
         # round up when computing the number of nodes needed to run on 'n_cores' cores
         nodes = int(math.ceil(float(n_cores) / ppn))
 
