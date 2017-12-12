@@ -978,6 +978,12 @@ def make_batch_header(system_name, n_cores, walltime, queue):
         # round up when computing the number of nodes needed to run on 'n_cores' cores
         nodes = int(math.ceil(float(n_cores) / ppn))
 
+        if nodes * ppn != n_cores:
+            print("Warning! Running {n_cores} tasks on {nodes} {ppn}-processor nodes, wasting {N} processors!".format(nodes=nodes,
+                                                                                                                      ppn=ppn,
+                                                                                                                      n_cores=n_cores,
+                                                                                                                      N=ppn*nodes - n_cores))
+
     system['mpido'] = system['mpido'].format(cores=n_cores)
     system["header"] = system["header"].format(queue=queue,
                                                walltime=walltime,
