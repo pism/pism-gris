@@ -141,7 +141,7 @@ else:
 
 climate_file = '../data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)    
 
-regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
+regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume,thk'
 
     
 pism_config = 'init_config'
