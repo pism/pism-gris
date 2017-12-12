@@ -5,7 +5,7 @@ import itertools
 from collections import OrderedDict
 import numpy as np
 import os, sys, shlex
-from os.path import join
+from os.path import join, abspath
 
 try:
     import subprocess32 as sub
@@ -50,8 +50,8 @@ parser.add_argument("-f", "--o_format", dest="oformat",
 parser.add_argument("-g", "--grid", dest="grid", type=int,
                     choices=grid_choices,
                     help="horizontal grid resolution", default=9000)
-parser.add_argument("--o_dir", dest="odir",
-                    help="output directory. Default: current directory", default='foo')
+parser.add_argument("--o_dir", dest="output_dir",
+                    help="output directory. Default: current directory", default='.')
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', 'big_2d', 'custom'],
                     help="output size type", default='custom')
@@ -98,7 +98,8 @@ parser.add_argument("-e", "--ensemble_file", dest="ensemble_file",
 options = parser.parse_args()
 
 nn = options.n
-odir = options.odir
+input_dir = abspath("..")
+output_dir = options.output_dir
 oformat = options.oformat
 osize = options.osize
 queue = options.queue
@@ -137,30 +138,30 @@ else:
     input_file = options.FILE[0]
 
 if domain.lower() in ('greenland_ext', 'gris_ext'):
-    pism_dataname = '$root/data_sets/bed_dem/pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
+    pism_dataname = '$input_dir/data_sets/bed_dem/pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 else:
-    pism_dataname = '$root/data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
+    pism_dataname = '$input_dir/data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
 
-climate_file = '$root/data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)
+climate_file = '$input_dir/data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc'.format(grid)
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume,thk'
 
 pism_config = 'init_config'
-pism_config_nc = pism_config + ".nc"
-ncgen = 'ncgen'
-cmd = "{ncgen} -o {output} ../config/{config}.cdl".format(ncgen=ncgen, output=pism_config_nc, config=pism_config)
+pism_config_nc = abspath("./" + pism_config + ".nc")
+
+cmd = "ncgen -o {output} ../config/{config}.cdl".format(output=pism_config_nc, config=pism_config)
 sub.call(shlex.split(cmd))
 
-dirs = {"output": "$output"}
+dirs = {"output": "$output_dir"}
 for d in ["performance", "state", "scalar", "spatial", "snap", "jobs"]:
-    dirs[d] = "$output/{dir}".format(dir=d)
+    dirs[d] = "$output_dir/{dir}".format(dir=d)
 
 if not calibrate:
-    dirs["output_tmp"] = "${output}_tmp"
+    dirs["output_tmp"] = "${output_dir}_tmp"
 
 # use the actual path of the run scripts directory (we need it now and
 # not during the simulation)
-scripts_dir = join(odir, "run_scripts")
+scripts_dir = join(output_dir, "run_scripts")
 try:
     os.makedirs(scripts_dir)
 except OSError:
@@ -171,13 +172,13 @@ run_header = """# stop if a variable is not defined
 set -u
 # stop on errors
 set -e
-# print commands before exe
-set -x
 
-# path to the root directory (input files are relative to this)
-root=".."
-# root output directory
-output="{output}"
+# path to the config file
+config="{config}"
+# path to the input directory (input files are relative to this)
+input_dir="{input_dir}"
+# output directory
+output_dir="{output_dir}"
 
 # create required output directories
 for each in {dirs};
@@ -185,7 +186,10 @@ do
   mkdir -p $each
 done
 
-""".format(output=odir, dirs=" ".join(dirs.values()))
+""".format(input_dir=input_dir,
+           output_dir=abspath(output_dir),
+           config=pism_config_nc,
+           dirs=" ".join(dirs.values()))
 
 # ########################################################
 # set up model initialization
@@ -268,11 +272,11 @@ for n, combination in enumerate(combinations):
         if rcp == 'ctrl':
             climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0)
         elif rcp == '26':
-            climate_modifier_file = '$root/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'
+            climate_modifier_file = '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'
         elif rcp == '45':
-            climate_modifier_file = '$root/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'
+            climate_modifier_file = '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'
         elif rcp == '85':
-            climate_modifier_file = '$root/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'
+            climate_modifier_file = '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'
         else:
             print("How did I get here")
 
@@ -341,7 +345,7 @@ for n, combination in enumerate(combinations):
                     else:
                         general_params_dict['output.sizes.medium'] = 'sftgif,velsurf_mag'
                         
-                    general_params_dict['config_override'] = pism_config_nc
+                    general_params_dict['config_override'] = "$config"
                     if test_climate_models == True:
                         general_params_dict['test_climate_models'] = ''
                         general_params_dict['no_mass'] = ''
@@ -349,7 +353,7 @@ for n, combination in enumerate(combinations):
                     if bed_deformation != 'off':
                         general_params_dict['bed_def'] = 'lc'
                     if (bed_deformation == 'ip') and (start == simulation_start_year):
-                        general_params_dict['bed_deformation.bed_uplift_file'] = '$root/data_sets/uplift/uplift_g{}m.nc'.format(grid)
+                        general_params_dict['bed_deformation.bed_uplift_file'] = '$input_dir/data_sets/uplift/uplift_g{}m.nc'.format(grid)
                     if forcing_type in ('e_age'):
                         general_params_dict['e_age_coupling'] = ''
 
@@ -372,9 +376,9 @@ for n, combination in enumerate(combinations):
                     ice_density = 910.
 
                     if firn == 'off':
-                        firn_file = '$root/data_sets/climate_forcing/firn_forcing_off.nc'
+                        firn_file = '$input_dir/data_sets/climate_forcing/firn_forcing_off.nc'
                     elif firn == 'ctrl':
-                        firn_file = '$root/data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'
+                        firn_file = '$input_dir/data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'
                     else:
                         print("How did I get here?")
 
@@ -411,24 +415,24 @@ for n, combination in enumerate(combinations):
                     if m_pdd == 1.0:
                         setattr(climate_params_dict, 'pdd_aschwanden', '')
                     if ocm == 'low':
-                        ocean_file = '$root/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc'
+                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc'
                     elif ocm == 'mid':
-                        ocean_file = '$root/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc'
+                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc'
                     elif ocm == 'high':
-                        ocean_file = '$root/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc'
+                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc'
                     elif ocm == 'm10':
-                        ocean_file = '$root/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc'
+                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc'
                     elif ocm == 'm15':
-                        ocean_file = '$root/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc'
+                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc'
                     else:
                         pass
 
                     if tct == 'low':
-                        tct_file = '$root/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
+                        tct_file = '$input_dir/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
                     elif  tct == 'mid':
-                        tct_file = '$root/data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc'
+                        tct_file = '$input_dir/data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc'
                     elif tct == 'high':
-                        tct_file = '$root/data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'
+                        tct_file = '$input_dir/data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'
                     else:
                         print('not implemented')
 
@@ -512,12 +516,12 @@ for n, combination in enumerate(combinations):
                                                       hydro_params_dict,
                                                       calving_params_dict,
                                                       scalar_ts_dict)
-                    all_params = ' \\\n  '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+                    all_params = ' \\\n  '.join(["-{} {}".format(k, v) for k, v in all_params_dict.items()])
 
                     if system == 'debug':
-                        redirect = '2>&1 | tee {jobs}/job_{job_no}.${job_id}'
+                        redirect = ' 2>&1 | tee {jobs}/job_{job_no}.${job_id}'
                     else:
-                        redirect = '> {jobs}/job_{job_no}.${job_id} 2>&1'
+                        redirect = ' > {jobs}/job_{job_no}.${job_id} 2>&1'
 
                     template = "{mpido} {pism} {params}" + redirect
 
