@@ -9,7 +9,7 @@ Provides:
 """
 
 from collections import OrderedDict
-import os
+import os, math
 
 
 def generate_prefix_str(pism_exec):
@@ -736,49 +736,25 @@ def generate_ocean(ocean, **kwargs):
 
 
 def list_systems():
-
     '''
     Return a list of supported systems.
     '''
-    
-    list = ['debug',
-            'chinook',
-            'electra_broadwell',
-            'fish',
-            'pacman',
-            'pleiades',
-            'pleiades_ivy',
-            'pleiades_haswell',
-            'pleiades_broadwell']
-    
-    return list
+    return sorted(systems.keys())
 
 
 def list_queues():
-
     '''
     Return a list of supported queues.
     '''
-    
-    list = ['debug',
-            'devel',
-            'gpu',
-            'gpu_long',
-            'normal',
-            'long',
-            'standard',
-            'standard_16',
-            't1standard',
-            't2standard',
-            't1small',
-            't2small']
-    
-    return list
+    result = set()
+    for s in systems.values():
+        for q in s["queue"].keys():
+            result.add(q)
 
+    return result
 
 
 def list_bed_types():
-
     '''
     Return a list of supported bed types.
     '''
@@ -796,97 +772,56 @@ def list_bed_types():
     return list
 
 
-def make_batch_header(system, cores, walltime, queue):
-    '''
-    Generate header file for different HPC system.
+# information about systems
+systems = {}
 
-    Returns: String
-    '''
-    
-    systems = {}
-    mpido = 'mpiexec -n {cores}'.format(cores=cores)
-    systems['debug'] = {'mpido' : mpido,
-                        'submit': 'echo',
-                        'job_id' : 'PBS_JOBID'}
-    mpido = 'mpiexec -n {cores}'.format(cores=cores)
-    systems['fish'] = {'mpido': 'aprun -n {cores}'.format(cores=cores),
+systems['debug'] = {'mpido' : 'mpiexec -n {cores}',
+                    'submit': 'echo',
+                    'job_id' : 'PBS_JOBID',
+                    'queue' : {}}
+
+systems['chinook'] = {'mpido' : 'mpirun -np {cores} -machinefile ./nodes_$SLURM_JOBID',
+                      'submit' : 'sbatch',
+                      'work_dir' : 'SLURM_SUBMIT_DIR',
+                      'job_id' : 'SLURM_JOBID',
+                      'queue' : {
+                          't1standard' : 24,
+                          't1small' : 24,
+                          't2standard' : 24,
+                          't2small' : 24,
+                          'debug' : 24}}
+
+systems['pleiades'] = {'mpido' : 'mpiexec -n {cores}',
                        'submit' : 'qsub',
                        'work_dir' : 'PBS_O_WORKDIR',
                        'job_id' : 'PBS_JOBID',
-                       'queue' : {
-                           'gpu' : 16,
-                           'gpu_long' : 16,
-                           'standard' : 12 }}
-    mpido = 'mpirun -np {cores}'.format(cores=cores)
-    systems['pacman'] = {'mpido' : mpido,
-                         'submit' : 'qsub',
-                         'work_dir' : 'PBS_O_WORKDIR',
-                         'job_id' : 'PBS_JOBID',
-                         'queue' : {
-                             'standard_16' : 16 }}
-    mpido = 'mpirun -np {cores} -machinefile ./nodes_$SLURM_JOBID'.format(cores=cores)                         
-    systems['chinook'] = {'mpido' : mpido,
-                          'submit' : 'sbatch',
-                          'work_dir' : 'SLURM_SUBMIT_DIR',
-                          'job_id' : 'SLURM_JOBID',
-                          'queue' : {
-                              't1standard' : 24,
-                              't1small' : 24,
-                              't2standard' : 24,
-                              't2small' : 24,
-                              'debug' : 24}}
-    mpido = 'mpiexec -n {cores}'.format(cores=cores)
-    systems['electra_broadwell'] = {'mpido' : mpido,
-                           'submit' : 'qsub',
-                           'work_dir' : 'PBS_O_WORKDIR',
-                           'job_id' : 'PBS_JOBID',
-                           'queue' : {
-                               'long' : 28,
-                               'normal': 28}}
-    systems['pleiades'] = {'mpido' : mpido,
-                           'submit' : 'qsub',
-                           'work_dir' : 'PBS_O_WORKDIR',
-                           'job_id' : 'PBS_JOBID',
-                           'queue' : {
-                               'long' : 20,
-                               'normal': 20}}
-    systems['pleiades_haswell'] = {'mpido' : mpido,
-                           'submit' : 'qsub',
-                           'work_dir' : 'PBS_O_WORKDIR',
-                           'job_id' : 'PBS_JOBID',
-                           'queue' : {
-                               'long' : 24,
-                               'normal': 24}}
-    systems['pleiades_ivy'] = {'mpido' : mpido,
-                           'submit' : 'qsub',
-                           'work_dir' : 'PBS_O_WORKDIR',
-                           'job_id' : 'PBS_JOBID',
-                           'queue' : {
-                               'long' : 20,
-                               'normal': 20}}
-    systems['pleiades_broadwell'] = {'mpido' : mpido,
-                           'submit' : 'qsub',
-                           'work_dir' : 'PBS_O_WORKDIR',
-                           'job_id' : 'PBS_JOBID',
-                           'queue' : {
-                               'long' : 28,
-                               'normal': 28}}
+                       'queue' : {'long' : 20, 'normal': 20}}
 
-    assert system in systems.keys()
-    if system not in 'debug':
-        assert queue in systems[system]['queue'].keys()
-        assert cores > 0
+systems['pleiades_haswell'] = systems['pleiades'].copy()
+systems['pleiades_haswell']['queue'] = {'long' : 24, 'normal': 24}
 
-        ppn = systems[system]['queue'][queue]
-        nodes = cores / ppn
+systems['pleiades_ivy'] = systems['pleiades'].copy()
+systems['pleiades_ivy']['queue'] = {'long' : 20, 'normal': 20}
 
-    if system in ('debug'):
+systems['pleiades_broadwell'] = systems['pleiades'].copy()
+systems['pleiades_broadwell']['queue'] = {'long' : 28, 'normal': 28}
 
-        header = ''
-        
-    elif system in ('chinook'):
-        
-        header = """#!/bin/sh
+systems['electra_broadwell'] = systems['pleiades_broadwell'].copy()
+
+
+# headers for batch jobs
+#
+# Available keywords:
+#
+# cores    - number of cores (MPI tasks)
+# queue    - queue (partition) name
+# nodes    - number of nodes
+# ppn      - number of tasks per node
+# walltime - wall time limit
+
+systems['debug']['header'] = ""
+
+systems['chinook']['header'] =  """#!/bin/sh
 #SBATCH --partition={queue}
 #SBATCH --ntasks={cores}
 #SBATCH --tasks-per-node={ppn}
@@ -908,10 +843,9 @@ srun -l /bin/hostname | sort -n | awk \'{{print $2}}\' > ./nodes_$SLURM_JOBID
 ulimit -l unlimited
 ulimit -s unlimited
 
-""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
-    elif system in ('electra_broadwell'):
-        
-        header = """#PBS -S /bin/bash
+"""
+
+systems['electra_broadwell']['header'] = """#PBS -S /bin/bash
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
@@ -923,10 +857,9 @@ module list
 
 cd $PBS_O_WORKDIR
 
-""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
-    elif system in ('pleiades'):
-        
-        header = """#PBS -S /bin/bash
+"""
+
+systems['pleiades']['header'] = """#PBS -S /bin/bash
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
@@ -939,10 +872,9 @@ module list
 
 cd $PBS_O_WORKDIR
 
-""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
-    elif system in ('pleiades_broadwell'):
-        
-        header = """#PBS -S /bin/bash
+"""
+
+systems['pleiades_broadwell']['header'] = """#PBS -S /bin/bash
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
@@ -955,10 +887,9 @@ module list
 
 cd $PBS_O_WORKDIR
 
-""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
-    elif system in ('pleiades_haswell'):
-        
-        header = """#PBS -S /bin/bash
+"""
+
+systems['pleiades_haswell']['header'] = """#PBS -S /bin/bash
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
@@ -971,10 +902,9 @@ module list
 
 cd $PBS_O_WORKDIR
 
-""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
-    elif system in ('pleiades_ivy'):
-        
-        header = """#PBS -S /bin/bash
+"""
+
+systems['pleiades_ivy']['header'] = """#PBS -S /bin/bash
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
@@ -987,9 +917,9 @@ module list
 
 cd $PBS_O_WORKDIR
 
-""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
-    else:
-        header = """#!/bin/bash
+"""
+
+systems['debug']['header'] = """#!/bin/bash
 #PBS -q {queue}
 #PBS -l walltime={walltime}
 #PBS -l nodes={nodes}:ppn={ppn}
@@ -999,15 +929,16 @@ module list
 
 cd $PBS_O_WORKDIR
 
-""".format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=cores)
+"""
 
-    return header, systems[system]
+# headers for post-processing jobs
 
-def make_batch_post_header(system):
+post_headers = {}
+post_headers['default'] = """#!/bin/bash
 
-    if system in ('electra_broadwell', 'pleiades', 'pleiades_ivy', 'pleiades_broadwell', 'pleiades_haswell'):
+"""
 
-        header = """#PBS -S /bin/bash
+post_headers['pbs'] = """#PBS -S /bin/bash
 #PBS -l select=1:mem=94GB
 #PBS -l walltime=8:00:00
 #PBS -q ldan
@@ -1015,8 +946,8 @@ def make_batch_post_header(system):
 cd $PBS_O_WORKDIR
 
 """
-    elif system in ('chinook'):
-        header = """#!/bin/bash
+
+post_headers['slurm'] = """#!/bin/bash
 #SBATCH --partition=analysis
 #SBATCH --ntasks=1
 #SBATCH --tasks-per-node=1
@@ -1027,8 +958,50 @@ cd $PBS_O_WORKDIR
 cd $SLURM_SUBMIT_DIR
 
 """
-    else:
-        header = """#!/bin/bash
 
-"""
-    return header
+def make_batch_header(system_name, n_cores, walltime, queue):
+    '''
+    Generate header file for different HPC system.
+
+    Returns: String
+    '''
+
+    # get system info; use "debug" if the requested name was not found
+    system = systems.get(system_name, systems["debug"]).copy()
+
+    assert n_cores > 0
+
+    if system_name == 'debug':
+        # when debugging, assume that all we need is one node
+        ppn = n_cores
+        nodes = 1
+    else:
+        assert queue in system['queue'].keys()
+        ppn = system['queue'][queue]
+        # round up when computing the number of nodes needed to run on 'n_cores' cores
+        nodes = int(math.ceil(float(n_cores) / ppn))
+
+    system['mpido'] = system['mpido'].format(cores=n_cores)
+    system["header"] = system["header"].format(queue=queue,
+                                               walltime=walltime,
+                                               nodes=nodes,
+                                               ppn=ppn,
+                                               cores=n_cores)
+
+    return system["header"], system
+
+def make_batch_post_header(system):
+
+    if system in ('electra_broadwell', 'pleiades', 'pleiades_ivy', 'pleiades_broadwell', 'pleiades_haswell'):
+        return post_headers['pbs']
+    elif system in ('chinook'):
+        return post_headers['slurm']
+    else:
+        return post_headers['default']
+
+def make_batch_header_test():
+    "print headers of all thew supported systems and queues (for testing)"
+    for s in systems.keys():
+        for q in systems[s]['queue'].keys():
+            print "# system: {system}, queue: {queue}".format(system=s, queue=q)
+            print make_batch_header(s, 100, "1:00:00", q)[0]
