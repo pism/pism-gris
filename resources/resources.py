@@ -1013,3 +1013,16 @@ def make_batch_header_test():
         for q in systems[s]['queue'].keys():
             print "# system: {system}, queue: {queue}".format(system=s, queue=q)
             print make_batch_header(s, 100, "1:00:00", q)[0]
+
+def version():
+    """Return the path to the top directory of the Git repository
+    containing this script, the URL of the "origin" remote and the version."""
+    import inspect, shlex, subprocess
+
+    def output(command):
+        path = os.path.realpath(os.path.dirname(inspect.stack(0)[0][1]))
+        return subprocess.check_output(shlex.split(command), cwd=path).strip()
+
+    return (output("git rev-parse --show-toplevel"),
+            output("git remote get-url origin"),
+            output("git describe --always"))
