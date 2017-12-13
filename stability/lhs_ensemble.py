@@ -282,16 +282,14 @@ for n, combination in enumerate(combinations):
         vversion = 'v' + str(version)
         full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
         full_outfile = 'g{grid}m_{experiment}.nc'.format(grid=grid, experiment=full_exp_name)
-        if rcp == 'ctrl':
-            climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0)
-        elif rcp == '26':
-            climate_modifier_file = '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'
-        elif rcp == '45':
-            climate_modifier_file = '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'
-        elif rcp == '85':
-            climate_modifier_file = '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'
-        else:
-            print("How did I get here")
+
+        forcing_files = {'ctrl' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0),
+                         '26'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc',
+                         '45'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc',
+                         '85'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'
+        }
+
+        climate_modifier_file = forcing_files[rcp]
 
         if m_ohc == 0:
             ocean_modifier_file = climate_modifier_file
@@ -388,12 +386,10 @@ for n, combination in enumerate(combinations):
                     stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
                     ice_density = 910.
 
-                    if firn == 'off':
-                        firn_file = '$input_dir/data_sets/climate_forcing/firn_forcing_off.nc'
-                    elif firn == 'ctrl':
-                        firn_file = '$input_dir/data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'
-                    else:
-                        print("How did I get here?")
+                    firn_files = {'off' : '$input_dir/data_sets/climate_forcing/firn_forcing_off.nc',
+                                  'ctrl': '$input_dir/data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'}
+
+                    firn_file = firn_files[firn]
 
                     if start == simulation_start_year:
 
@@ -427,45 +423,26 @@ for n, combination in enumerate(combinations):
 
                     if m_pdd == 1.0:
                         setattr(climate_params_dict, 'pdd_aschwanden', '')
-                    if ocm == 'low':
-                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc'
-                    elif ocm == 'mid':
-                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc'
-                    elif ocm == 'high':
-                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc'
-                    elif ocm == 'm10':
-                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc'
-                    elif ocm == 'm15':
-                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc'
-                    else:
-                        pass
 
-                    if tct == 'low':
-                        tct_file = '$input_dir/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
-                    elif  tct == 'mid':
-                        tct_file = '$input_dir/data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc'
-                    elif tct == 'high':
-                        tct_file = '$input_dir/data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'
-                    else:
-                        print('not implemented')
+                    ocean_files = {'low' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc',
+                                   'mid' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc',
+                                   'high': '$input_dir/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc',
+                                   'm10' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc',
+                                   'm15' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc'}
 
-                    if ocs == 'low':
-                        ocean_alpha = 0.5
-                        ocean_beta = 1.0
-                    elif ocs == 'mid':
-                        ocean_alpha = 0.54
-                        ocean_beta = 1.17
-                    elif ocs == 'high':
-                        ocean_alpha = 0.85
-                        ocean_beta = 1.61
-                    # elif ocs == 'mid':
-                    #     ocean_alpha = 0.54
-                    #     ocean_beta = 1.17
-                    # elif ocs == 'high':
-                    #     ocean_alpha = 0.85
-                    #     ocean_beta = 1.61
-                    else:
-                        pass
+                    ocean_file = ocean_files[ocm]
+
+                    calving_thresholds = {'low' : '$input_dir/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc',
+                                          'mid' : '$input_dir/data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc',
+                                          'high': '$input_dir/data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'}
+
+                    tct_file = calving_thresholds[tct]
+
+                    ocs_params = {'low' : (0.5, 1.0),
+                                  'mid' : (0.54, 1.17),
+                                  'high': (0.85, 1.61)}
+
+                    ocean_alpha, ocean_beta = ocs_params[ocs]
 
                     if ocs == 'off':
                         ocean = 'given'
