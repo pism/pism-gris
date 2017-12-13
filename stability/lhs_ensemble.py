@@ -248,7 +248,9 @@ if restart_step > (simulation_end_year - simulation_start_year):
     print('Try again')
     import sys
     sys.exit(0)
-    
+
+batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
+post_header = make_batch_post_header(system)
 
 for n, combination in enumerate(combinations):
 
@@ -315,7 +317,6 @@ for n, combination in enumerate(combinations):
                     except OSError:
                         pass
 
-                batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
                 if (start == simulation_start_year):
                     f_combined.write(batch_header)
                     f_combined.write(run_header)
@@ -514,8 +515,6 @@ for n, combination in enumerate(combinations):
 
         script_post = join(scripts_dir, 'post_lhs_g{}m_{}.sh'.format(grid, full_exp_name))
         scripts_post.append(script_post)
-
-        post_header = make_batch_post_header(system)
 
         with open(script_post, 'w') as f:
 
