@@ -108,8 +108,8 @@ parser.add_argument("-e", "--ensemble_file", dest="ensemble_file",
 options = parser.parse_args()
 
 nn = options.n
-input_dir = options.input_dir
-output_dir = options.output_dir
+input_dir = abspath(options.input_dir)
+output_dir = abspath(options.output_dir)
 oformat = options.oformat
 osize = options.osize
 queue = options.queue
@@ -156,14 +156,6 @@ climate_file = '$input_dir/data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume,thk'
 
-pism_config = 'init_config'
-pism_config_nc = abspath("./" + pism_config + ".nc")
-
-cmd = "ncgen -o {output} {script_directory}/../config/{config}.cdl".format(output=pism_config_nc,
-                                                                           script_directory=script_directory,
-                                                                           config=pism_config)
-sub.call(shlex.split(cmd))
-
 dirs = {"output": "$output_dir"}
 for d in ["performance", "state", "scalar", "spatial", "snap", "jobs"]:
     dirs[d] = "$output_dir/{dir}".format(dir=d)
@@ -178,6 +170,14 @@ try:
     os.makedirs(scripts_dir)
 except OSError:
     pass
+
+pism_config = 'init_config'
+pism_config_nc = join(output_dir, pism_config + ".nc")
+
+cmd = "ncgen -o {output} {input_dir}/config/{config}.cdl".format(output=pism_config_nc,
+                                                                 input_dir=input_dir,
+                                                                 config=pism_config)
+sub.call(shlex.split(cmd))
 
 # these Bash commands are added to the beginning of the run scrips
 run_header = """# stop if a variable is not defined
@@ -199,7 +199,7 @@ do
 done
 
 """.format(input_dir=input_dir,
-           output_dir=abspath(output_dir),
+           output_dir=output_dir,
            config=pism_config_nc,
            dirs=" ".join(dirs.values()))
 
