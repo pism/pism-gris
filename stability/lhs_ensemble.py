@@ -167,10 +167,8 @@ if not save_spatial_ts:
 # use the actual path of the run scripts directory (we need it now and
 # not during the simulation)
 scripts_dir = join(output_dir, "run_scripts")
-try:
+if not os.path.isdir(scripts_dir):
     os.makedirs(scripts_dir)
-except OSError:
-    pass
 
 pism_config = 'init_config'
 pism_config_nc = join(output_dir, pism_config + ".nc")
