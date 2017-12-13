@@ -117,6 +117,7 @@ walltime = options.walltime
 system = options.system
 
 calibrate = options.calibrate
+save_spatial_ts = not calibrate
 
 bed_type = options.bed_type
 calving = options.calving
@@ -160,8 +161,8 @@ dirs = {"output": "$output_dir"}
 for d in ["performance", "state", "scalar", "spatial", "snap", "jobs"]:
     dirs[d] = "$output_dir/{dir}".format(dir=d)
 
-if not calibrate:
-    dirs["output_tmp"] = "${output_dir}_tmp"
+if not save_spatial_ts:
+    del dirs["spatial"]
 
 # use the actual path of the run scripts directory (we need it now and
 # not during the simulation)
@@ -502,8 +503,8 @@ for n, combination in enumerate(combinations):
                                                         odir=dirs["scalar"])
 
                     exvars = stability_spatial_ts_vars()
-                    if not calibrate:
-                        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=dirs["output_tmp"], split=False)
+                    if save_spatial_ts:
+                        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=dirs["spatial"], split=False)
                         snap_dict = generate_snap_shots(outfile, save_times, odir=dirs["snap"])
                         if start != simulation_start_year:
                             spatial_ts_dict['extra_append'] = ''
@@ -581,7 +582,7 @@ for n, combination in enumerate(combinations):
                 state_file = join(dirs["state"], outfile)
                 cmd = ' '.join(['ncks -O -4 -L 3', state_file, state_file, '\n'])
                 f.write(cmd)
-            if not calibrate:
+            if save_spatial_ts:
                 extra_file_tmp = spatial_ts_dict['extra_file']
                 extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
                 extra_file_wd = join(dirs["spatial"], extra_file)
