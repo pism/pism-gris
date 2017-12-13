@@ -1008,7 +1008,7 @@ def make_batch_post_header(system):
         return post_headers['default']
 
 def make_batch_header_test():
-    "print headers of all thew supported systems and queues (for testing)"
+    "print headers of all supported systems and queues (for testing)"
     for s in systems.keys():
         for q in systems[s]['queue'].keys():
             print "# system: {system}, queue: {queue}".format(system=s, queue=q)
