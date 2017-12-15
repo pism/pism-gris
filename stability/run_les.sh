@@ -9,16 +9,6 @@ grid=3600
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_20171104.csv --calibrate --o_dir ${odir} --exstep 1 -n ${n} -w 10:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
-exit 
-odir=2017_11_lhs
-s=pleiades_broadwell
-q=normal
-n=84
-grid=3600
-
-./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_20171104.csv --calibrate --o_dir ${odir} --exstep 1 -n ${n} -w 08:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
-
-
 for id in `seq 0 9`;
 do
 for rcp in 26 45 85;
@@ -51,7 +41,7 @@ grid=3600
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_20171104.csv --calibrate --o_dir ${odir} --exstep 1 -n ${n} -w 10:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
-for id2 in `seq 7 9`;
+for id2 in `seq 5 10`;
 do
 for id1 in `seq 0 9`;
 do
@@ -59,8 +49,7 @@ for id in `seq 0 9`;
 do
 for rcp in 26 45 85;
 do
-qsub 2017_12_les/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_j.sh
-#JOBID=$(qsub 2017_12_les/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_j.sh | sed 's/[^0-9]*//g')
+qsub 2017_12_les/run_scripts/post_g3600m_v3a_rcp_${rcp}_id_${id2}${id1}${id}.sh 
 #qsub -W depend=afterok:$JOBID 2017_12_les/run_scripts/post_lhs_g3600m_v3a_rcp_${rcp}_id_${id2}${id1}${id}.sh;
 done
 done
@@ -68,34 +57,12 @@ done
 done
 
 
-
-
-odir=2017_12_ctrl
-mkdir -p $odir/dgmsl
-for grid in 9000 4500 3600 1800 900; do
-    for rcp in 26 45 85; do
-        for year in 2100 2200 2500 3000; do
-            for run in CTRL; do
-                cdo mulc,-1 -divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgms_g${grid}m_rcp_${rcp}_${run}_${year}.nc
-            done
-        done
-    done
-done
-
 odir=2017_12_ctrl
 grid=900
-mkdir -p $odir/elevation_change
-cd $odir/spatial
-for file in ex_g${grid}m*0_1000.nc; do
-    extract_profiles.py -v usurf,thk ~/Google\ Drive/data/GreenlandIceCoreSites/ice-core-sites.shp $file ../elevation_change/usurf_$file
-done
-cd ../../
-
-
+mkdir -p ${odir}/station_ts
 for rcp in 26 45 85; do
-    cdo -O enspctl,16 $odir/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc $odir/thk_pctl/pctl16_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
-done 
-
+extract_profiles.py -v thk,usrf,tempsurf ../../data_sets/GreenlandIceCoreSites/ice-core-sites.shp ${odir}/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc ${odir}/station_ts/profile_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
+done
 
 # NISO-CTRL
 odir=2017_11_ctrl
@@ -107,9 +74,9 @@ for rcp in 26 45 85; do
 done
 
 # Cumulative contribution LES and CTRL
-~/base/gris-analysis/plotting/plotting.py  -n 4 -o les --time_bounds 2008 3000 --ctrl_file 2017_12_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2017_12_les/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
+~/base/gris-analysis/plotting/plotting.py  -n 8 -o les --time_bounds 2008 3000 --ctrl_file 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2017_12_les/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
 # Rates of GMSL rise LES and CTRL
-~/base/gris-analysis/plotting/plotting.py -n 4 -o les --time_bounds 2008 3000 --no_legend --ctrl_file 2017_11_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
+~/base/gris-analysis/plotting/plotting.py -n 8 -o les --time_bounds 2008 3000 --no_legend --ctrl_file 2017_11_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
 
 # Flux Partitioning
 ~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --time_bounds 2008 3000 --no_legend --plot flux_partitioning 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*id_CTRL_*.nc
@@ -138,15 +105,6 @@ for file in gris_g${grid}m*0_1000.nc; do
     gdaldem hillshade ../final_states/usurf_$file.tif ../final_states/hs_usurf_$file.tif
     gdal_translate NETCDF:../final_states/$file:topg ../final_states/topg_$file.tif
     gdaldem hillshade ../final_states/topg_$file.tif ../final_states/hs_topg_$file.tif
-done
-cd ../../
-
-odir=2017_11_ctrl
-grid=900
-mkdir -p $odir/elevation_change
-cd $odir/spatial
-for file in ex_g${grid}m*0_1000.nc; do
-    extract_profiles.py -v usurf,thk ~/Google\ Drive/data/GreenlandIceCoreSites/ice-core-sites.shp $file ../elevation_change/usurf_$file
 done
 cd ../../
 
@@ -236,7 +194,7 @@ for rcp in 26 45 85; do
     done
 done
 
-odir=2017_11_lhs
+odir=2017_12_les
 grid=3600
 mkdir -p $odir/sftgif
 mkdir -p $odir/sftgif_pctl
@@ -249,7 +207,7 @@ for file in gris_g${grid}m*id_*0_1000.nc; do
 done
 cd ../../
 for rcp in 26 45 85; do
-    cdo -O enssum $odir/sftgif/gris_g${grid}m_v3a_rcp_${rcp}_id_*_0_1000.nc $odir/sftgif_pctl/sum_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+    cdo -O -P 12 enssum $odir/sftgif/gris_g${grid}m_v3a_rcp_${rcp}_id_*_0_1000.nc $odir/sftgif_pctl/sum_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
     cdo divc,4.95 $odir/sftgif_pctl/sum_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/sftgif_pctl/percent_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
 done 
 
@@ -358,13 +316,15 @@ grid=900
 
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 168:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
-odir=2017_12_ctrl
+
+odir=2017_12_600m
 s=chinook
 q=t2standard
-n=360
-grid=900
+n=480
+grid=600
 
-./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 168:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 2000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 168:00:00 -g ${grid} -s ${s} -q ${q} --step 200 --duration 200 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
 
 odir=2017_11_ocean
 s=chinook
