@@ -117,6 +117,7 @@ walltime = options.walltime
 system = options.system
 
 calibrate = options.calibrate
+save_spatial_ts = not calibrate
 
 bed_type = options.bed_type
 calving = options.calving
@@ -160,17 +161,16 @@ dirs = {"output": "$output_dir"}
 for d in ["performance", "state", "scalar", "spatial", "snap", "jobs"]:
     dirs[d] = "$output_dir/{dir}".format(dir=d)
 
-if not calibrate:
-    dirs["output_tmp"] = "${output_dir}_tmp"
+if not save_spatial_ts:
+    del dirs["spatial"]
 
 # use the actual path of the run scripts directory (we need it now and
 # not during the simulation)
 scripts_dir = join(output_dir, "run_scripts")
-try:
+if not os.path.isdir(scripts_dir):
     os.makedirs(scripts_dir)
-except OSError:
-    pass
 
+# generate the config file *after* creating the output directory
 pism_config = 'init_config'
 pism_config_nc = join(output_dir, pism_config + ".nc")
 
@@ -187,7 +187,7 @@ set -e
 
 # path to the config file
 config="{config}"
-# path to the input directory (input files are relative to this)
+# path to the input directory (input data sets are contained in this directory)
 input_dir="{input_dir}"
 # output directory
 output_dir="{output_dir}"
@@ -207,40 +207,40 @@ done
 # set up model initialization
 # ########################################################
 
-ssa_n = 3.25
-ssa_e = 1.0
-tefo = 0.020
+ssa_n    = 3.25
+ssa_e    = 1.0
+tefo     = 0.020
 phi_min  = 5.0
-phi_max = 40.
+phi_max  = 40.
 topg_min = -700
 topg_max = 700
 
-rcps = ['ctrl', '26', '45', '85']
-std_dev = 4.23
-firn = 'ctrl'
-lapse_rate = 6
-bed_deformation  = 'ip'
+rcps            = ['ctrl', '26', '45', '85']
+std_dev         = 4.23
+firn            = 'ctrl'
+lapse_rate      = 6
+bed_deformation = 'ip'
 
 try:
     combinations = np.loadtxt(ensemble_file, delimiter=',', skiprows=1)
 except:
     combinations = np.genfromtxt(ensemble_file, dtype=None, delimiter=',', skip_header=1)
 
-firn_dict = {-1.0: 'low', 0.0: 'off', 1.0: 'ctrl'} 
-ocs_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
-ocm_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high', 2.0: 'm10', 3.0: 'm15'}
-tct_dict = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
-bd_dict = {-1.0: 'off', 0.0: 'i0', 1.0: 'ip'}
+firn_dict = {-1.0: 'low', 0.0: 'off', 1.0: 'ctrl'}
+ocs_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
+ocm_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high', 2.0: 'm10', 3.0: 'm15'}
+tct_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
+bd_dict   = {-1.0: 'off', 0.0: 'i0', 1.0: 'ip'}
 
 tsstep = 'yearly'
 
-scripts = []
+scripts           = []
 scripts_combinded = []
-scripts_post = []
+scripts_post      = []
 
 simulation_start_year = options.start_year
-simulation_end_year = options.start_year + options.duration
-restart_step = options.step
+simulation_end_year   = options.start_year + options.duration
+restart_step          = options.step
 
 if restart_step > (simulation_end_year - simulation_start_year):
     print('Error:')
@@ -248,7 +248,9 @@ if restart_step > (simulation_end_year - simulation_start_year):
     print('Try again')
     import sys
     sys.exit(0)
-    
+
+batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
+post_header = make_batch_post_header(system)
 
 for n, combination in enumerate(combinations):
 
@@ -257,12 +259,12 @@ for n, combination in enumerate(combinations):
         m_pdd = 0.0
         m_ohc = 0.0
         try:
-            run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn, m_pdd, m_ohc = combination
+            run_id, fice, fsnow, prs, rfr, ocm_v, ocs_v, tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn, m_pdd, m_ohc = combination
             bed_deformation = bd_dict[m_bd]
             firn = firn_dict[m_firn]
             lapse_rate = m_tlr
         except:
-            run_id, fice, fsnow, prs ,rfr ,ocm_v, ocs_v ,tct_v, vcm, ppq, sia_e = combination
+            run_id, fice, fsnow, prs, rfr, ocm_v, ocs_v, tct_v, vcm, ppq, sia_e = combination
 
         ocm = ocm_dict[ocm_v]
         ocs = ocs_dict[ocs_v]
@@ -270,8 +272,7 @@ for n, combination in enumerate(combinations):
 
         ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
-        name_options = OrderedDict()
-        name_options['rcp'] = rcp
+        name_options = {'rcp' : rcp}
         try:
             name_options['id'] = '{:03d}'.format(int(run_id))
         except:
@@ -281,16 +282,13 @@ for n, combination in enumerate(combinations):
         vversion = 'v' + str(version)
         full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
         full_outfile = 'g{grid}m_{experiment}.nc'.format(grid=grid, experiment=full_exp_name)
-        if rcp == 'ctrl':
-            climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0)
-        elif rcp == '26':
-            climate_modifier_file = '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'
-        elif rcp == '45':
-            climate_modifier_file = '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'
-        elif rcp == '85':
-            climate_modifier_file = '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'
-        else:
-            print("How did I get here")
+
+        forcing_files = {'ctrl' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0),
+                         '26'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc',
+                         '45'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc',
+                         '85'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'}
+
+        climate_modifier_file = forcing_files[rcp]
 
         if m_ohc == 0:
             ocean_modifier_file = climate_modifier_file
@@ -319,7 +317,6 @@ for n, combination in enumerate(combinations):
                     except OSError:
                         pass
 
-                batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
                 if (start == simulation_start_year):
                     f_combined.write(batch_header)
                     f_combined.write(run_header)
@@ -329,12 +326,21 @@ for n, combination in enumerate(combinations):
                     f.write(batch_header)
                     f.write(run_header)
 
-                    outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+                    outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=experiment)
 
                     pism = generate_prefix_str(pism_exec)
 
-                    general_params_dict = OrderedDict()
-                    general_params_dict['profile'] = join(dirs["performance"], 'profile_${job_id}.py'.format(**batch_system))
+                    general_params_dict = {
+                        'profile':                     join(dirs["performance"], 'profile_${job_id}.py'.format(**batch_system)),
+                        'ys':                          start,
+                        'ye':                          end,
+                        'calendar':                    '365_day',
+                        'climate_forcing_buffer_size': 365,
+                        'o':                           join(dirs["state"], outfile),
+                        'o_format':                    oformat,
+                        'config_override':             "$config"
+                    }
+
                     if start == simulation_start_year:
                         general_params_dict['bootstrap'] = ''
                         general_params_dict['i'] = pism_dataname
@@ -343,29 +349,25 @@ for n, combination in enumerate(combinations):
                         general_params_dict['regrid_special'] = ''
                     else:
                         general_params_dict['i'] = regridfile
+
                     if (start == simulation_start_year) and (topg_delta_file is not None):
                         general_params_dict['topg_delta_file'] = topg_delta_file
-                    general_params_dict['ys'] = start
-                    general_params_dict['ye'] = end
-                    general_params_dict['calendar'] = '365_day'
-                    general_params_dict['climate_forcing_buffer_size'] = 365
 
-                    general_params_dict['o'] = join(dirs["state"], outfile)
-                    general_params_dict['o_format'] = oformat
                     if osize != 'custom':
                         general_params_dict['o_size'] = osize
                     else:
                         general_params_dict['output.sizes.medium'] = 'sftgif,velsurf_mag'
                         
-                    general_params_dict['config_override'] = "$config"
                     if test_climate_models == True:
                         general_params_dict['test_climate_models'] = ''
                         general_params_dict['no_mass'] = ''
 
                     if bed_deformation != 'off':
                         general_params_dict['bed_def'] = 'lc'
+
                     if (bed_deformation == 'ip') and (start == simulation_start_year):
                         general_params_dict['bed_deformation.bed_uplift_file'] = '$input_dir/data_sets/uplift/uplift_g{}m.nc'.format(grid)
+
                     if forcing_type in ('e_age'):
                         general_params_dict['e_age_coupling'] = ''
 
@@ -374,127 +376,87 @@ for n, combination in enumerate(combinations):
                     else:
                         grid_params_dict = generate_grid_description(grid, domain, restart=True)
 
-                    sb_params_dict = OrderedDict()
-                    sb_params_dict['sia_e'] = sia_e
-                    sb_params_dict['ssa_e'] = ssa_e
-                    sb_params_dict['ssa_n'] = ssa_n
-                    sb_params_dict['pseudo_plastic_q'] = ppq
-                    sb_params_dict['till_effective_fraction_overburden'] = tefo
+                    sb_params_dict = {'sia_e':                              sia_e,
+                                      'ssa_e':                              ssa_e,
+                                      'ssa_n':                              ssa_n,
+                                      'pseudo_plastic_q':                   ppq,
+                                      'till_effective_fraction_overburden': tefo,
+                                      'vertical_velocity_approximation':    vertical_velocity_approximation}
+
                     if start == simulation_start_year:
                         sb_params_dict['topg_to_phi'] = ttphi
-                    sb_params_dict['vertical_velocity_approximation'] = vertical_velocity_approximation
 
                     stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
-                    ice_density = 910.
 
-                    if firn == 'off':
-                        firn_file = '$input_dir/data_sets/climate_forcing/firn_forcing_off.nc'
-                    elif firn == 'ctrl':
-                        firn_file = '$input_dir/data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'
-                    else:
-                        print("How did I get here?")
+                    firn_files = {'off' : '$input_dir/data_sets/climate_forcing/firn_forcing_off.nc',
+                                  'ctrl': '$input_dir/data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'}
+
+                    firn_file = firn_files[firn]
+
+                    ice_density = 910.
+                    climate_parameters = {'surface.pdd.factor_ice':                               fice / ice_density,
+                                          'surface.pdd.factor_snow':                              fsnow / ice_density,
+                                          'surface.pdd.refreeze':                                 rfr,
+                                          'surface.pdd.std_dev':                                  std_dev,
+                                          'atmosphere_given_file':                                climate_file,
+                                          'atmosphere_given_period':                              1,
+                                          'atmosphere_lapse_rate_file':                           climate_file,
+                                          'atmosphere.precip_exponential_factor_for_temperature': prs / 100,
+                                          'atmosphere_paleo_precip_file':                         climate_modifier_file,
+                                          'atmosphere_delta_T_file':                              climate_modifier_file,
+                                          'temp_lapse_rate':                                      lapse_rate}
 
                     if start == simulation_start_year:
+                        climate_parameters['pdd_firn_depth_file'] = firn_file
 
-                        climate_params_dict = generate_climate(climate,
-                                                               **{'surface.pdd.factor_ice': fice / ice_density,
-                                                                  'surface.pdd.factor_snow': fsnow / ice_density,
-                                                                  'surface.pdd.refreeze': rfr,
-                                                                  'pdd_firn_depth_file': firn_file,
-                                                                  'surface.pdd.std_dev': std_dev,
-                                                                  'atmosphere_given_file': climate_file,
-                                                                  'atmosphere_given_period': 1,
-                                                                  'atmosphere_lapse_rate_file': climate_file,
-                                                                  'atmosphere.precip_exponential_factor_for_temperature': prs / 100,
-                                                                  'temp_lapse_rate': lapse_rate,
-                                                                  'atmosphere_paleo_precip_file': climate_modifier_file,
-                                                                  'atmosphere_delta_T_file': climate_modifier_file})
-                    else:
-                        climate_params_dict = generate_climate(climate,
-                                                               **{'surface.pdd.factor_ice': fice / ice_density,
-                                                                  'surface.pdd.factor_snow': fsnow / ice_density,
-                                                                  'surface.pdd.refreeze': rfr,
-                                                                  'surface.pdd.std_dev': std_dev,
-                                                                  'atmosphere_given_file': climate_file,
-                                                                  'atmosphere_given_period': 1,
-                                                                  'atmosphere_lapse_rate_file': climate_file,
-                                                                  'atmosphere.precip_exponential_factor_for_temperature': prs / 100,
-                                                                  'temp_lapse_rate': lapse_rate,
-                                                                  'atmosphere_paleo_precip_file': climate_modifier_file,
-                                                                  'atmosphere_delta_T_file': climate_modifier_file})
-
+                    climate_params_dict = generate_climate(climate, **climate_parameters)
 
                     if m_pdd == 1.0:
                         setattr(climate_params_dict, 'pdd_aschwanden', '')
-                    if ocm == 'low':
-                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc'
-                    elif ocm == 'mid':
-                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc'
-                    elif ocm == 'high':
-                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc'
-                    elif ocm == 'm10':
-                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc'
-                    elif ocm == 'm15':
-                        ocean_file = '$input_dir/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc'
-                    else:
-                        pass
 
-                    if tct == 'low':
-                        tct_file = '$input_dir/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc'
-                    elif  tct == 'mid':
-                        tct_file = '$input_dir/data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc'
-                    elif tct == 'high':
-                        tct_file = '$input_dir/data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'
-                    else:
-                        print('not implemented')
+                    ocean_files = {'low' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc',
+                                   'mid' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc',
+                                   'high': '$input_dir/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc',
+                                   'm10' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc',
+                                   'm15' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc'}
 
-                    if ocs == 'low':
-                        ocean_alpha = 0.5
-                        ocean_beta = 1.0
-                    elif ocs == 'mid':
-                        ocean_alpha = 0.54
-                        ocean_beta = 1.17
-                    elif ocs == 'high':
-                        ocean_alpha = 0.85
-                        ocean_beta = 1.61
-                    # elif ocs == 'mid':
-                    #     ocean_alpha = 0.54
-                    #     ocean_beta = 1.17
-                    # elif ocs == 'high':
-                    #     ocean_alpha = 0.85
-                    #     ocean_beta = 1.61
-                    else:
-                        pass
+                    ocean_file = ocean_files[ocm]
+
+                    calving_thresholds = {'low' : '$input_dir/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc',
+                                          'mid' : '$input_dir/data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc',
+                                          'high': '$input_dir/data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'}
+
+                    tct_file = calving_thresholds[tct]
+
+                    ocs_params = {'low' : (0.5, 1.0),
+                                  'mid' : (0.54, 1.17),
+                                  'high': (0.85, 1.61)}
+
+                    ocean_alpha, ocean_beta = ocs_params[ocs]
 
                     if ocs == 'off':
-                        ocean = 'given'
-                        ocean_params_dict = generate_ocean(ocean,
-                                                       **{'ocean_given_file': ocean_file})
+                        ocean_params_dict = generate_ocean('given',
+                                                           **{'ocean_given_file': ocean_file})
                     else:
-                        ocean = 'warming'
-                        ocean_params_dict = generate_ocean(ocean,
-                                                       **{'ocean_given_file': ocean_file,
-                                                          'ocean.runoff_to_ocean_melt_power_alpha': ocean_alpha,
-                                                          'ocean.runoff_to_ocean_melt_power_beta': ocean_beta,
-                                                          'ocean_runoff_smb_file': ocean_modifier_file})
-
+                        ocean_params_dict = generate_ocean('warming',
+                                                           **{'ocean_given_file':                       ocean_file,
+                                                              'ocean.runoff_to_ocean_melt_power_alpha': ocean_alpha,
+                                                              'ocean.runoff_to_ocean_melt_power_beta':  ocean_beta,
+                                                              'ocean_runoff_smb_file':                  ocean_modifier_file})
 
                     hydro_params_dict = generate_hydrology(hydrology)
-                    if start == simulation_start_year:
-                        calving_params_dict = generate_calving(calving,
-                                                               **{'thickness_calving_threshold_file': tct_file,
-                                                                  'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
-                                                                  'ocean_kill_file': input_file,
-                                                                  'frontal_melt': frontal_melt,
-                                                                  'calving.vonmises.sigma_max': vcm * 1e6})
-                    else:
-                        calving_params_dict = generate_calving(calving,
-                                                               **{'thickness_calving_threshold_file': tct_file,
-                                                                  'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
-                                                                  'ocean_kill_file': regridfile,
-                                                                  'frontal_melt': frontal_melt,
-                                                                  'calving.vonmises.sigma_max': vcm * 1e6})
 
+                    calving_parameters = {'thickness_calving_threshold_file':     tct_file,
+                                          'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
+                                          'frontal_melt':                         frontal_melt,
+                                          'calving.vonmises.sigma_max':           vcm * 1e6}
+
+                    if start == simulation_start_year:
+                        calving_parameters['ocean_kill_file'] = input_file
+                    else:
+                        calving_parameters['ocean_kill_file'] = regridfile,
+
+                    calving_params_dict = generate_calving(calving, **calving_parameters)
 
                     scalar_ts_dict = generate_scalar_ts(outfile, tsstep,
                                                         start=simulation_start_year,
@@ -502,32 +464,27 @@ for n, combination in enumerate(combinations):
                                                         odir=dirs["scalar"])
 
                     exvars = stability_spatial_ts_vars()
-                    if not calibrate:
-                        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=dirs["output_tmp"], split=False)
+
+                    all_params_dict = merge_dicts(general_params_dict,
+                                                  grid_params_dict,
+                                                  stress_balance_params_dict,
+                                                  climate_params_dict,
+                                                  ocean_params_dict,
+                                                  hydro_params_dict,
+                                                  calving_params_dict,
+                                                  scalar_ts_dict)
+
+                    if save_spatial_ts:
+                        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=dirs["spatial"], split=False)
                         snap_dict = generate_snap_shots(outfile, save_times, odir=dirs["snap"])
+
                         if start != simulation_start_year:
                             spatial_ts_dict['extra_append'] = ''
 
-
-                        all_params_dict = merge_dicts(general_params_dict,
-                                                      grid_params_dict,
-                                                      stress_balance_params_dict,
-                                                      climate_params_dict,
-                                                      ocean_params_dict,
-                                                      hydro_params_dict,
-                                                      calving_params_dict,
+                        all_params_dict = merge_dicts(all_params_dict,
                                                       spatial_ts_dict,
-                                                      scalar_ts_dict,
                                                       snap_dict)
-                    else:
-                        all_params_dict = merge_dicts(general_params_dict,
-                                                      grid_params_dict,
-                                                      stress_balance_params_dict,
-                                                      climate_params_dict,
-                                                      ocean_params_dict,
-                                                      hydro_params_dict,
-                                                      calving_params_dict,
-                                                      scalar_ts_dict)
+
                     all_params = ' \\\n  '.join(["-{} {}".format(k, v) for k, v in all_params_dict.items()])
 
                     if system == 'debug':
@@ -559,8 +516,6 @@ for n, combination in enumerate(combinations):
         script_post = join(scripts_dir, 'post_lhs_g{}m_{}.sh'.format(grid, full_exp_name))
         scripts_post.append(script_post)
 
-        post_header = make_batch_post_header(system)
-
         with open(script_post, 'w') as f:
 
             f.write(post_header)
@@ -581,7 +536,7 @@ for n, combination in enumerate(combinations):
                 state_file = join(dirs["state"], outfile)
                 cmd = ' '.join(['ncks -O -4 -L 3', state_file, state_file, '\n'])
                 f.write(cmd)
-            if not calibrate:
+            if save_spatial_ts:
                 extra_file_tmp = spatial_ts_dict['extra_file']
                 extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
                 extra_file_wd = join(dirs["spatial"], extra_file)
