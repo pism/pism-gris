@@ -184,7 +184,7 @@ for rcp in 26 45 85; do
     done
 done
 
-odir=2017_11_ctrl
+odir=2017_12_ctrl
 mkdir -p $odir/dgmsl
 for rcp in 26 45 85; do
     for year in 2100 2200 2500 3000; do
@@ -201,14 +201,13 @@ mkdir -p $odir/sftgif_pctl
 cd $odir/state
 for file in gris_g${grid}m*id_*0_1000.nc; do
     if [ ! -f "../sftgif/$file" ]; then
-    echo $file
     cdo selvar,sftgif $file ../sftgif/$file
     fi
 done
 cd ../../
 for rcp in 26 45 85; do
     cdo -O -P 12 enssum $odir/sftgif/gris_g${grid}m_v3a_rcp_${rcp}_id_*_0_1000.nc $odir/sftgif_pctl/sum_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
-    cdo divc,4.95 $odir/sftgif_pctl/sum_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/sftgif_pctl/percent_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+    cdo divc,9.89 $odir/sftgif_pctl/sum_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/sftgif_pctl/percent_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
 done 
 
 mkdir -p $odir/velsurf_mag

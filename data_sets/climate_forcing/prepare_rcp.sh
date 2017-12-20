@@ -2,10 +2,10 @@
 
 var=tas
 box="-73,-12,59,84"
-
+data_dir=nasa-giss
 for rcp in 26 45 85; do
     for ens in r1i1p1 r1i1p2 r1i1p3; do
-        cdo -O mergetime ${var}_Amon_GISS-E2-H_rcp${rcp}_${ens}_*01-*12.nc  ${var}_Amon_GISS-E2-H_rcp${rcp}_ens_${ens}_2006-2300.nc
+        cdo -O mergetime ${data_dir}/${var}_Amon_GISS-E2-H_rcp${rcp}_${ens}_*01-*12.nc  ${var}_Amon_GISS-E2-H_rcp${rcp}_ens_${ens}_2006-2300.nc
         cdo -O fldmean -sellonlatbox,$box ${var}_Amon_GISS-E2-H_rcp${rcp}_ens_${ens}_2006-2300.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ens_${ens}_GRIS_2006-2300.nc
     done
     cdo -O ensmean ${var}_Amon_GISS-E2-H_rcp${rcp}_ens_*_GRIS_2006-2300.nc ${var}_Amon_GISS-E2-H_rcp${rcp}_ensmean_GRIS_2006-2300.nc
