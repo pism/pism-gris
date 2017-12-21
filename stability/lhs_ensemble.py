@@ -193,6 +193,8 @@ config="{config}"
 input_dir="{input_dir}"
 # output directory
 output_dir="{output_dir}"
+# temporary directory for spatial files
+spatial_tmp_dir="{spatial_tmp_dir}"
 
 # create required output directories
 for each in {dirs};
