@@ -521,6 +521,7 @@ for n, combination in enumerate(combinations):
         with open(script_post, 'w') as f:
 
             f.write(post_header)
+            f.write(run_header)
 
             if exstep == 'monthly':
                 mexstep = 1. / 12
