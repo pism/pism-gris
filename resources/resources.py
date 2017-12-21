@@ -837,6 +837,7 @@ srun -l /bin/hostname | sort -n | awk '{{print $2}}' > ./nodes_$SLURM_JOBID
 
 ulimit -l unlimited
 ulimit -s unlimited
+ulimit
 
 """
 
@@ -956,6 +957,10 @@ post_headers['slurm'] = """#!/bin/bash
 #SBATCH --mem=214G
 
 cd $SLURM_SUBMIT_DIR
+
+ulimit -l unlimited
+ulimit -s unlimited
+ulimit
 
 """
 

@@ -110,6 +110,8 @@ options = parser.parse_args()
 nn = options.n
 input_dir = abspath(options.input_dir)
 output_dir = abspath(options.output_dir)
+spatial_tmp_dir = abspath(options.output_dir + '_tmp')
+
 oformat = options.oformat
 osize = options.osize
 queue = options.queue
@@ -157,8 +159,8 @@ climate_file = '$input_dir/data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2
 
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume,thk'
 
-dirs = {"output": "$output_dir"}
-for d in ["performance", "state", "scalar", "spatial", "snap", "jobs"]:
+dirs = {"output": "$output_dir", "spatial_tmp": "$spatial_tmp_dir"}
+for d in ["performance", "state", "scalar", "spatial", "snap", "jobs", "basins"]:
     dirs[d] = "$output_dir/{dir}".format(dir=d)
 
 if not save_spatial_ts:
@@ -475,7 +477,7 @@ for n, combination in enumerate(combinations):
                                                   scalar_ts_dict)
 
                     if save_spatial_ts:
-                        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=dirs["spatial"], split=False)
+                        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=dirs["spatial_tmp"], split=False)
                         snap_dict = generate_snap_shots(outfile, save_times, odir=dirs["snap"])
 
                         if start != simulation_start_year:
@@ -527,35 +529,37 @@ for n, combination in enumerate(combinations):
             else:
                 mexstep = int(exstep)
 
-            ts_file = join(dirs["scalar"], 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=simulation_start_year, end=simulation_end_year))
-            cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', '{}'.format(ts_file), '\n'])
-            f.write(cmd)
+            real_start_year = 2008
             for start in range(simulation_start_year, simulation_end_year, restart_step):
                 end = start + restart_step
+                ts_file = join(dirs["scalar"], 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=start, end=end))
+                cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a {}-1-1 -u seconds -d 2008-1-1'.format(real_start_year), '{}'.format(ts_file), '\n'])
+                f.write(cmd)
                 outfile = '{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=start, end=end)
                 state_file = join(dirs["state"], outfile)
-                cmd = ' '.join(['ncks -O -4 -L 3', state_file, state_file, '\n'])
+                cmd = ' '.join(['ncks -O -4 -L 3', state_file, state_file, '\n\n'])
                 f.write(cmd)
+                real_start_year += restart_step
+            ts_files = join(dirs["scalar"], 'ts_{domain}_g{grid}m_{experiment}_*.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
+            ts_file = join(dirs["scalar"], 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=simulation_start_year, end=simulation_end_year))
+            cmd = 'cdo mergetime {} {}\n\n'.format(ts_files, ts_file)
             if save_spatial_ts:
                 extra_file_tmp = spatial_ts_dict['extra_file']
                 extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
                 extra_file_wd = join(dirs["spatial"], extra_file)
                 cmd = ' '.join(['ncks -O -4 -L 3 ', extra_file_tmp, extra_file_wd, '\n'])
                 f.write(cmd)
-                cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', extra_file, '\n'])
+                cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', extra_file_wd, '\n'])
                 f.write(cmd)
-                cmd = ' '.join(['~/base/gris-analysis/scripts/nc_add_hillshade.py -z 1 ', extra_file, '\n'])
+                cmd = ' '.join(['~/base/gris-analysis/scripts/nc_add_hillshade.py -z 1 ', extra_file_wd, '\n\n'])
                 f.write(cmd)
-                # basin_dir = 'basins'
-                # basin_odir = os.path.join(odir, basin_dir)
-                # if not os.path.isdir(basin_odir):
-                #     os.mkdir(basin_odir)
-                # cmd = ' '.join(['cd', os.path.join(odir, spatial_dir), '\n'])
-                # f.write(cmd)
-                # for basin in ('CW', 'NE', 'NO', 'NW', 'SE', 'SW'):
-                #     cmd = ' '.join(['~/base/gris-analysis/basins/extract_basins.py --basins ', basin, '--o_dir ../{}'.format(basin_dir),  extra_file, '\n'])
-                #     f.write(cmd)
-                # f.write('cd ../../ \n')
+                basin_dir = 'basins'
+                cmd = ' '.join(['cd', dirs['spatial'], '\n'])
+                f.write(cmd)
+                for basin in ('CW', 'NE', 'NO', 'NW', 'SE', 'SW'):
+                    cmd = ' '.join(['~/base/gris-analysis/basins/extract_basins.py --basins ', basin, '--o_dir ../{}'.format(basin_dir),  extra_file, '\n'])
+                    f.write(cmd)
+                f.write('cd ../../ \n')
 
 scripts = uniquify_list(scripts)
 scripts_combinded = uniquify_list(scripts_combinded)
