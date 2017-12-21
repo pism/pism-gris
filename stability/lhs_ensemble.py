@@ -204,6 +204,7 @@ done
 
 """.format(input_dir=input_dir,
            output_dir=output_dir,
+           spatial_tmp_dir=spatial_tmp_dir,
            config=pism_config_nc,
            dirs=" ".join(dirs.values()))
 
