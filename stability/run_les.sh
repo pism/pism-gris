@@ -100,6 +100,14 @@ grid=900
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 168:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 2000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
+odir=2017_12_ocean
+s=chinook
+q=t2standard
+n=360
+grid=900
+
+./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 168:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
 odir=2017_12_600m
 s=chinook
 q=t2standard
@@ -132,9 +140,9 @@ for rcp in 26 45 85; do
 done
 
 # Cumulative contribution LES and CTRL
-~/base/gris-analysis/plotting/plotting.py  -n 8 -o les --time_bounds 2008 3000 --ctrl_file 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2017_12_les/scalar_clean/ts_gris_g3600m_v3a_rcp_*id_*.nc
+~/base/gris-analysis/plotting/plotting.py  -n 8 -o les --time_bounds 2008 3000 --ctrl_file 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2017_12_les/scalar_ensstat/ens*_gris_g3600m_v3a_rcp_*id_*.nc
 # Rates of GMSL rise LES and CTRL
-~/base/gris-analysis/plotting/plotting.py -n 8 -o les --time_bounds 2008 3000 --no_legend --ctrl_file 2017_11_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
+~/base/gris-analysis/plotting/plotting.py -n 8 -o les --time_bounds 2008 3000 --no_legend --ctrl_file 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2017_12_les/scalar_ensstat/ens*_gris_g3600m_v3a_rcp_*id_*.nc
 
 # Flux Partitioning
 ~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --time_bounds 2008 3000 --no_legend --plot flux_partitioning 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*id_CTRL_*.nc
