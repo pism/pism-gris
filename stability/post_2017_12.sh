@@ -59,3 +59,12 @@ for rcp in 26 45 85; do
         cdo -O -P 7 enspctl,$pctl $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}*0_1000.nc  $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
     done
 done
+
+odir=2017_12_ctrl
+grid=900
+mkdir -p $odir/spatial_processed
+mkdir -p $odir/ice_extend
+for rcp in 26 45 85; do
+    cdo -L selvar,mask -selyear,2008,2100,2200,2300,2400,2500 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_2000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_2000.nc
+    extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_2000.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_2000.nc
+done

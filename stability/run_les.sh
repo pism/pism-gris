@@ -126,18 +126,6 @@ for rcp in 26 45 85; do
 extract_profiles.py -v thk,usurf,tempsurf ../../data_sets/GreenlandIceCoreSites/ice-core-sites.shp ${odir}/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc ${odir}/station_ts/profile_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
 done
 
-~/base/gris-analysis/plotting/plotting.py -o ctrl --time_bounds 2008 3000 --no_legend --plot station_usurf 2017_12_ctrl/station_ts/profile_g900m_v3a_rcp_*_id_CTRL_0_1000.nc
-
-
-
-# NISO-CTRL
-odir=2017_11_ctrl
-grid=3600
-mkdir -p $odir/niso
-for rcp in 26 45 85; do
-    cdo sub -selvar,topg $odir/state/gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc -selvar,topg $odir/state/gris_g${grid}m_v3a_rcp_${rcp}_id_NISO_0_1000.nc $odir/niso/topg_CTRL_NISO_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
-    gdal_translate $odir/niso/topg_CTRL_NISO_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/niso/topg_CTRL_NISO_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.tif
-done
 
 # Cumulative contribution LES and CTRL
 ~/base/gris-analysis/plotting/plotting.py  -n 8 -o les --time_bounds 2008 3000 --ctrl_file 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2017_12_les/scalar_ensstat/ens*_gris_g3600m_v3a_rcp_*id_*.nc
@@ -152,14 +140,32 @@ done
 ~/base/gris-analysis/plotting/plotting.py -o les_flux --time_bounds 2008 3000 --no_legend --plot rcp_fluxes 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
 # Plot fluxes for each basin
 for rcp in 26 45 85; do
-    ~/base/gris-analysis/plotting/plotting.py -o basins_rcp_${rcp} --time_bounds 2008 3000 --no_legend --plot basin_mass 2017_11_ctrl/basins/scalar/ts_b_*_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
+    ~/base/gris-analysis/plotting/plotting.py -o basins_rcp_${rcp} --time_bounds 2008 3000 --no_legend --plot basin_mass 2017_12_ctrl/basins/scalar/ts_b_*_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_2000.nc
 done
+
+~/base/gris-analysis/plotting/plotting.py -o ctrl --time_bounds 2008 3000 --no_legend --plot station_usurf 2017_12_ctrl/station_ts/profile_g900m_v3a_rcp_*_id_CTRL_0_1000.nc
+
+# grid resolution
+~/base/gris-analysis/plotting/plotting.py  -n 8 -o ctrl --time_bounds 2020 2200 --plot grid_res 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_85_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g1800m_v3a_rcp_85_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g3600m_v3a_rcp_85_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g4500m_v3a_rcp_85_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g9000m_v3a_rcp_85_id_CTRL_0_1000.nc 
+
+
+
+
+# NISO-CTRL
+odir=2017_11_ctrl
+grid=3600
+mkdir -p $odir/niso
+for rcp in 26 45 85; do
+    cdo sub -selvar,topg $odir/state/gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc -selvar,topg $odir/state/gris_g${grid}m_v3a_rcp_${rcp}_id_NISO_0_1000.nc $odir/niso/topg_CTRL_NISO_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+    gdal_translate $odir/niso/topg_CTRL_NISO_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/niso/topg_CTRL_NISO_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.tif
+done
+
 for rcp in 26 45 85; do
     ~/base/gris-analysis/plotting/plotting.py -o basins_rcp_${rcp} --time_bounds 2008 3000 --no_legend --plot basin_d 2017_11_ctrl/basins/scalar/ts_b_*_ex_g1800m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
 done
 ~/base/gris-analysis/plotting/plotting.py -o ctrl --time_bounds 2008 3000 --no_legend --plot per_basin_flux 2017_11_ctrl/basins/scalar/ts_b_*_ex_g3600m_v3a_rcp_*_id_CTRL_0_1000.nc
 
-odir=2017_11_ctrl
+odir=2017_12_ctrl
 grid=900
 mkdir -p $odir/final_states
 cd $odir/state
@@ -175,18 +181,13 @@ done
 cd ../../
 
 
-odir=2017_11_ctrl
+odir=2017_12_ctrl
 grid=900
 mkdir -p $odir/spatial_processed
 mkdir -p $odir/ice_extend
 for rcp in 26 45 85; do
-    cdo selvar,mask -selyear,2008,2100,2200,2300,2400,2500 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
-    extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_1000.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
-    # for year in 2008 2100 2200 2300 2400 2500; do
-    #     cdo selvar,velsurf_mag,usurf_hs -selyear,$year $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc
-    #     gdal_translate NETCDF:$odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc:velsurf_mag $odir/spatial_processed/velsurf_mag_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
-    #     gdal_translate NETCDF:$odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc:usurf_hs $odir/spatial_processed/hs_usurf_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
-    # done
+    cdo -L selvar,mask -selyear,2008,2100,2200,2300,2400,2500 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_2000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_2000.nc
+    extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_2000.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_2000.nc
 done
 
 
