@@ -45,7 +45,7 @@ parser.add_argument("-w", '--wall_time', dest="walltime",
 parser.add_argument("-q", '--queue', dest="queue", choices=list_queues(),
                     help='''queue. default=long.''', default='long')
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'vonmises_calving'],
+                    choices=['float_kill', 'vonmises_calving'],
                     help="calving", default='vonmises_calving')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
@@ -455,11 +455,6 @@ for n, combination in enumerate(combinations):
                                           'float_kill_calve_near_grounding_line': float_kill_calve_near_grounding_line,
                                           'frontal_melt':                         frontal_melt,
                                           'calving.vonmises.sigma_max':           vcm * 1e6}
-
-                    if start == simulation_start_year:
-                        calving_parameters['ocean_kill_file'] = input_file
-                    else:
-                        calving_parameters['ocean_kill_file'] = regridfile,
 
                     calving_params_dict = generate_calving(calving, **calving_parameters)
 
