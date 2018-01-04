@@ -56,15 +56,6 @@ for grid in 18000 9000 4500 3600 1800 900; do
     done
 done
 
-odir=2017_12_600m
-mkdir -p $odir/dgmsl
-for rcp in 85; do
-    for year in 2100 2200; do
-        for run in CTRL; do
-            cdo divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_0_200.nc -selyear,2008 $odir/scalar/ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_0_200.nc $odir/dgmsl/dgms_g600m_rcp_${rcp}_${run}_${year}.nc
-        done
-    done
-done
 
 odir=2017_12_les
 grid=3600
