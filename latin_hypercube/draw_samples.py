@@ -6,7 +6,7 @@ from pyDOE import lhs
 from scipy.stats.distributions import truncnorm, gamma, uniform, randint
 
 # The number of allowable model runs
-n_samples = 1000
+n_samples = 500
 
 # scipy.stats.distributions objects for each distribution, per Table 1 in the paper.  Note that for truncated normal, the bounds are relative to the mean in units of scale, so if we want a positive distribution for a normal with mean 8 and sigma 4, then the lower bound is -8/4=-2
 distributions = {'FICE':  truncnorm(-4/4.,4./4,loc=8,scale=4),

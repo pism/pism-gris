@@ -1,5 +1,30 @@
 #!/bin/bash
 
+odir=2018_01_les
+s=chinook
+q=t2standard
+n=144
+grid=1800
+
+./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_20180107.csv --calibrate --o_dir ${odir} --exstep 1 -n ${n} -w 48:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+
+for id2 in `seq 0 4`;
+do
+for id1 in `seq 0 9`;
+do
+for id in `seq 0 9`;
+do
+for rcp in 26 45 85;
+do
+JOBID=$(sbatch 2018_01_les/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_j.sh | sed 's/[^0-9]*//g')
+sbatch --dependency=afterok:$JOBID 2018_01_les/run_scripts/post_lhs_g1800m_v3a_rcp_${rcp}_id_${id2}${id1}${id}.sh;
+done
+done
+done
+done
+
+
 odir=2017_12_les
 s=chinook
 q=t2standard
@@ -31,6 +56,14 @@ done
 done
 done
 done
+
+odir=2018_01_les
+s=pleiades_ivy
+q=long
+n=160
+grid=1800
+
+./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_20180107.csv --calibrate --o_dir ${odir} --exstep 1 -n ${n} -w 10:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 odir=2017_12_les
 s=pleiades_ivy
@@ -153,8 +186,10 @@ grid=450
 odir=2017_12_ctrl
 grid=900
 mkdir -p ${odir}/station_ts
+mkdir -p ${odir}/profiles
 for rcp in 26 45 85; do
-extract_profiles.py -v thk,usurf,tempsurf ../../data_sets/GreenlandIceCoreSites/ice-core-sites.shp ${odir}/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc ${odir}/station_ts/profile_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
+    # extract_profiles.py -v thk,usurf,tempsurf ../../data_sets/GreenlandIceCoreSites/ice-core-sites.shp ${odir}/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc ${odir}/station_ts/profile_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc
+    extract_profiles.py -v velsurf_mag,thk,usurf,topg,beta,mask ../../gris-outlet-glacier-profiles/gris-outlet-glacier-profiles-100m.shp 2017_12_ctrl/spatial/ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc 2017_12_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc
 done
 
 
@@ -162,16 +197,22 @@ done
 ~/base/gris-analysis/plotting/plotting.py  -n 8 -o les --time_bounds 2008 3000 --ctrl_file 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2017_12_les/scalar_ensstat/ens*_0_1000.nc
 # Rates of GMSL rise LES and CTRL
 ~/base/gris-analysis/plotting/plotting.py -n 8 -o les --time_bounds 2008 3000 --no_legend --ctrl_file 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2017_12_les/scalar_ensstat/ens*_0_1000.nc
+# Long term evolution
+~/base/gris-analysis/plotting/plotting.py  -o ctrl5k --plot ctrl_mass --time_bounds 2008 5000  2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_3000.nc 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_85_id_CTRL_0_2000.nc
+
+# Profiles
+~/base/gris-analysis/plotting/plotting.py --bounds 0 12000 --time_bounds 2009 2300  -o rcp26 --plot profile_combined 2017_12_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_26_id_CTRL_0_3000.nc
+~/base/gris-analysis/plotting/plotting.py --bounds 0 12000 --time_bounds 2009 2300  -o rcp45 --plot profile_combined 2017_12_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_45_id_CTRL_0_3000.nc
+~/base/gris-analysis/plotting/plotting.py --bounds 0 15000 --time_bounds 2009 2300  -o rcp85 --plot profile_combined 2017_12_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_85_id_CTRL_0_3000.nc
 
 # Flux Partitioning
-~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --time_bounds 2008 3000 --no_legend --plot flux_partitioning 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*id_CTRL_*.nc
+~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --time_bounds 2008 3000 --no_legend --plot flux_partitioning 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*id_CTRL_0_1000.nc
+# Basin Flux Partitioning
+~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --bounds -850 450 --time_bounds 2008 3000 --no_legend --plot basin_flux_partitioning 2017_12_ctrl/basins/scalar/ts_b_*_ex_g900m_v3a_rcp_*_id_CTRL_0_2000.nc
 
-# Trajectory plots
-~/base/gris-analysis/plotting/plotting.py -o les --time_bounds 2008 3000 --plot rcp_traj 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
-~/base/gris-analysis/plotting/plotting.py -o les_flux --time_bounds 2008 3000 --no_legend --plot rcp_fluxes 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_*.nc
 # Plot fluxes for each basin
 for rcp in 26 45 85; do
-    ~/base/gris-analysis/plotting/plotting.py -o basins_rcp_${rcp} --time_bounds 2008 3000 --no_legend --plot basin_mass 2017_12_ctrl/basins/scalar/ts_b_*_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_2000.nc
+    ~/base/gris-analysis/plotting/plotting.py -o basins_rcp_${rcp}  --time_bounds 2008 3000 --no_legend --plot basin_mass 2017_12_ctrl/basins/scalar/ts_b_*_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_2000.nc
 done
 
 ~/base/gris-analysis/plotting/plotting.py -o ctrl --time_bounds 2008 3000 --no_legend --plot station_usurf 2017_12_ctrl/station_ts/profile_g900m_v3a_rcp_*_id_CTRL_0_1000.nc
@@ -180,8 +221,6 @@ done
 
 
 # grid resolution
-~/base/gris-analysis/plotting/plotting.py  -n 8 -o ctrl --time_bounds 2020 2200 --plot grid_res 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_85_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g1800m_v3a_rcp_85_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g3600m_v3a_rcp_85_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g4500m_v3a_rcp_85_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g9000m_v3a_rcp_85_id_CTRL_0_1000.nc 
-
 ~/base/gris-analysis/plotting/plotting.py  -n 8 -o ctrl --time_bounds 2020 2200 --plot grid_res 2017_12_450m/scalar/ts_gris_g450m_v3a_rcp_*_id_CTRL_0_100.nc 2017_12_ctrl/scalar/ts_gris_g600m_v3a_rcp_*_id_CTRL_0_200.nc 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g3600m_v3a_rcp_*_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g4500m_v3a_rcp_*_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g9000m_v3a_rcp_*_id_CTRL_0_1000.nc 2017_12_ctrl/scalar/ts_gris_g18000m_v3a_rcp_*_id_CTRL_0_1000.nc
 
 

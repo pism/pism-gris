@@ -12,11 +12,7 @@ ulimit -l unlimited
 ulimit -s unlimited
 ulimit
 
-
-# stop if a variable is not defined
-set -u
-# stop on errors
-set -e
+set +e
 
 odir=2017_12_les
 mkdir -p $odir/dgmsl
@@ -26,7 +22,7 @@ for grid in 3600; do
             for id2 in `seq 0 9`; do
                 for id1 in `seq 0 9`; do
                     for id in `seq 0 9`; do
-                        cdo -L mulc,-100 -divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar_pruned/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_0_1000.nc -selyear,2008 $odir/scalar_pruned/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_0_1000.nc $odir/dgmsl/dgms_g${grid}m_rcp_${rcp}_${id2}${id1}${id}_${year}.nc
+                        cdo -L mulc,-1000 -divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar_pruned/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_0_1000.nc -selyear,2008 $odir/scalar_pruned/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_0_1000.nc $odir/dgmsl/dgms_g${grid}m_rcp_${rcp}_id_${id2}${id1}${id}_${year}.nc
                     done
                 done
             done

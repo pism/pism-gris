@@ -56,6 +56,13 @@ for grid in 18000 9000 4500 3600 1800 900; do
     done
 done
 
+odir=2017_12_ctrl
+run=CTRL
+grid=900
+mkdir -p $odir/uplift
+for rcp in 26 45 85; do
+    gdal_translate NETCDF:${odir}/state/gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc:dbdt ${odir}/uplift/dbdt_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.tif
+done
 
 odir=2017_12_les
 grid=3600
