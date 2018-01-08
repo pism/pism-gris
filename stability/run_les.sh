@@ -1,15 +1,15 @@
 #!/bin/bash
 
 odir=2018_01_les
-s=chinook
-q=t2standard
-n=144
+s=pleiades_ivy
+q=long
+n=160
 grid=1800
 
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_20180107.csv --calibrate --o_dir ${odir} --exstep 1 -n ${n} -w 48:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
-for id2 in `seq 0 4`;
+for id2 in `seq 0 1`;
 do
 for id1 in `seq 0 9`;
 do
@@ -17,8 +17,7 @@ for id in `seq 0 9`;
 do
 for rcp in 26 45 85;
 do
-JOBID=$(sbatch 2018_01_les/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_j.sh | sed 's/[^0-9]*//g')
-sbatch --dependency=afterok:$JOBID 2018_01_les/run_scripts/post_lhs_g1800m_v3a_rcp_${rcp}_id_${id2}${id1}${id}.sh;
+qsub 2018_01_les/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_j.sh 
 done
 done
 done
