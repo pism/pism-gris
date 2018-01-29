@@ -202,7 +202,7 @@ done
 # Profiles
 ~/base/gris-analysis/plotting/plotting.py --bounds 0 12000 --time_bounds 2009 2300  -o rcp26 --plot profile_combined 2017_12_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_26_id_CTRL_0_3000.nc
 ~/base/gris-analysis/plotting/plotting.py --bounds 0 12000 --time_bounds 2009 2300  -o rcp45 --plot profile_combined 2017_12_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_45_id_CTRL_0_3000.nc
-~/base/gris-analysis/plotting/plotting.py --bounds 0 15000 --time_bounds 2009 2300  -o rcp85 --plot profile_combined 2017_12_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_85_id_CTRL_0_3000.nc
+~/base/gris-analysis/plotting/plotting.py --bounds 0 12000 --time_bounds 2009 2300  -o rcp85 --plot profile_combined 2017_12_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_85_id_CTRL_0_3000.nc
 
 # Flux Partitioning
 ~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --time_bounds 2008 3000 --no_legend --plot flux_partitioning 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*id_CTRL_0_1000.nc
@@ -418,118 +418,45 @@ done
 
 
 
-odir=2017_11_ocean
-s=chinook
-q=t2standard
-n=360
-grid=900
 
-./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 48:00:00 -g ${grid} -s ${s} -q ${q} --step 100 --duration 100 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
-
-odir=2017_11_ctrl
-s=chinook
-q=t2standard
-n=480
-grid=600
-
-./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 168:00:00 -g ${grid} -s ${s} -q ${q} --step 100 --duration 100 ../calibration/2017_06_vc/state/gris_g900m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
-
-
-
-odir=2017_11_ctrl
-cd $odir/snap
-for file in save_gris_g900m*; do
-    gdal_translate 
-
-# 300 members
-
-~/base/gris-analysis/plotting/plotting.py  -n 4 -o les --time_bounds 2008 3000 --ctrl_file 2017_11_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_0*.nc 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_1*.nc 2017_11_lhs/scalar/ts_gris_g3600m_v3a_rcp_*id_2*.nc
-
-Reading files for RCP 8.5
-Year 2100: 0.11 - 0.19 - 0.28 m SLE
+Reading RCP 85 files
+Year 2100: 0.11 - 0.19 - 0.27 m SLE, -0.08 0.08
+Year 2100: 1.57 - 3.77 percent reduction
          CTRL 0.21 m SLE
-Year 2200: 0.50 - 0.75 - 1.04 m SLE
+Year 2200: 0.51 - 0.76 - 1.01 m SLE, -0.24 0.25
+Year 2200: 7.04 - 13.87 percent reduction
          CTRL 0.72 m SLE
-Year 2500: 2.52 - 3.40 - 4.31 m SLE
+Year 2500: 2.54 - 3.42 - 4.24 m SLE, -0.89 0.81
+Year 2500: 34.80 - 58.11 percent reduction
          CTRL 3.05 m SLE
-Year 3000: 5.58 - 6.64 - 7.17 m SLE
+Year 3000: 5.52 - 6.52 - 7.12 m SLE, -1.01 0.60
+Year 3000: 75.64 - 97.70 percent reduction
          CTRL 6.05 m SLE
-Reading files for RCP 4.5
-Year 2100: 0.06 - 0.13 - 0.20 m SLE
+Reading RCP 45 files
+Year 2100: 0.07 - 0.13 - 0.20 m SLE, -0.06 0.07
+Year 2100: 0.92 - 2.76 percent reduction
          CTRL 0.16 m SLE
-Year 2200: 0.20 - 0.36 - 0.55 m SLE
-         CTRL 0.39 m SLE
-Year 2500: 0.87 - 1.36 - 1.89 m SLE
-         CTRL 1.27 m SLE
-Year 3000: 2.24 - 3.27 - 4.24 m SLE
+Year 2200: 0.22 - 0.38 - 0.54 m SLE, -0.16 0.16
+Year 2200: 3.02 - 7.35 percent reduction
+         CTRL 0.40 m SLE
+Year 2500: 0.93 - 1.38 - 1.87 m SLE, -0.45 0.48
+Year 2500: 12.78 - 25.59 percent reduction
+         CTRL 1.28 m SLE
+Year 3000: 2.32 - 3.32 - 4.21 m SLE, -1.00 0.89
+Year 3000: 31.84 - 57.71 percent reduction
          CTRL 2.95 m SLE
-Reading files for RCP 2.6
-Year 2100: 0.03 - 0.10 - 0.16 m SLE
-         CTRL 0.12 m SLE
-Year 2200: 0.08 - 0.20 - 0.33 m SLE
-         CTRL 0.23 m SLE
-Year 2500: 0.16 - 0.42 - 0.73 m SLE
-         CTRL 0.48 m SLE
-Year 3000: 0.24 - 0.72 - 1.27 m SLE
-         CTRL 0.75 m SLE
+Reading RCP 26 files
+Year 2100: 0.04 - 0.10 - 0.16 m SLE, -0.06 0.06
+Year 2100: 0.56 - 2.20 percent reduction
+         CTRL 0.13 m SLE
+Year 2200: 0.09 - 0.20 - 0.32 m SLE, -0.12 0.12
+Year 2200: 1.22 - 4.44 percent reduction
+         CTRL 0.24 m SLE
+Year 2500: 0.19 - 0.44 - 0.72 m SLE, -0.26 0.28
+Year 2500: 2.54 - 9.91 percent reduction
+         CTRL 0.49 m SLE
+Year 3000: 0.30 - 0.76 - 1.25 m SLE, -0.46 0.49
+Year 3000: 4.14 - 17.11 percent reduction
+         CTRL 0.78 m SLE
   - writing image les_rcp_limnsw.pdf ...
-
-# 500 members
-  Reading files for RCP 8.5
-Year 2100: 0.11 - 0.19 - 0.28 m SLE
-         CTRL 0.21 m SLE
-Year 2200: 0.51 - 0.76 - 1.03 m SLE
-         CTRL 0.72 m SLE
-Year 2500: 2.56 - 3.42 - 4.33 m SLE
-         CTRL 3.05 m SLE
-Year 3000: 5.64 - 6.64 - 7.18 m SLE
-         CTRL 6.05 m SLE
-Reading files for RCP 4.5
-Year 2100: 0.06 - 0.13 - 0.20 m SLE
-         CTRL 0.16 m SLE
-Year 2200: 0.21 - 0.37 - 0.55 m SLE
-         CTRL 0.39 m SLE
-Year 2500: 0.89 - 1.38 - 1.89 m SLE
-         CTRL 1.27 m SLE
-Year 3000: 2.27 - 3.30 - 4.25 m SLE
-         CTRL 2.95 m SLE
-Reading files for RCP 2.6
-Year 2100: 0.04 - 0.10 - 0.16 m SLE
-         CTRL 0.12 m SLE
-Year 2200: 0.08 - 0.20 - 0.34 m SLE
-         CTRL 0.23 m SLE
-Year 2500: 0.18 - 0.44 - 0.74 m SLE
-         CTRL 0.48 m SLE
-Year 3000: 0.30 - 0.75 - 1.27 m SLE
-         CTRL 0.75 m SLE
-  - writing image les_rcp_limnsw.pdf ...
-
-
-Reading files for RCP 8.5
-Year 2100: 0.28 - 0.42 - 0.58 cm SLE year-1
-Year 2200: 0.54 - 0.73 - 0.96 cm SLE year-1
-Year 2500: 0.83 - 0.99 - 1.08 cm SLE year-1
-Max loss rate 50th pctl in Year 2457: 1.020 cm SLE year-1
-Max loss rate 16th pctl in Year 2457: 1.212 cm SLE year-1
-Max loss rate 84th pctl in Year 2496: 0.827 cm SLE year-1
-Max loss rate ctrl in Year 2496: 0.927 cm SLE year-1
-Reading files for RCP 4.5
-Year 2100: 0.12 - 0.21 - 0.30 cm SLE year-1
-Year 2200: 0.18 - 0.29 - 0.42 cm SLE year-1
-Year 2500: 0.28 - 0.39 - 0.51 cm SLE year-1
-Max loss rate 50th pctl in Year 2739: 0.397 cm SLE year-1
-Max loss rate 16th pctl in Year 2739: 0.525 cm SLE year-1
-Max loss rate 84th pctl in Year 2988: 0.279 cm SLE year-1
-Max loss rate ctrl in Year 2988: 0.333 cm SLE year-1
-Reading files for RCP 2.6
-Year 2100: 0.05 - 0.11 - 0.18 cm SLE year-1
-Year 2200: 0.05 - 0.11 - 0.17 cm SLE year-1
-Year 2500: 0.01 - 0.06 - 0.10 cm SLE year-1
-Max loss rate 50th pctl in Year 2041: 0.132 cm SLE year-1
-Max loss rate 16th pctl in Year 2041: 0.210 cm SLE year-1
-Max loss rate 84th pctl in Year 2041: 0.062 cm SLE year-1
-Max loss rate ctrl in Year 2041: 0.155 cm SLE year-1
-  - writing image les_rcp_tendency_of_ice_mass_glacierized.pdf ...
-
-
   

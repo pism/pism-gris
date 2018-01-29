@@ -18,7 +18,7 @@ odir=2017_12_les
 mkdir -p $odir/dgmsl
 for grid in 3600; do
     for rcp in 26 45 85; do
-        for year in 3000; do
+        for year in 2100 2200 3000; do
             for id2 in `seq 0 9`; do
                 for id1 in `seq 0 9`; do
                     for id in `seq 0 9`; do

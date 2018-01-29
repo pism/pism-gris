@@ -42,6 +42,11 @@ for grid in 18000 9000 4500 3600 1800 900; do
         cdo mulc,100 -div -sub -seltimestep,1 -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -seltimestep,1 -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/scalar_percent/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
     done
 done
+for grid in 900; do
+    for rcp in 26 45; do
+        cdo mulc,100 -div -sub -seltimestep,1 -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_3000.nc -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_3000.nc -seltimestep,1 -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_3000.nc $odir/scalar_percent/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_3000.nc
+    done
+done
 
 odir=2017_12_ctrl
 run=CTRL

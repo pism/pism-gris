@@ -17,8 +17,17 @@ ulimit
 set -u
 # stop on errors
 set -e
-
+set -x
 odir=2017_12_ctrl
+
+mkdir -p ${odir}/contrib
+grid=900
+for rcp in 26 45 85; do
+    cdo -L aexpr,"d_contrib=tendency_of_ice_mass*(tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge+surface_runoff_rate))" -timcumsum ${odir}/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc ${odir}/contrib/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
+done
+
+exit
+
 cd ${odir}_tmp/
 for file in *.nc; do
     echo $file
