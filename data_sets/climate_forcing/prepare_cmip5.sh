@@ -9,8 +9,8 @@ for rcp in 26 45 85; do
     cd ${data_dir}/rcp${rcp}_${ens}_monNG
     for file in tas_mon*nc; do
         echo $file
-        cdo -O yearmean -fldmean -selyear,2006/2100 -sellonlatbox,$box $file ../../fldmean_GRIS_2006_2100_$file
-        cdo -O sub ../../fldmean_GRIS_2006_2100_$file -timmean -selyear,2006/2015 ../../fldmean_GRIS_2006_2100_$file ../../fldmean_anom_GRIS_2006_2100_$file
+        cdo -L -O yearmean -fldmean -selyear,2006/2100 -sellonlatbox,$box $file ../../fldmean_GRIS_2006_2100_$file
+        cdo -L -O sub ../../fldmean_GRIS_2006_2100_$file -timmean -selyear,2006/2015 ../../fldmean_GRIS_2006_2100_$file ../../fldmean_anom_GRIS_2006_2100_$file
     done
     cd ../../
     cdo -O ensmean fldmean_anom_GRIS_2006_2100_*rcp${rcp}*.nc ${var}_cmip5_rcp${rcp}_ensmean_anom_GRIS_2006_2100.nc 

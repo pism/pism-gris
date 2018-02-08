@@ -10,6 +10,13 @@ cd $SLURM_SUBMIT_DIR
 
 odir=2017_12_ctrl
 grid=900
+mkdir -p ${odir}/contrib
+for rcp in 26 45 85; do
+    cdo  divc,365 '-aexpr,d_contrib=-tendency_of_ice_mass*(-tendency_of_ice_mass_due_to_discharge/(-tendency_of_ice_mass_due_to_discharge+surface_runoff_rate/1e12));ru_contrib=-tendency_of_ice_mass*(surface_runoff_rate/1e12/(-tendency_of_ice_mass_due_to_discharge+surface_runoff_rate/1e12))' -timcumsum ${odir}/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc ${odir}/contrib/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
+done
+
+odir=2017_12_ctrl
+grid=900
 mkdir -p ${odir}/station_ts
 for rcp in 26 45 85; do
 extract_profiles.py -v thk,usrf,tempsurf ../../data_sets/GreenlandIceCoreSites/ice-core-sites.shp ${odir}/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc ${odir}/station_ts/profile_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
