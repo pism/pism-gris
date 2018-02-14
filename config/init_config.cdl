@@ -20,7 +20,7 @@ netcdf pism_overrides {
     pism_overrides:run_info.institution = "University of Alaska Fairbanks";
     pism_overrides:run_info.institution_doc = "Institution name. This string is written to output files as the 'institution' global attribute.";
 
-    pism_overrides:output.backup_interval = 20.0;
+    pism_overrides:output.backup_interval = 5.0;
     pism_overrides:output.backup_interval_doc = "hours; wall-clock time between automatic backups";
     
     pism_overrides:surface.force_to_thickness.alpha = 0.1;
