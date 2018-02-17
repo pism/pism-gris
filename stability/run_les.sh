@@ -201,7 +201,7 @@ done
 ~/base/gris-analysis/plotting/plotting.py -n 8 -o les --time_bounds 2008 3000 --no_legend --ctrl_file 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2017_12_les/scalar_ensstat/ens*_0_1000.nc
 ~/base/gris-analysis/plotting/plotting.py -n 8 -o les18 --time_bounds 2008 3000 --no_legend --ctrl_file 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2018_01_les/scalar_ensstat/ens*_0_1000.nc
 # Long term evolution
-~/base/gris-analysis/plotting/plotting.py  -o ctrl5k --plot ctrl_mass --time_bounds 2008 5000  2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_3000.nc 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_85_id_CTRL_0_2000.nc
+~/base/gris-analysis/plotting/plotting.py  -o ctrl5k --plot ctrl_mass --time_bounds 2008 7000  2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_26_id_CTRL_0_4000.nc 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_45_id_CTRL_0_5000.nc 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_85_id_CTRL_0_2000.nc
 
 # Profiles
 ~/base/gris-analysis/plotting/plotting.py --bounds 0 12000 --time_bounds 2015 2315  -o rcp26 --plot profile_combined 2017_12_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_26_id_CTRL_0_3000.nc
