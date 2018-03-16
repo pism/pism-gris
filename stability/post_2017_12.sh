@@ -49,9 +49,10 @@ for grid in 18000 9000 4500 3600 1800 900; do
         cdo mulc,100 -div -sub -seltimestep,1 -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -seltimestep,1 -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/scalar_percent/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
     done
 done
+
 for grid in 900; do
     for rcp in 26 45; do
-        cdo mulc,100 -div -sub -seltimestep,1 -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_3000.nc -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_3000.nc -seltimestep,1 -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_3000.nc $odir/scalar_percent/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_3000.nc
+        cdo mulc,100 -div -sub -seltimestep,1 -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_3000.nc -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_3000.nc -seltimestep,1 -selvar,limnsw $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_3000.nc $odir/scalar_percent/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_5000.nc
     done
 done
 
@@ -62,6 +63,19 @@ for grid in 18000 9000 4500 3600 1800 900; do
     for rcp in 26 45 85; do
         for year in 2100 2200 2500 3000; do
             for run in CTRL; do
+                cdo mulc,-1 -divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgms_g${grid}m_rcp_${rcp}_${run}_${year}.nc
+            done
+        done
+    done
+done
+
+odir=2017_12_ctrl
+run=CTRL
+mkdir -p $odir/dgmsl
+for grid in 900; do
+    for rcp in 26 45 85; do
+        for year in 2100 2200 2500 3000; do
+            for run in NTRL; do
                 cdo mulc,-1 -divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgms_g${grid}m_rcp_${rcp}_${run}_${year}.nc
             done
         done

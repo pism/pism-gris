@@ -232,7 +232,7 @@ except:
     combinations = np.genfromtxt(ensemble_file, dtype=None, delimiter=',', skip_header=1)
 
 firn_dict = {-1.0: 'low', 0.0: 'off', 1.0: 'ctrl'}
-ocs_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
+ocs_dict  = {-2.0: 'off', -1.0: 'low', 0.0: 'mid', 1.0: 'high'}
 ocm_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high', 2.0: 'm10', 3.0: 'm15'}
 tct_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
 bd_dict   = {-1.0: 'off', 0.0: 'i0', 1.0: 'ip'}
@@ -433,7 +433,8 @@ for n, combination in enumerate(combinations):
 
                     tct_file = calving_thresholds[tct]
 
-                    ocs_params = {'low' : (0.5, 1.0),
+                    ocs_params = {'off': (1.0, 1.0),
+                                  'low' : (0.5, 1.0),
                                   'mid' : (0.54, 1.17),
                                   'high': (0.85, 1.61)}
 
@@ -536,7 +537,7 @@ for n, combination in enumerate(combinations):
                 f.write(cmd)
                 outfile = '{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=start, end=end)
                 state_file = join(dirs["state"], outfile)
-                cmd = ' '.join(['ncks -O -4 -L 3', state_file, state_file, '\n\n'])
+                cmd = ' '.join(['ncks -O -4 -L 9', state_file, state_file, '\n\n'])
                 f.write(cmd)
                 real_start_year += restart_step
             ts_files = join(dirs["scalar"], 'ts_{domain}_g{grid}m_{experiment}_*.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
@@ -547,7 +548,7 @@ for n, combination in enumerate(combinations):
                 extra_file_tmp = spatial_ts_dict['extra_file']
                 extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
                 extra_file_wd = join(dirs["spatial"], extra_file)
-                cmd = ' '.join(['ncks -O -4 -L 3 ', extra_file_tmp, extra_file_wd, '\n'])
+                cmd = ' '.join(['ncks -O -4 -L 9 ', extra_file_tmp, extra_file_wd, '\n'])
                 f.write(cmd)
                 cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', extra_file_wd, '\n'])
                 f.write(cmd)
