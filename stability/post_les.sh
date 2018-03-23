@@ -35,6 +35,7 @@ done
 cd ../../
 
 
+
 odir=2017_12_ctrl
 grid=900
 mkdir -p $odir/spatial_processed
@@ -43,6 +44,21 @@ for rcp in 26 45 85; do
     cdo -L selvar,mask -selyear,2008,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc
     extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc
 done
+
+
+odir=2017_12_ctrl
+grid=900
+mkdir -p $odir/spatial_processed
+mkdir -p $odir/ice_extend_vol
+rcp=26
+cdo -L selvar,mask -selyear,2059,2117,2316,2918 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
+extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_percent.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
+rcp=45
+cdo -L selvar,mask -selyear,2056,2097,2189,2321 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
+extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_percent.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
+rcp=85
+cdo -L selvar,mask -selyear,2053,2082,2137,2202 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
+extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_percent.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
 
 
 odir=2017_12_ctrl
