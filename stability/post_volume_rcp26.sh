@@ -29,5 +29,5 @@ grid=900
 mkdir -p $odir/spatial_processed
 mkdir -p $odir/ice_extend_vol
 rcp=26
-cdo -L selvar,mask -selyear,2059,2117,2316,2918 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
-extract_interface.py -a 1e6 -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_percent.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
+cdo -L selvar,mask -selyear,2117,2316,2918,4073 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
+extract_interface.py -a 1e6 -t grounding_line -o $odir/ice_extend_vol/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_percent.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc

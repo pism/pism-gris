@@ -9,7 +9,7 @@
 # Long term evolution
 ~/base/gris-analysis/plotting/plotting.py  -o ctrl5k --plot ctrl_mass --time_bounds 2008 7000  2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_26_id_CTRL_0_5000.nc 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_45_id_CTRL_0_5000.nc 2017_12_ctrl/scalar/ts_gris_g900m_v3a_rcp_85_id_CTRL_0_2000.nc
 # Percent mass
-~/base/gris-analysis/plotting/plotting.py  -o ctrl --plot percent_mass --time_bounds 0 100 --bounds 2008 5000 2017_12_ctrl/scalar_percent/ts_gris_g900m_v3a_rcp_26_id_CTRL_0_5000.nc 2017_12_ctrl/scalar_percent/ts_gris_g900m_v3a_rcp_45_id_CTRL_0_5000.nc 2017_12_ctrl/scalar_percent/ts_gris_g900m_v3a_rcp_85_id_CTRL_0_2000.nc
+~/base/gris-analysis/plotting/plotting.py  -o ctrl --plot percent_mass --time_bounds 1 100 --bounds 2008 7000 2017_12_ctrl/scalar_percent/ts_gris_g900m_v3a_rcp_26_id_CTRL_0_5000.nc 2017_12_ctrl/scalar_percent/ts_gris_g900m_v3a_rcp_45_id_CTRL_0_5000.nc 2017_12_ctrl/scalar_percent/ts_gris_g900m_v3a_rcp_85_id_CTRL_0_2000.nc
 
 # Profiles
 ~/base/gris-analysis/plotting/plotting.py --bounds 0 12000 --time_bounds 2015 2315  -o rcp26 --plot profile_combined 2017_12_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_26_id_CTRL_0_3000.nc
