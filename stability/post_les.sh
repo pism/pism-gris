@@ -34,6 +34,12 @@ for file in gris_g${grid}m*0_1000.nc; do
 done
 cd ../../
 
+odir=2017_12_ctrl
+grid=900
+mkdir -p $odir/contrib
+for rcp in 26 45 85; do
+    cdo expr,'d_contrib_rate_pc=(-tendency_of_ice_mass_due_to_discharge/(-tendency_of_ice_mass_due_to_discharge+surface_runoff_rate/1e12));ru_contrib_rate_pc=(surface_runoff_rate/1e12/(-tendency_of_ice_mass_due_to_discharge+surface_runoff_rate/1e12));d_contrib_pc=-tendency_of_ice_mass*(-tendency_of_ice_mass_due_to_discharge/(-tendency_of_ice_mass_due_to_discharge+surface_runoff_rate/1e12));ru_contrib_pc=-tendency_of_ice_mass*(surface_runoff_rate/1e12/(-tendency_of_ice_mass_due_to_discharge+surface_runoff_rate/1e12));d_contrib=-3650*tendency_of_ice_mass*(-tendency_of_ice_mass_due_to_discharge/(-tendency_of_ice_mass_due_to_discharge+surface_runoff_rate/1e12));ru_contrib=-3650*tendency_of_ice_mass*(surface_runoff_rate/1e12/(-tendency_of_ice_mass_due_to_discharge+surface_runoff_rate/1e12));' -timcumsum ${odir}/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc ${odir}/contrib/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
+done
 
 
 odir=2017_12_ctrl
@@ -46,27 +52,6 @@ for rcp in 26 45 85; do
 done
 
 
-odir=2017_12_ctrl
-grid=900
-mkdir -p $odir/spatial_processed
-mkdir -p $odir/ice_extend_vol
-rcp=26
-cdo -L selvar,mask -selyear,2059,2117,2316,2918 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
-extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_percent.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
-rcp=45
-cdo -L selvar,mask -selyear,2056,2097,2189,2321 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
-extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_percent.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
-rcp=85
-cdo -L selvar,mask -selyear,2053,2082,2137,2202 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
-extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_percent.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
-
-
-odir=2017_12_ctrl
-grid=900
-mkdir -p $odir/foo
-for rcp in 26 45 85; do
-    cdo selvar,mask -selyear,2008,2100,2200,2300,2400,2500 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/foo/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc
-done
 
 
 odir=2017_12_ctrl
@@ -76,18 +61,6 @@ for rcp in 26 45 85; do
     extract_interface.py -t grounding_line -o $odir/ice_extend/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL.shp ${odir}/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc
 done
 
-
-
-odir=2017_12_ctrl
-mkdir -p $odir/dgmsl
-for rcp in 26 45 85; do
-    for year in 2100 2200 2500 3000; do
-        for run in NTRL; do
-            
-            cdo divc,365 -divc,1e15 -selvar,limnsw -sub -selyear,$year $odir/scalar/ts_gris_g3600m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar/ts_gris_g3600m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgms_g3600m_rcp_${rcp}_${run}_${year}.nc
-        done
-    done
-done
 
 odir=2017_11_ctrl
 mkdir -p $odir/dgmsl
@@ -124,4 +97,23 @@ grid=900
 mkdir -p ${odir}/discharge_relative
 for rcp in 45 85 26; do
     cdo runmean,11 -expr,d_rel="100*tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_runoff_rate/1e12)" ${odir}/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc ${odir}/discharge_relative/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
+done
+
+odir=2018_04_enth
+grid=900
+mkdir -p ${odir}/enth_base
+for rcp in 85 45; do
+    for year in 1 92 192 292; do
+        for pc in 5 10; do
+            #python ~/base/gris-analysis/enth_base/extract_basal_enthalpy.py -t $pc ${odir}/snap/save_gris_g900m_v3a_rcp_${rcp}_id_CTRL_0_500_${year}.000.nc ${odir}/enth_base/enth_base_${pc}_gris_g900m_v3a_rcp_${rcp}_id_CTRL_0_500_${year}.000.nc
+            #gdal_translate -a_srs EPSG:3413 NETCDF:${odir}/enth_base/enth_base_${pc}_gris_g900m_v3a_rcp_${rcp}_id_CTRL_0_500_${year}.000.nc:basal_enthalpy ${odir}/enth_base/enth_base_${pc}_gris_g900m_v3a_rcp_${rcp}_id_CTRL_0_500_${year}.tif
+            cd ${odir}/enth_base
+            mkdir -p ../basins
+            for basin in CW; do
+                # ~/base/gris-analysis/basins/extract_basins.py --no_timeseries --basins  $basin --o_dir ../basins enth_base_${pc}_gris_g900m_v3a_rcp_${rcp}_id_CTRL_0_500_${year}.000.nc
+                gdal_translate -a_srs EPSG:3413 NETCDF:../basins/b_${basin}_enth_base_${pc}_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_500_${year}.000/b_${basin}_enth_base_${pc}_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_500_${year}.000.nc:basal_enthalpy enth_base_${pc}_b_${basin}_gris_g900m_v3a_rcp_${rcp}_id_CTRL_0_500_${year}.tif
+            done
+        cd ../../
+        done
+    done
 done

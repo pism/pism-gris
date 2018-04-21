@@ -29,5 +29,10 @@ grid=900
 mkdir -p $odir/spatial_processed
 mkdir -p $odir/ice_extend_vol
 rcp=45
+for year in 2189 2321 2556 2989 3511 4274; do
+    cdo -L selvar,usurf -selyear,${year} $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc
+    gdal_translate -a_nodata 0 $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc $odir/ice_extend_vol/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+    gdaldem slope $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc $odir/ice_extend_vol/slope_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+done
 cdo -L selvar,mask -selyear,2097,2189,2321,2556,2989,3511,4274 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
 extract_interface.py -t grounding_line -o $odir/ice_extend_vol/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_percent.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc

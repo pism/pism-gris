@@ -29,5 +29,17 @@ grid=900
 mkdir -p $odir/spatial_processed
 mkdir -p $odir/ice_extend_vol
 rcp=26
+for year in  2316 2918 4073; do
+    cdo -L selvar,usurf -selyear,${year} $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc
+    gdal_translate -a_nodata 0 $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc $odir/ice_extend_vol/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+    gdaldem slope $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc $odir/ice_extend_vol/slope_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+done
+for year in 6262; do
+    cdo -L selvar,usurf -selyear,${year} $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_4000_5000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc
+    gdal_translate -a_nodata 0 $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc $odir/ice_extend_vol/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+    gdaldem slope $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.nc $odir/ice_extend_vol/slope_ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_${year}.tif
+done
 cdo -L selvar,mask -selyear,2117,2316,2918,4073 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
-extract_interface.py -a 1e6 -t grounding_line -o $odir/ice_extend_vol/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_percent.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc
+cdo -L selvar,mask -selyear,6262 $odir/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_4000_5000.nc $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_4000_5000_percent.nc
+cdo -O mergetime $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000_percent.nc  $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_4000_5000_percent.nc  $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_5000_percent.nc
+extract_interface.py -t grounding_line -o $odir/ice_extend_vol/gl_ex_g900m_v3a_rcp_${rcp}_id_CTRL_percent.shp $odir/spatial_processed/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_5000_percent.nc
