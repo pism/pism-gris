@@ -163,7 +163,7 @@ dirs = {"output": "$output_dir", "spatial_tmp": "$spatial_tmp_dir"}
 for d in ["performance", "state", "scalar", "spatial", "snap", "jobs", "basins"]:
     dirs[d] = "$output_dir/{dir}".format(dir=d)
 
-if not save_spatial_ts:
+if spatial_ts == 'none':
     del dirs["spatial"]
 
 # use the actual path of the run scripts directory (we need it now and
