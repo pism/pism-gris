@@ -480,11 +480,8 @@ for n, combination in enumerate(combinations):
                             exvars = basic_spatial_ts_vars
                         else:
                             exvars = stability_spatial_ts_vars
-                        spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=dirs["spatial_tmp"], split=False)
+                        spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=dirs["spatial_tmp"], split=False)
                         snap_dict = generate_snap_shots(outfile, save_times, odir=dirs["snap"])
-
-                        if start != simulation_start_year:
-                            spatial_ts_dict['extra_append'] = ''
 
                         all_params_dict = merge_dicts(all_params_dict,
                                                       spatial_ts_dict,
@@ -546,27 +543,29 @@ for n, combination in enumerate(combinations):
                 real_start_year += restart_step
             ts_files = join(dirs["scalar"], 'ts_{domain}_g{grid}m_{experiment}_*.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
             ts_file = join(dirs["scalar"], 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=simulation_start_year, end=simulation_end_year))
-            cmd = 'cdo mergetime {} {}\n\n'.format(ts_files, ts_file)
+            cmd = '#cdo -f nc4 -z zip_9 mergetime {} {}\n\n'.format(ts_files, ts_file)
             f.write(cmd)
             if not spatial_ts == 'none':
-                extra_file_tmp = spatial_ts_dict['extra_file']
-                extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
-                extra_file_wd = join(dirs["spatial"], extra_file)
-                cmd = ' '.join(['ncks -O -4 -L 9 ', extra_file_tmp, extra_file_tmp, '\n'])
-                f.write(cmd)
-                cmd = ' '.join(['nccopy ', extra_file_tmp, extra_file_wd, '\n'])
-                f.write(cmd)
-                cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', extra_file_wd, '\n'])
-                f.write(cmd)
-                cmd = ' '.join(['~/base/gris-analysis/scripts/nc_add_hillshade.py -z 1 ', extra_file_wd, '\n\n'])
-                f.write(cmd)
-                basin_dir = 'basins'
-                cmd = ' '.join(['cd', dirs['spatial'], '\n'])
-                f.write(cmd)
-                for basin in ('CW', 'NE', 'NO', 'NW', 'SE', 'SW'):
-                    cmd = ' '.join(['~/base/gris-analysis/basins/extract_basins.py --basins ', basin, '--o_dir ../{}'.format(basin_dir),  extra_file, '\n'])
+                for start in range(simulation_start_year, simulation_end_year, restart_step):
+                    end = start + restart_step
+                    extra_file = '{}_{}_{}.nc'.format(os.path.split(full_outfile)[-1].split('.nc')[0], start, end)
+                    extra_file_tmp = join(dirs["spatial_tmp"], extra_file)
+                    extra_file_wd = join(dirs["spatial"], extra_file)
+                    cmd = ' '.join(['ncks -O -4 -L 9 ', extra_file_tmp, extra_file_tmp, '\n'])
                     f.write(cmd)
-                f.write('cd ../../ \n')
+                    cmd = ' '.join(['nccopy ', extra_file_tmp, extra_file_wd, '\n'])
+                    f.write(cmd)
+                    cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', extra_file_wd, '\n'])
+                    f.write(cmd)
+                    cmd = ' '.join(['~/base/gris-analysis/scripts/nc_add_hillshade.py -z 1 ', extra_file_wd, '\n\n'])
+                    f.write(cmd)
+                    basin_dir = 'basins'
+                    cmd = ' '.join(['cd', dirs['spatial'], '\n'])
+                    #f.write(cmd)
+                    for basin in ('CW', 'NE', 'NO', 'NW', 'SE', 'SW'):
+                        cmd = ' '.join(['~/base/gris-analysis/basins/extract_basins.py --basins ', basin, '--o_dir ../{}'.format(basin_dir),  extra_file, '\n'])
+                        # f.write(cmd)
+                    # f.write('cd ../../ \n')
 
 scripts = uniquify_list(scripts)
 scripts_combinded = uniquify_list(scripts_combinded)
