@@ -135,6 +135,32 @@ def stability_spatial_ts_vars():
 
     return exvars
 
+def basic_spatial_ts_vars():
+    '''
+    Returns a list of commonly-used extra vars
+    '''
+    
+    exvars = ['beta',
+              'cell_area',
+              'dHdt',
+              'ice_mass',
+              'mask',
+              'mass_fluxes',
+              'lat',
+              'lat_bnds',
+              'lon',
+              'lon_bnds',
+              'pdd_rates',
+              'sftgif',
+              'temppabase',
+              'thk',
+              'topg',
+              'usurf',
+              'velbase_mag',
+              'velsurf_mag']
+
+    return exvars
+
 
 def glacial_spatial_ts_vars():
     '''

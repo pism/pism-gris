@@ -71,6 +71,9 @@ parser.add_argument("-s", "--system", dest="system",
 parser.add_argument("-b", "--bed_type", dest="bed_type",
                     choices=list_bed_types(),
                     help="output size type", default='no_bath')
+parser.add_argument("--spatial_ts", dest="spatial_ts",
+                    choices=['basic', 'standard', 'none'],
+                    help="output size type", default='standard')
 parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
@@ -100,8 +103,6 @@ parser.add_argument("--step", dest="step", type=int,
                     help="Step in years for restarting", default=1000)
 parser.add_argument("--test_climate_models", dest="test_climate_models", action="store_true",
                     help="Turn off ice dynamics and mass transport to test climate models", default=False)
-parser.add_argument("--calibrate", dest="calibrate", action="store_true",
-                    help="Run calibration mode (no spatial time series written)", default=False)
 parser.add_argument("-e", "--ensemble_file", dest="ensemble_file",
                     help="File that has all combinations for ensemble study", default=None)
 
@@ -118,8 +119,7 @@ queue = options.queue
 walltime = options.walltime
 system = options.system
 
-calibrate = options.calibrate
-save_spatial_ts = not calibrate
+spatial_ts = options.spatial_ts
 
 bed_type = options.bed_type
 calving = options.calving
@@ -465,7 +465,7 @@ for n, combination in enumerate(combinations):
                                                         odir=dirs["scalar"])
 
                     exvars = stability_spatial_ts_vars()
-
+                    
                     all_params_dict = merge_dicts(general_params_dict,
                                                   grid_params_dict,
                                                   stress_balance_params_dict,
@@ -475,7 +475,11 @@ for n, combination in enumerate(combinations):
                                                   calving_params_dict,
                                                   scalar_ts_dict)
 
-                    if save_spatial_ts:
+                    if not spatial_ts == 'none':
+                        if spatial_ts == 'basic':
+                            exvars = basic_spatial_ts_vars
+                        else:
+                            exvars = stability_spatial_ts_vars
                         spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=dirs["spatial_tmp"], split=False)
                         snap_dict = generate_snap_shots(outfile, save_times, odir=dirs["snap"])
 
@@ -548,7 +552,9 @@ for n, combination in enumerate(combinations):
                 extra_file_tmp = spatial_ts_dict['extra_file']
                 extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
                 extra_file_wd = join(dirs["spatial"], extra_file)
-                cmd = ' '.join(['ncks -O -4 -L 9 ', extra_file_tmp, extra_file_wd, '\n'])
+                cmd = ' '.join(['ncks -O -4 -L 9 ', extra_file_tmp, extra_file_tmp, '\n'])
+                f.write(cmd)
+                cmd = ' '.join(['nccopy ', extra_file_tmp, extra_file_wd, '\n'])
                 f.write(cmd)
                 cmd = ' '.join(['adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1', extra_file_wd, '\n'])
                 f.write(cmd)
