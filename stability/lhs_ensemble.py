@@ -548,7 +548,7 @@ for n, combination in enumerate(combinations):
             ts_file = join(dirs["scalar"], 'ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name, start=simulation_start_year, end=simulation_end_year))
             cmd = 'cdo mergetime {} {}\n\n'.format(ts_files, ts_file)
             f.write(cmd)
-            if save_spatial_ts:
+            if not spatial_ts == 'none':
                 extra_file_tmp = spatial_ts_dict['extra_file']
                 extra_file = '{}_{}_{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0], simulation_start_year, simulation_end_year)
                 extra_file_wd = join(dirs["spatial"], extra_file)
