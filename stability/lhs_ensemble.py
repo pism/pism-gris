@@ -463,8 +463,6 @@ for n, combination in enumerate(combinations):
                                                         start=simulation_start_year,
                                                         end=simulation_end_year,
                                                         odir=dirs["scalar"])
-
-                    exvars = stability_spatial_ts_vars()
                     
                     all_params_dict = merge_dicts(general_params_dict,
                                                   grid_params_dict,
@@ -477,9 +475,9 @@ for n, combination in enumerate(combinations):
 
                     if not spatial_ts == 'none':
                         if spatial_ts == 'basic':
-                            exvars = basic_spatial_ts_vars
+                            exvars = basic_spatial_ts_vars()
                         else:
-                            exvars = stability_spatial_ts_vars
+                            exvars = stability_spatial_ts_vars()
                         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=dirs["spatial_tmp"], split=False)
                         snap_dict = generate_snap_shots(outfile, save_times, odir=dirs["snap"])
 

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+odir=2018_04_ctrl
+grid=900
+mkdir -p ${odir}/profiles
+for rcp in 45; do
+    extract_profiles.py -v velsurf_mag,velbase_mag,thk,usurf,topg ../../gris-outlet-glacier-profiles/gris-outlet-glacier-profiles-all-100m.shp ${odir}_tmp/ex_g900m_v3a_rcp_${rcp}_id_CTRL.nc ${odir}/profiles/profiles_100m_all_ex_g900m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
+done
+
+
 odir=2018_01_les
 mkdir -p $odir/dgmsl
 for grid in 1800; do
@@ -84,7 +92,7 @@ done
 
 odir=2017_12_ctrl
 grid=900
-mkdir -p ${odir}/station_ts
+#mkdir -p ${odir}/station_ts
 mkdir -p ${odir}/profiles
 for rcp in 45 85 26; do
     # extract_profiles.py -v thk,usurf,tempsurf ../../data_sets/GreenlandIceCoreSites/ice-core-sites.shp ${odir}/spatial/ex_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc ${odir}/station_ts/profile_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_3000.nc
