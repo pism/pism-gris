@@ -220,7 +220,7 @@ phi_max  = 40.
 topg_min = -700
 topg_max = 700
 
-rcps            = ['ctrl', '26', '45', '85']
+rcps            = ['cold', '26', '45', '85']
 std_dev         = 4.23
 firn            = 'ctrl'
 lapse_rate      = 6
@@ -288,7 +288,8 @@ for n, combination in enumerate(combinations):
         full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
         full_outfile = 'g{grid}m_{experiment}.nc'.format(grid=grid, experiment=full_exp_name)
 
-        forcing_files = {'ctrl' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0),
+        forcing_files = {'cold' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=-1),
+                         'ctrl' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0),
                          '26'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc',
                          '45'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc',
                          '85'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'}
@@ -546,8 +547,8 @@ for n, combination in enumerate(combinations):
             if not spatial_ts == 'none':
                 for start in range(simulation_start_year, simulation_end_year, restart_step):
                     end = start + restart_step
-                    extra_file = '{}_{}_{}.nc'.format(os.path.split(full_outfile)[-1].split('.nc')[0], start, end)
-                    extra_file_tmp = join(dirs["spatial_tmp"], extra_file)
+                    extra_file_tmp = spatial_ts_dict['extra_file']
+                    extra_file = '{}.nc'.format(os.path.split(extra_file_tmp)[-1].split('.nc')[0])
                     extra_file_wd = join(dirs["spatial"], extra_file)
                     cmd = ' '.join(['ncks -O -4 -L 9 ', extra_file_tmp, extra_file_tmp, '\n'])
                     f.write(cmd)
@@ -559,11 +560,11 @@ for n, combination in enumerate(combinations):
                     f.write(cmd)
                     basin_dir = 'basins'
                     cmd = ' '.join(['cd', dirs['spatial'], '\n'])
-                    #f.write(cmd)
+                    f.write(cmd)
                     for basin in ('CW', 'NE', 'NO', 'NW', 'SE', 'SW'):
                         cmd = ' '.join(['~/base/gris-analysis/basins/extract_basins.py --basins ', basin, '--o_dir ../{}'.format(basin_dir),  extra_file, '\n'])
-                        # f.write(cmd)
-                    # f.write('cd ../../ \n')
+                        f.write(cmd)
+                    f.write('cd ../../ \n')
 
 scripts = uniquify_list(scripts)
 scripts_combinded = uniquify_list(scripts_combinded)
