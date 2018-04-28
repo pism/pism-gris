@@ -73,7 +73,7 @@ parser.add_argument("-b", "--bed_type", dest="bed_type",
                     help="output size type", default='no_bath')
 parser.add_argument("--spatial_ts", dest="spatial_ts",
                     choices=['basic', 'standard', 'none'],
-                    help="output size type", default='standard')
+                    help="output size type", default='basic')
 parser.add_argument("--forcing_type", dest="forcing_type",
                     choices=['ctrl', 'e_age'],
                     help="output size type", default='ctrl')
