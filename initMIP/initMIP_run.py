@@ -178,9 +178,9 @@ for n, combination in enumerate(combinations):
     
     vversion = 'v' + str(version)
     if bed_type is None:
-        experiment =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+        experiment =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
     else:
-        experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+        experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
 
         
     script = 'exp_{}_g{}m_{}_{}.sh'.format(domain.lower(), grid, experiment, exp)
@@ -238,7 +238,7 @@ for n, combination in enumerate(combinations):
 
         
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
-        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
         
         cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
 
@@ -249,12 +249,12 @@ for n, combination in enumerate(combinations):
             mytype = "MO14 2015-04-27"
         else:
             import sys
-            print('TYPE {} not recognized, exiting'.format(vversion))
+            print(('TYPE {} not recognized, exiting'.format(vversion)))
             sys.exit(0)        
     
 scripts = uniquify_list(scripts)
 
-print '\n'.join([script for script in scripts])
+print('\n'.join([script for script in scripts]))
 print('\nwritten\n')
 
 

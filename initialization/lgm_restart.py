@@ -178,7 +178,7 @@ for n, combination in enumerate(combinations):
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
-    full_exp_name =  '_'.join(['lgm', climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    full_exp_name =  '_'.join(['lgm', climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
 
     outfiles = []
@@ -187,7 +187,7 @@ for n, combination in enumerate(combinations):
 
         end = start + restart_step
 
-        experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
+        experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())]), '{}'.format(start), '{}'.format(end)])
 
         script = 'lgm_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
         scripts.append(script)
@@ -259,7 +259,7 @@ for n, combination in enumerate(combinations):
             snap_shot_dict = generate_snap_shots(outfile, save_times, odir=odir)
 
             all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
-            all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+            all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
 
             cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
 
@@ -292,8 +292,8 @@ for n, combination in enumerate(combinations):
     
 scripts = uniquify_list(scripts)
 scripts_post = uniquify_list(scripts_post)
-print '\n'.join([script for script in scripts])
+print('\n'.join([script for script in scripts]))
 print('\nwritten\n')
-print '\n'.join([script for script in scripts_post])
+print('\n'.join([script for script in scripts_post]))
 print('\nwritten\n')
 

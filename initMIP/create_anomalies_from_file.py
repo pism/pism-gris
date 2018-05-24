@@ -69,26 +69,26 @@ nc.createDimension(tdim)
 bnds_var_name = "time_bnds"
 # create a new dimension for bounds only if it does not yet exist
 bnds_dim = "nb2"
-if bnds_dim not in nc.dimensions.keys():
+if bnds_dim not in list(nc.dimensions.keys()):
     nc.createDimension(bnds_dim, 2)
 
 time_var = nc.createVariable(tdim, 'float64', dimensions=(tdim))
 time_var.bounds = bnds_var_name
 time_var.units = 'years'
 time_var.axis = 'T'
-time_var[:] = range(start, end)
+time_var[:] = list(range(start, end))
 
 # create time bounds variable
 time_bnds_var = nc.createVariable(bnds_var_name, 'd', dimensions=(tdim, bnds_dim))
-time_bnds_var[:, 0] = range(start, end)
-time_bnds_var[:, 1] = range(start+1, end+1)
+time_bnds_var[:, 0] = list(range(start, end))
+time_bnds_var[:, 1] = list(range(start+1, end+1))
 
 varname = 'surface_altitude'
-for name in nc_dem.variables.keys():
+for name in list(nc_dem.variables.keys()):
     v = nc_dem.variables[name]
     if getattr(v, "standard_name", "") == varname:
-        print("variabe {0} found by its standard_name {1}".format(name,
-                                                                  varname))
+        print(("variabe {0} found by its standard_name {1}".format(name,
+                                                                  varname)))
         myvar = name
 h = np.squeeze(nc_dem.variables[myvar][:])
 lat = np.squeeze(nc_dem.variables['lat'][:])

@@ -313,7 +313,7 @@ restart_step = options.step
 
 if restart_step > (simulation_end_year - simulation_start_year):
     print('Error:')
-    print('restart_step > (simulation_end_year - simulation_start_year): {} > {}'.format(restart_step, simulation_end_year - simulation_start_year))
+    print(('restart_step > (simulation_end_year - simulation_start_year): {} > {}'.format(restart_step, simulation_end_year - simulation_start_year)))
     print('Try again')
     import sys
     sys.exit(0)
@@ -346,7 +346,7 @@ for n, combination in enumerate(combinations):
         name_options['test_climate'] = 'on'
     
     vversion = 'v' + str(version)
-    full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
     full_outfile = 'g{grid}m_{experiment}.nc'.format(grid=grid, experiment=full_exp_name)
     if rcp == 'ctrl':
         climate_modifier_file = 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0)
@@ -370,7 +370,7 @@ for n, combination in enumerate(combinations):
 
             end = start + restart_step
 
-            experiment =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
+            experiment =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())]), '{}'.format(start), '{}'.format(end)])
 
             script = os.path.join(odir, script_dir, 'warm_g{}m_{}.sh'.format(grid, experiment))
             scripts.append(script)
@@ -560,7 +560,7 @@ for n, combination in enumerate(combinations):
                                                   hydro_params_dict,
                                                   calving_params_dict,
                                                   scalar_ts_dict)
-                all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+                all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
 
                 if system in ('debug'):
                     cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job_{job_no}.${batch}'.format(outdir=odir, job_no=job_no, batch=batch_system['job_id'])])
@@ -628,10 +628,10 @@ for n, combination in enumerate(combinations):
 scripts = uniquify_list(scripts)
 scripts_combinded = uniquify_list(scripts_combinded)
 scripts_post = uniquify_list(scripts_post)
-print '\n'.join([script for script in scripts])
+print('\n'.join([script for script in scripts]))
 print('\nwritten\n')
-print '\n'.join([script for script in scripts_combinded])
+print('\n'.join([script for script in scripts_combinded]))
 print('\nwritten\n')
-print '\n'.join([script for script in scripts_post])
+print('\n'.join([script for script in scripts_post]))
 print('\nwritten\n')
 

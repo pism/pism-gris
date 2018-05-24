@@ -230,12 +230,12 @@ def adjust_time_axis(ifile):
 
     # create a new dimension for bounds only if it does not yet exist
     time_dim = "time"
-    if time_dim not in nc.dimensions.keys():
+    if time_dim not in list(nc.dimensions.keys()):
         nc.createDimension(time_dim)
 
     # create a new dimension for bounds only if it does not yet exist
     bnds_dim = "nb2"
-    if bnds_dim not in nc.dimensions.keys():
+    if bnds_dim not in list(nc.dimensions.keys()):
         nc.createDimension(bnds_dim, 2)
 
     # variable names consistent with PISM

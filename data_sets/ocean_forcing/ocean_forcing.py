@@ -84,12 +84,12 @@ def get_projection_from_file(nc):
         except:
             try:
                 # go through variables and look for 'grid_mapping' attribute
-                for var in nc.variables.keys():
+                for var in list(nc.variables.keys()):
                     if hasattr(nc.variables[var], 'grid_mapping'):
                         mappingvarname = nc.variables[var].grid_mapping
-                        print(
+                        print((
                             'Found projection information in variable "%s", using it' %
-                            mappingvarname)
+                            mappingvarname))
                         break
                 var_mapping = nc.variables[mappingvarname]
                 p = Proj(proj="stere",
@@ -174,7 +174,7 @@ else:
 
 # create a new dimension for bounds only if it does not yet exist
 bnds_dim = "nb2"
-if bnds_dim not in nc.dimensions.keys():
+if bnds_dim not in list(nc.dimensions.keys()):
     nc.createDimension(bnds_dim, 2)
 
 # variable names consistent with PISM
@@ -209,14 +209,14 @@ def def_var(nc, name, units):
     return var
 
 var = "shelfbmassflux"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     bmelt_var = def_var(nc, var, "kg m-2 yr-1")
 else:
     bmelt_var = nc.variables[var]
 bmelt_var.grid_mapping = "mapping"
 
 var = "shelfbtemp"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     btemp_var = def_var(nc, var, "deg_C")
 else:
     btemp_var = nc.variabels[var]
@@ -231,9 +231,9 @@ if mask:
 nt = len(time_var[:])
 for t in range(nt):
     if time_bnds_var is not None:
-        print('Processing from {} to {}'.format(time_bnds_var[t,0], time_bnds_var[t,1]))
+        print(('Processing from {} to {}'.format(time_bnds_var[t,0], time_bnds_var[t,1])))
     else:
-        print('Processing {}'.format(dates[t]))        
+        print(('Processing {}'.format(dates[t])))        
     bmelt = a * Lat + b
     bmelt[Lat<lat_0] = a * lat_0 + b
     bmelt[Lat>lat_1] = a * lat_1 + b

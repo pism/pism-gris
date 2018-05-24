@@ -38,12 +38,10 @@ def permute_nc(variable, output_order=('time', 'station', 'profile', 'z', 'zb'))
     input_dimensions = variable.dimensions
 
     # filter out irrelevant dimensions
-    dimensions = filter(lambda x: x in input_dimensions,
-                        output_order)
+    dimensions = [x for x in output_order if x in input_dimensions]
 
     # create the mapping
-    mapping = map(lambda x: dimensions.index(x),
-                  input_dimensions)
+    mapping = [dimensions.index(x) for x in input_dimensions]
 
     if mapping:
         return np.transpose(variable[:], mapping)
@@ -73,12 +71,10 @@ def permute(array,
     input_dimensions = input_order
 
     # filter out irrelevant dimensions
-    dimensions = filter(lambda x: x in input_dimensions,
-                        output_order)
+    dimensions = [x for x in output_order if x in input_dimensions]
 
     # create the mapping
-    mapping = map(lambda x: dimensions.index(x),
-                  input_dimensions)
+    mapping = [dimensions.index(x) for x in input_dimensions]
 
     return np.transpose(array, mapping)
 
@@ -97,8 +93,7 @@ def compute_normal_speed(ifile):
     nc.createVariable('velsurf_normal', 'd', dimensions=dims, fill_value=fill_value)
     vn = ux * nx + vy * ny
     # filter out irrelevant dimensions
-    input_dims = filter(lambda x: x in dims,
-                        ('time', 'station', 'profile', 'z', 'zb'))
+    input_dims = [x for x in ('time', 'station', 'profile', 'z', 'zb') if x in dims]
     nc.variables['velsurf_normal'][:] = permute(vn,
                                                 input_order=input_dims,
                                                 output_order=dims)

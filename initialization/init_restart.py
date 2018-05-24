@@ -149,7 +149,7 @@ if precip in ('racmo'):
 elif precip in ('hirham'):
     precip_file = 'DMI-HIRHAM5_GL2_ERAI_1980_2014_PR_TM_EPSG3413_{}m.nc'.format(grid)
 else:
-    print('Precip model {} not support. How did we get here?'.format(precip))
+    print(('Precip model {} not support. How did we get here?'.format(precip)))
 
 if ocean_melt in ('x'):
     ocean_file = 'ocean_forcing_latitudinal_ctrl.nc'
@@ -262,7 +262,7 @@ for n, combination in enumerate(combinations):
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
-    full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
     
     # All runs in one script file for coarse grids that fit into max walltime
@@ -280,7 +280,7 @@ for n, combination in enumerate(combinations):
 
             end = start + restart_step
 
-            experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
+            experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())]), '{}'.format(start), '{}'.format(end)])
 
             script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
             scripts.append(script)
@@ -376,7 +376,7 @@ for n, combination in enumerate(combinations):
                                               spatial_ts_dict,
                                               scalar_ts_dict,
                                               snap_shot_dict)
-                all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+                all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
 
                 if system in ('debug'):
                     cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job_{job_no}.${batch}'.format(outdir=odir, job_no=job_no, batch=batch_system['job_id'])])
@@ -423,10 +423,10 @@ for n, combination in enumerate(combinations):
 scripts = uniquify_list(scripts)
 scripts_combinded = uniquify_list(scripts_combinded)
 scripts_post = uniquify_list(scripts_post)
-print '\n'.join([script for script in scripts])
+print('\n'.join([script for script in scripts]))
 print('\nwritten\n')
-print '\n'.join([script for script in scripts_combinded])
+print('\n'.join([script for script in scripts_combinded]))
 print('\nwritten\n')
-print '\n'.join([script for script in scripts_post])
+print('\n'.join([script for script in scripts_post]))
 print('\nwritten\n')
 

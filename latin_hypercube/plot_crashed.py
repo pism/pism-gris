@@ -29,7 +29,7 @@ with open("lhs_samples_20171022.csv", "rb") as f:
             continue
 
         ID = int(row[0])
-        row = map(float, row)
+        row = list(map(float, row))
 
         if failed_ids.count(ID) == 1:
             failed.append(row)

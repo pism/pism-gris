@@ -83,19 +83,19 @@ def make_spatial_vars_ismip6_conforming(filename, ismip6_vars_dict):
     cell_area_units = cell_area_var.units
     cell_area = cell_area_var[:]
 
-    pism_to_ismip6_dict = dict((v.pism_name, k) for k, v in ismip6_vars_dict.iteritems())
+    pism_to_ismip6_dict = dict((v.pism_name, k) for k, v in ismip6_vars_dict.items())
     
     for pism_var in nc.variables:
         nc_var = nc.variables[pism_var]
-        if pism_var in pism_to_ismip6_dict.keys():
+        if pism_var in list(pism_to_ismip6_dict.keys()):
             ismip6_var = pism_to_ismip6_dict[pism_var]
-            print('Processing {} / {}'.format(pism_var, ismip6_var))
+            print(('Processing {} / {}'.format(pism_var, ismip6_var)))
             if not pism_var == ismip6_var:
-                print('  Renaming {pism_var} to {ismip6_var}'.format(pism_var=pism_var, ismip6_var=ismip6_var))
+                print(('  Renaming {pism_var} to {ismip6_var}'.format(pism_var=pism_var, ismip6_var=ismip6_var)))
                 nc.renameVariable(pism_var, ismip6_var)
                 nc.sync()
             if pism_var in pism_mass_to_vol_vars:
-                print('  Converting {pism_var} from mass to volume'.format(pism_var=pism_var))
+                print(('  Converting {pism_var} from mass to volume'.format(pism_var=pism_var)))
                 nc_var[:] /= cell_area
                 i_units = nc_var.units
                 o_units = cf_units.Unit(i_units) / cf_units.Unit(cell_area_units)
@@ -103,7 +103,7 @@ def make_spatial_vars_ismip6_conforming(filename, ismip6_vars_dict):
             if not nc_var.units == ismip6_vars_dict[ismip6_var].units:
                 o_units = ismip6_vars_dict[ismip6_var].units            
                 i_units = nc_var.units
-                print('  Converting {pism_var} from {i_units} to {o_units}'.format(pism_var=pism_var, i_units=i_units, o_units=o_units))    
+                print(('  Converting {pism_var} from {i_units} to {o_units}'.format(pism_var=pism_var, i_units=i_units, o_units=o_units)))    
                 i_f = cf_units.Unit(i_units)
                 o_f = cf_units.Unit(o_units)
                 nc_var[:] = i_f.convert(nc_var[:], o_f)
@@ -120,21 +120,21 @@ def make_scalar_vars_ismip6_conforming(filename, ismip6_vars_dict):
     # Open file
     nc = CDF(filename, 'a')
 
-    pism_to_ismip6_dict = dict((v.pism_name, k) for k, v in ismip6_vars_dict.iteritems())
+    pism_to_ismip6_dict = dict((v.pism_name, k) for k, v in ismip6_vars_dict.items())
     
     for pism_var in nc.variables:
         nc_var = nc.variables[pism_var]
-        if pism_var in pism_to_ismip6_dict.keys():
+        if pism_var in list(pism_to_ismip6_dict.keys()):
             ismip6_var = pism_to_ismip6_dict[pism_var]
-            print('Processing {} / {}'.format(pism_var, ismip6_var))
+            print(('Processing {} / {}'.format(pism_var, ismip6_var)))
             if not pism_var == ismip6_var:
-                print('  Renaming {pism_var} to {ismip6_var}'.format(pism_var=pism_var, ismip6_var=ismip6_var))
+                print(('  Renaming {pism_var} to {ismip6_var}'.format(pism_var=pism_var, ismip6_var=ismip6_var)))
                 nc.renameVariable(pism_var, ismip6_var)
                 nc.sync()
             if not nc_var.units == ismip6_vars_dict[ismip6_var].units:
                 o_units = ismip6_vars_dict[ismip6_var].units            
                 i_units = nc_var.units
-                print('  Converting {pism_var} from {i_units} to {o_units}'.format(pism_var=pism_var, i_units=i_units, o_units=o_units))    
+                print(('  Converting {pism_var} from {i_units} to {o_units}'.format(pism_var=pism_var, i_units=i_units, o_units=o_units)))    
                 i_f = cf_units.Unit(i_units)
                 o_f = cf_units.Unit(o_units)
                 nc_var[:] = i_f.convert(nc_var[:], o_f)
@@ -148,7 +148,7 @@ def create_searise_grid(filename, grid_spacing, **kwargs):
     Create dummy grid description
     '''
 
-    if 'fileformat' not in kwargs.keys():
+    if 'fileformat' not in list(kwargs.keys()):
         fileformat = 'NETCDF4'
     else:
         fileformat = str.upper(kwargs['fileformat'])

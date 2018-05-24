@@ -167,7 +167,7 @@ for n, combination in enumerate(combinations):
     name_options['hydro'] = hydro
     
     vversion = 'v' + str(version)
-    experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
 
         
     script = '{}_{}_g{}m_{}.sh'.format(climate, domain.lower(), grid, experiment)
@@ -225,7 +225,7 @@ for n, combination in enumerate(combinations):
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end)
         
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
-        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
         
         cmd = ' '.join([prefix, all_params, '2>&1 | tee job.${PBS_JOBID}'])
 
@@ -236,7 +236,7 @@ for n, combination in enumerate(combinations):
             mytype = "MO14 2015-04-27"
         else:
             import sys
-            print('TYPE {} not recognized, exiting'.format(vversion))
+            print(('TYPE {} not recognized, exiting'.format(vversion)))
             sys.exit(0)        
     
 scripts = uniquify_list(scripts)
@@ -254,5 +254,5 @@ with open(submit, 'w') as f:
     for k in range(len(scripts)):
         f.write('JOBID=$(qsub {script})\n'.format(script=scripts[k]))
 
-print("\nRun {} to submit all jobs to the scheduler\n".format(submit))
+print(("\nRun {} to submit all jobs to the scheduler\n".format(submit)))
 

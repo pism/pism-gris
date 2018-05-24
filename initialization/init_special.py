@@ -95,10 +95,10 @@ domain = options.domain
 pism_exec = generate_domain(domain)
 
 no_grid_choices = len(grid_choices)
-grid_nos = range(0, no_grid_choices)
-grid_mapping = OrderedDict(zip(grid_choices, grid_nos))
+grid_nos = list(range(0, no_grid_choices))
+grid_mapping = OrderedDict(list(zip(grid_choices, grid_nos)))
 save_times = [-125000, 100000, -25000, -20000, -15000, -11700, -1000, -500, -200, -100, -5]
-grid_start_times = OrderedDict(zip(grid_choices, save_times))
+grid_start_times = OrderedDict(list(zip(grid_choices, save_times)))
 infile = ''
 if domain.lower() in ('greenland_ext', 'gris_ext'):
     pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
@@ -168,7 +168,7 @@ for n, combination in enumerate(combinations):
     name_options['forcing_type'] = forcing_type
 
     vversion = 'v' + str(version)
-    experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
 
         
     script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
@@ -198,7 +198,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['i'] = pism_dataname
         general_params_dict['bootstrap'] = ''
         if grid_mapping[grid] > 0:
-            previous_grid =  [k for k, v in grid_mapping.iteritems() if v == grid_mapping[grid] -1][0]
+            previous_grid =  [k for k, v in grid_mapping.items() if v == grid_mapping[grid] -1][0]
             regridfile = os.path.join(odir, 'save_{domain}_g{grid}m_refine_{experiment}_0_{start}.000.nc'.format(domain=domain.lower(), grid=previous_grid, experiment=experiment, start=start))
             general_params_dict['regrid_file'] = regridfile
             general_params_dict['regrid_vars'] = regridvars
@@ -238,7 +238,7 @@ for n, combination in enumerate(combinations):
         snap_shot_dict = generate_snap_shots(outfile, save_times[grid_mapping[grid]+1::], odir=odir)
         
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
-        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
         
         cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
 
@@ -261,6 +261,6 @@ for n, combination in enumerate(combinations):
     
 scripts = uniquify_list(scripts)
 scripts_post = uniquify_list(scripts_post)
-print '\n'.join([script for script in scripts])
+print('\n'.join([script for script in scripts]))
 print('written')
 

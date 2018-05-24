@@ -188,9 +188,9 @@ for n, combination in enumerate(combinations):
         name_options['k'] = eigen_calving_k
         
     vversion = 'v' + str(version)
-    full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
-    full_exp_name_relax =  '_'.join([climate_relax, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    full_exp_name_relax =  '_'.join([climate_relax, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
     full_outfile_relax = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name_relax)
     
     # All runs in one script file for coarse grids that fit into max walltime
@@ -205,7 +205,7 @@ for n, combination in enumerate(combinations):
         start = simulation_start_year
         end = simulation_end_year
 
-        experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
+        experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())]), '{}'.format(start), '{}'.format(end)])
 
         batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
         f.write(batch_header)
@@ -266,7 +266,7 @@ for n, combination in enumerate(combinations):
         # Remove flow law so this works with different SIA N
         if 'sia_flow_law' in all_params_dict:
             del all_params_dict['sia_flow_law']
-        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
 
         
         if system in ('debug'):
@@ -281,7 +281,7 @@ for n, combination in enumerate(combinations):
 
         relax_start = 0
         relax_end = 25
-        experiment =  '_'.join([climate_relax, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(relax_start), '{}'.format(relax_end)])
+        experiment =  '_'.join([climate_relax, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())]), '{}'.format(relax_start), '{}'.format(relax_end)])
 
         outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
         general_params_dict = OrderedDict()
@@ -333,7 +333,7 @@ for n, combination in enumerate(combinations):
                                       spatial_ts_dict)
         if 'sia_flow_law' in all_params_dict:
             del all_params_dict['sia_flow_law']
-        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
 
         if system in ('debug'):
             cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job_2.${batch}'.format(outdir=odir, batch=batch_system['job_id'])])
@@ -348,6 +348,6 @@ for n, combination in enumerate(combinations):
         scripts.append(script)
 
 scripts = uniquify_list(scripts)
-print '\n'.join([script for script in scripts])
+print('\n'.join([script for script in scripts]))
 print('\nwritten\n')
 

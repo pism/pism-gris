@@ -84,12 +84,12 @@ def get_projection_from_file(nc):
         except:
             try:
                 # go through variables and look for 'grid_mapping' attribute
-                for var in nc.variables.keys():
+                for var in list(nc.variables.keys()):
                     if hasattr(nc.variables[var], 'grid_mapping'):
                         mappingvarname = nc.variables[var].grid_mapping
-                        print(
+                        print((
                             'Found projection information in variable "%s", using it' %
-                            mappingvarname)
+                            mappingvarname))
                         break
                 var_mapping = nc.variables[mappingvarname]
                 p = Proj(proj="stere",
@@ -132,7 +132,7 @@ firn_0 = options.firn_0
 alt_1 = float(options.alt_1)
 alt_0 = float(options.alt_0)
 
-print options
+print(options)
 nc = NC(infile, 'a')
 
 xdim, ydim, zdim, tdim = get_dims(nc)
@@ -147,7 +147,7 @@ else:
 
 # create a new dimension for bounds only if it does not yet exist
 bnds_dim = "nb2"
-if bnds_dim not in nc.dimensions.keys():
+if bnds_dim not in list(nc.dimensions.keys()):
     nc.createDimension(bnds_dim, 2)
 
 # variable names consistent with PISM
@@ -182,7 +182,7 @@ def def_var(nc, name, units):
     return var
 
 var = "firn_depth"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     firn_var = def_var(nc, var, "m")
 else:
     firn__var = nc.variabels[var]
@@ -195,9 +195,9 @@ b = firn_0 - a * alt_0
 nt = len(time_var[:])
 for t in range(nt):
     if time_bnds_var is not None:
-        print('Processing from {} to {}'.format(time_bnds_var[t,0], time_bnds_var[t,1]))
+        print(('Processing from {} to {}'.format(time_bnds_var[t,0], time_bnds_var[t,1])))
     else:
-        print('Processing {}'.format(dates[t]))            
+        print(('Processing {}'.format(dates[t])))            
     firn = a * altitude + b
     firn[altitude<alt_0] = firn_0
     firn[altitude>alt_1] = firn_1

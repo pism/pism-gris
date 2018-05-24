@@ -88,12 +88,12 @@ nc = NC(infile, 'a')
 
 # create a new dimension for bounds only if it does not yet exist
 time_dim = "time"
-if time_dim not in nc.dimensions.keys():
+if time_dim not in list(nc.dimensions.keys()):
     nc.createDimension(time_dim)
 
 # create a new dimension for bounds only if it does not yet exist
 bnds_dim = "nb2"
-if bnds_dim not in nc.dimensions.keys():
+if bnds_dim not in list(nc.dimensions.keys()):
     nc.createDimension(bnds_dim, 2)
 
 # create time variable
@@ -151,21 +151,21 @@ def def_var(nc, name, units):
     return var
 
 var = "shelfbmassflux"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     bmelt_var = def_var(nc, var, "kg m-2 yr-1")
 else:
     bmelt_var = nc.variables[var]
 bmelt_var.grid_mapping = "mapping"
 
 var = "shelfbtemp"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     btemp_var = def_var(nc, var, "deg_C")
 else:
     btemp_var = nc.variables[var]
 btemp_var.grid_mapping = "mapping"
 
 var = "delta_MBP"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     mbp_var = nc.createVariable(var, 'f', dimensions=(time_dim), zlib=True, complevel=3)
 else:
     mbp_var = nc.variables[var]
@@ -183,7 +183,7 @@ if mask:
 
 nt = len(time_interval_since_refdate)
 for t in range(nt):
-    print('Processing from {} to {}'.format(bnds_datelist[t], bnds_datelist[t+1]))
+    print(('Processing from {} to {}'.format(bnds_datelist[t], bnds_datelist[t+1])))
     if periodicity in 'DAILY':
         if calendar.isleap(bnds_datelist[t].year):
             mt = 366
@@ -192,7 +192,7 @@ for t in range(nt):
     elif periodicity in 'MONTHLY':
         mt = 12
     else:
-        print('Periodicity {} not recognized'.format(periodicity))
+        print(('Periodicity {} not recognized'.format(periodicity)))
     bmelt_var[t, Ellipsis] = bmelt * (1 + np.sin(2 * np.pi * t / mt))
     btemp_var[t, Ellipsis] = 0
     x = np.mod(t, mt)

@@ -21,7 +21,7 @@ start = 0
 end = 50000
 step = 10
 warming_factor = options.warming_factor
-bnds_interval_since_refdate = np.array(range(start, end + step, step))
+bnds_interval_since_refdate = np.array(list(range(start, end + step, step)))
 time_interval_since_refdate = (bnds_interval_since_refdate[0:-1] +
                                np.diff(bnds_interval_since_refdate) / 2)
 
@@ -36,12 +36,12 @@ def def_var(nc, name, units):
 
 # create a new dimension for bounds only if it does not yet exist
 time_dim = "time"
-if time_dim not in nc.dimensions.keys():
+if time_dim not in list(nc.dimensions.keys()):
     nc.createDimension(time_dim)
 
 # create a new dimension for bounds only if it does not yet exist
 bnds_dim = "nb2"
-if bnds_dim not in nc.dimensions.keys():
+if bnds_dim not in list(nc.dimensions.keys()):
     nc.createDimension(bnds_dim, 2)
 
 # variable names consistent with PISM
@@ -66,7 +66,7 @@ time_bnds_var[:, 1] = bnds_interval_since_refdate[1::]
 psi = np.ones_like(time_var[:]) * warming_factor
 
 var = "frac_mass_flux"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     frac_var = def_var(nc, var, "1")
 else:
     frac_var = nc.variables[var]

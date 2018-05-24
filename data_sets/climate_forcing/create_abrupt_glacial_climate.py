@@ -24,7 +24,7 @@ n = options.n
 start = 0
 end = 27500
 step = 10
-bnds_interval_since_refdate = np.array(range(start, end + step, step))
+bnds_interval_since_refdate = np.array(list(range(start, end + step, step)))
 time_interval_since_refdate = (bnds_interval_since_refdate[0:-1] +
                                np.diff(bnds_interval_since_refdate) / 2)
 
@@ -39,12 +39,12 @@ def def_var(nc, name, units):
 
 # create a new dimension for bounds only if it does not yet exist
 time_dim = "time"
-if time_dim not in nc.dimensions.keys():
+if time_dim not in list(nc.dimensions.keys()):
     nc.createDimension(time_dim)
 
 # create a new dimension for bounds only if it does not yet exist
 bnds_dim = "nb2"
-if bnds_dim not in nc.dimensions.keys():
+if bnds_dim not in list(nc.dimensions.keys()):
     nc.createDimension(bnds_dim, 2)
 
 # variable names consistent with PISM
@@ -102,7 +102,7 @@ psi = a * (temp)**n + b
 psi[temp<T_min] = psi_min
 
 var = "frac_mass_flux"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     frac_var = def_var(nc, var, "1")
 else:
     frac_var = nc.variables[var]
@@ -122,7 +122,7 @@ psi[temp<T_min] = psi_min
 psi[temp>T_max] = psi_max
 
 var = "delta_MBP"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     frac_var = def_var(nc, var, "1")
 else:
     frac_var = nc.variables[var]
@@ -130,7 +130,7 @@ else:
 frac_var[:] = psi
 
 var = "frac_MBP"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     frac_var = def_var(nc, var, "1")
 else:
     frac_var = nc.variables[var]

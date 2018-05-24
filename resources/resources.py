@@ -46,7 +46,7 @@ def generate_domain(domain):
         y_max = -2020000.
         pism_exec = '''pismo -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
     else:
-        print('Domain {} not recognized, exiting'.format(domain))
+        print(('Domain {} not recognized, exiting'.format(domain)))
         import sys
         sys.exit(0)
 
@@ -457,7 +457,7 @@ def generate_grid_description(grid_resolution, domain, restart=False):
             grid_resolution in accepted_resolutions
             pass
         except:
-            print('grid resolution {}m not recognized'.format(grid_resolution))
+            print(('grid resolution {}m not recognized'.format(grid_resolution)))
 
         if grid_resolution < 1200:
             skip_max = 200
@@ -489,7 +489,7 @@ def generate_grid_description(grid_resolution, domain, restart=False):
             grid_resolution in accepted_resolutions
             pass
         except:
-            print('grid resolution {}m not recognized'.format(grid_resolution))
+            print(('grid resolution {}m not recognized'.format(grid_resolution)))
 
         skip_max = 200
         mz = 401
@@ -569,8 +569,8 @@ def generate_stress_balance(stress_balance, additional_params_dict):
     accepted_stress_balances = ('sia', 'ssa+sia')
 
     if stress_balance not in accepted_stress_balances:
-        print('{} not in {}'.format(stress_balance, accepted_stress_balances))
-        print('available stress balance solvers are {}'.format(accepted_stress_balances))
+        print(('{} not in {}'.format(stress_balance, accepted_stress_balances)))
+        print(('available stress balance solvers are {}'.format(accepted_stress_balances)))
         import sys
         sys.exit(0)
 
@@ -607,7 +607,7 @@ def generate_hydrology(hydro, **kwargs):
     elif hydro in ('distributed'):
         params_dict['hydrology'] = 'distributed'
     else:
-        print('hydrology {} not recognized, exiting'.format(hydro))
+        print(('hydrology {} not recognized, exiting'.format(hydro)))
         import sys
         sys.exit(0)
 
@@ -633,7 +633,7 @@ def generate_calving(calving, **kwargs):
     elif calving in ('float_kill', 'float_kill,ocean_kill', 'vonmises_calving,ocean_kill', 'eigen_calving,ocean_kill'):
         params_dict['calving'] = calving
     else:
-        print('calving {} not recognized, exiting'.format(calving))
+        print(('calving {} not recognized, exiting'.format(calving)))
         import sys
         sys.exit(0)
     if 'frontal_melt' in kwargs and kwargs['frontal_melt'] is True:
@@ -703,7 +703,7 @@ def generate_climate(climate, **kwargs):
     elif climate in ('elevation'):
         params_dict['surface'] = 'elevation'
     else:
-        print('climate {} not recognized, exiting'.format(climate))
+        print(('climate {} not recognized, exiting'.format(climate)))
         import sys
         sys.exit(0)
         
@@ -749,7 +749,7 @@ def generate_ocean(ocean, **kwargs):
     elif ocean == 'const':
         params_dict['ocean'] = 'constant'
     else:
-        print('ocean {} not recognized, exiting'.format(ocean))
+        print(('ocean {} not recognized, exiting'.format(ocean)))
         import sys
         sys.exit(0)
 
@@ -768,8 +768,8 @@ def list_queues():
     Return a list of supported queues.
     '''
     result = set()
-    for s in systems.values():
-        for q in s["queue"].keys():
+    for s in list(systems.values()):
+        for q in list(s["queue"].keys()):
             result.add(q)
 
     return result
@@ -1010,15 +1010,15 @@ def make_batch_header(system_name, n_cores, walltime, queue):
         try:
             ppn = system['queue'][queue]
         except:
-            raise ValueError("There is no queue {} on {}. Pick one of {}.".format(queue, system_name, system['queue'].keys()))
+            raise ValueError("There is no queue {} on {}. Pick one of {}.".format(queue, system_name, list(system['queue'].keys())))
         # round up when computing the number of nodes needed to run on 'n_cores' cores
         nodes = int(math.ceil(float(n_cores) / ppn))
 
         if nodes * ppn != n_cores:
-            print("Warning! Running {n_cores} tasks on {nodes} {ppn}-processor nodes, wasting {N} processors!".format(nodes=nodes,
+            print(("Warning! Running {n_cores} tasks on {nodes} {ppn}-processor nodes, wasting {N} processors!".format(nodes=nodes,
                                                                                                                       ppn=ppn,
                                                                                                                       n_cores=n_cores,
-                                                                                                                      N=ppn*nodes - n_cores))
+                                                                                                                      N=ppn*nodes - n_cores)))
 
     system['mpido'] = system['mpido'].format(cores=n_cores)
     system["header"] = system["header"].format(queue=queue,
@@ -1043,10 +1043,10 @@ def make_batch_post_header(system):
 
 def make_batch_header_test():
     "print headers of all supported systems and queues (for testing)"
-    for s in systems.keys():
-        for q in systems[s]['queue'].keys():
-            print "# system: {system}, queue: {queue}".format(system=s, queue=q)
-            print make_batch_header(s, 100, "1:00:00", q)[0]
+    for s in list(systems.keys()):
+        for q in list(systems[s]['queue'].keys()):
+            print("# system: {system}, queue: {queue}".format(system=s, queue=q))
+            print(make_batch_header(s, 100, "1:00:00", q)[0])
 
 def version():
     """Return the path to the top directory of the Git repository

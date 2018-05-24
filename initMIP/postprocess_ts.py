@@ -53,10 +53,10 @@ pism_stats_vars = ['pism_config',
                    'run_stats']
 
 ismip6_vars_dict = get_ismip6_vars_dict('../resources/ismip6vars.csv', 1)
-ismip6_to_pism_dict = dict((k, v.pism_name) for k, v in ismip6_vars_dict.iteritems())
-pism_to_ismip6_dict = dict((v.pism_name, k) for k, v in ismip6_vars_dict.iteritems())
+ismip6_to_pism_dict = dict((k, v.pism_name) for k, v in ismip6_vars_dict.items())
+pism_to_ismip6_dict = dict((v.pism_name, k) for k, v in ismip6_vars_dict.items())
 
-pism_copy_vars = [x for x in (ismip6_to_pism_dict.values() + pism_stats_vars)]
+pism_copy_vars = [x for x in (list(ismip6_to_pism_dict.values()) + pism_stats_vars)]
 
 if __name__ == "__main__":
 
@@ -79,9 +79,9 @@ if __name__ == "__main__":
     nc = CDF(infile, 'r')
     for m_var in pism_copy_vars:
         if m_var not in nc.variables:
-            print("Requested variable '{}' missing".format(m_var))
+            print(("Requested variable '{}' missing".format(m_var)))
     nc.close()
-    print('  Removing times < 0 in file {}'.format(out_file))
+    print(('  Removing times < 0 in file {}'.format(out_file)))
     cmd = ['ncks', '-O',
            '-d', 'time,9,-1',
            '-v', '{}'.format(','.join(pism_copy_vars)),
@@ -100,11 +100,11 @@ if __name__ == "__main__":
     nc = CDF(out_file, 'a')
     nc.Conventions = 'CF-1.6'
     nc.close()
-    print('Finished processing scalar file {}'.format(out_file))
+    print(('Finished processing scalar file {}'.format(out_file)))
 
     if EXP in ('ctrl'):
         init_file = '{}/scalar_{}_{}.nc'.format(init_dir, project, 'init')
-        print('  Copying time 0 to file {}'.format(init_file))
+        print(('  Copying time 0 to file {}'.format(init_file)))
         ncks_cmd = ['ncks', '-O', '-4', '-L', '3',
                     '-d', 'time,1',
                     out_file,

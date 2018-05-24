@@ -46,7 +46,7 @@ psi = a * (temp)**n + b
 psi[temp<T_min] = psi_min
 
 var = "frac_mass_flux"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     frac_var = def_var(nc, var, "1")
 else:
     frac_var = nc.variables[var]
@@ -67,7 +67,7 @@ psi[temp<T_min] = psi_min
 psi[temp>T_max] = psi_max
 
 var = "delta_MBP"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     frac_var = def_var(nc, var, "1")
 else:
     frac_var = nc.variables[var]
@@ -75,7 +75,7 @@ else:
 frac_var[:] = psi
 
 var = "frac_MBP"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     frac_var = def_var(nc, var, "1")
 else:
     frac_var = nc.variables[var]

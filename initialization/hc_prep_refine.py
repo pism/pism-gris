@@ -105,10 +105,10 @@ paleo_start_year = options.start_year
 paleo_end_year = -11700
 
 no_grid_choices = len(grid_choices)
-grid_nos = range(0, no_grid_choices)
-grid_mapping = OrderedDict(zip(grid_choices, grid_nos))
+grid_nos = list(range(0, no_grid_choices))
+grid_mapping = OrderedDict(list(zip(grid_choices, grid_nos)))
 save_times = [paleo_start_year, -12200, -12000, -11900, -11800]
-grid_start_times = OrderedDict(zip(grid_choices, save_times))
+grid_start_times = OrderedDict(list(zip(grid_choices, save_times)))
 start = grid_start_times[grid]
 end = paleo_end_year
 
@@ -181,12 +181,12 @@ for n, combination in enumerate(combinations):
     name_options['forcing_type'] = forcing_type
     
     vversion = 'v' + str(version)
-    full_exp_name =  '_'.join(['hc_refine', climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+    full_exp_name =  '_'.join(['hc_refine', climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
     full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
 
     outfiles = []
     
-    experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
+    experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())]), '{}'.format(start), '{}'.format(end)])
 
     script = 'hc_prep_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
@@ -212,7 +212,7 @@ for n, combination in enumerate(combinations):
         general_params_dict['bootstrap'] = ''
 
         if grid_mapping[grid] > 0:
-            previous_grid =  [k for k, v in grid_mapping.iteritems() if v == grid_mapping[grid] -1][0]
+            previous_grid =  [k for k, v in grid_mapping.items() if v == grid_mapping[grid] -1][0]
             regridfile = os.path.join(odir, 'save_{domain}_g{grid}m_hc_refine_{experiment}_{start}.000.nc'.format(domain=domain.lower(), grid=previous_grid, experiment=experiment, start=start))
             general_params_dict['regrid_file'] = regridfile
             general_params_dict['regrid_vars'] = regridvars
@@ -260,7 +260,7 @@ for n, combination in enumerate(combinations):
         snap_shot_dict = generate_snap_shots(outfile, save_times, odir=odir)
 
         all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
-        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in all_params_dict.items()])
+        all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
 
         if system in ('debug'):
             cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job.${batch}'.format(outdir=odir,batch=batch_system['job_id'])])
@@ -295,8 +295,8 @@ for n, combination in enumerate(combinations):
     
 scripts = uniquify_list(scripts)
 scripts_post = uniquify_list(scripts_post)
-print '\n'.join([script for script in scripts])
+print('\n'.join([script for script in scripts]))
 print('\nwritten\n')
-print '\n'.join([script for script in scripts_post])
+print('\n'.join([script for script in scripts_post]))
 print('\nwritten\n')
 

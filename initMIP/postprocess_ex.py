@@ -74,10 +74,10 @@ pism_proj_vars = ['cell_area',
                   'lon',
                   'lon_bnds']
 ismip6_vars_dict = get_ismip6_vars_dict('../resources/ismip6vars.csv', 2)
-ismip6_to_pism_dict = dict((k, v.pism_name) for k, v in ismip6_vars_dict.iteritems())
-pism_to_ismip6_dict = dict((v.pism_name, k) for k, v in ismip6_vars_dict.iteritems())
+ismip6_to_pism_dict = dict((k, v.pism_name) for k, v in ismip6_vars_dict.items())
+pism_to_ismip6_dict = dict((v.pism_name, k) for k, v in ismip6_vars_dict.items())
 
-pism_copy_vars = [x for x in (ismip6_to_pism_dict.values() + pism_stats_vars + pism_proj_vars)]
+pism_copy_vars = [x for x in (list(ismip6_to_pism_dict.values()) + pism_stats_vars + pism_proj_vars)]
 
 mask_var = 'sftgif' 
 
@@ -108,9 +108,9 @@ if __name__ == "__main__":
     nc = CDF(infile, 'r')
     for m_var in pism_copy_vars:
         if m_var not in nc.variables:
-            print("Requested variable '{}' missing".format(m_var))
+            print(("Requested variable '{}' missing".format(m_var)))
     nc.close()
-    print('Copy {} to {}'.format(infile, tmp_file))
+    print(('Copy {} to {}'.format(infile, tmp_file)))
     cmd = ['ncks', '-O', '-d', 'time,1,',
            '-v', '{}'.format(','.join(pism_copy_vars)),
            infile, tmp_file]
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     # Create source grid definition file
     source_grid_filename = 'source_grid.nc'
     source_grid_file = os.path.join(tmp_dir, source_grid_filename)
-    print('create source grid file {}'.format(source_grid_file))
+    print(('create source grid file {}'.format(source_grid_file)))
     ncks_cmd = ['ncks', '-O', '-v', 'thk,mapping', infile, source_grid_file]
     sub.call(ncks_cmd)
     nc2cdo_cmd = ['nc2cdo.py', source_grid_file]
@@ -144,14 +144,14 @@ if __name__ == "__main__":
         pass
 
     # Create target grid description file
-    print('create target grid file {}'.format(target_grid_file))
+    print(('create target grid file {}'.format(target_grid_file)))
     create_searise_grid(target_grid_file, target_resolution)
     
     # Generate weights if weights file does not exist yet
     cdo_weights_filename = 'searise_grid_{resolution}m_{method}_weights.nc'.format(resolution=target_resolution, method=remap_method)
     cdo_weights_file = os.path.join(tmp_dir, cdo_weights_filename)
     if (not os.path.isfile(cdo_weights_file)) or (override_weights_file is True):
-        print('Generating CDO weights file {}'.format(cdo_weights_file))
+        print(('Generating CDO weights file {}'.format(cdo_weights_file)))
         if n_procs > 1:
             cdo_cmd = ['cdo', '-P', '{}'.format(n_procs),
                        'gen{method},{grid}'.format(method=remap_method, grid=target_grid_file),
@@ -188,11 +188,11 @@ if __name__ == "__main__":
     print('Adjusting time axis')
     adjust_time_axis(out_file)
     
-    for m_var in ismip6_vars_dict.keys():
+    for m_var in list(ismip6_vars_dict.keys()):
         final_file = '{}/{}_{}_{}.nc'.format(project_dir, m_var, project, EXP)
-        print('Finalizing variable {}'.format(m_var))
+        print(('Finalizing variable {}'.format(m_var)))
         # Generate file
-        print('  Copying to file {}'.format(final_file))
+        print(('  Copying to file {}'.format(final_file)))
         ncks_cmd = ['ncks', '-O', '-4', '-L', '3',
                     '-v', ','.join([m_var,'lat','lon', 'lat_bnds', 'lon_bnds']),
                     out_file,
@@ -248,11 +248,11 @@ if __name__ == "__main__":
             pass
         nc.Conventions = 'CF-1.6'
         nc.close()
-        print('  Done finalizing variable {}'.format(m_var))
+        print(('  Done finalizing variable {}'.format(m_var)))
 
         if EXP in ('ctrl'):
             init_file = '{}/{}_{}_{}.nc'.format(init_dir, m_var, project, 'init')
-            print('  Copying time 0 to file {}'.format(init_file))
+            print(('  Copying time 0 to file {}'.format(init_file)))
             ncks_cmd = ['ncks', '-O', '-4', '-L', '3',
                         '-d', 'time,0',
                         '-v', m_var,

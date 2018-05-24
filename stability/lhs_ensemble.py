@@ -206,7 +206,7 @@ done
            output_dir=output_dir,
            spatial_tmp_dir=spatial_tmp_dir,
            config=pism_config_nc,
-           dirs=" ".join(dirs.values()))
+           dirs=" ".join(list(dirs.values())))
 
 # ########################################################
 # set up model initialization
@@ -249,7 +249,7 @@ restart_step          = options.step
 
 if restart_step > (simulation_end_year - simulation_start_year):
     print('Error:')
-    print('restart_step > (simulation_end_year - simulation_start_year): {} > {}'.format(restart_step, simulation_end_year - simulation_start_year))
+    print(('restart_step > (simulation_end_year - simulation_start_year): {} > {}'.format(restart_step, simulation_end_year - simulation_start_year)))
     print('Try again')
     import sys
     sys.exit(0)
@@ -285,7 +285,7 @@ for n, combination in enumerate(combinations):
             
 
         vversion = 'v' + str(version)
-        full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()])])
+        full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
         full_outfile = 'g{grid}m_{experiment}.nc'.format(grid=grid, experiment=full_exp_name)
 
         forcing_files = {'cold' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=-1),
@@ -312,7 +312,7 @@ for n, combination in enumerate(combinations):
 
                 end = start + restart_step
 
-                experiment =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in name_options.items()]), '{}'.format(start), '{}'.format(end)])
+                experiment =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())]), '{}'.format(start), '{}'.format(end)])
 
                 script = join(scripts_dir, 'lhs_g{}m_{}.sh'.format(grid, experiment))
                 scripts.append(script)
@@ -486,7 +486,7 @@ for n, combination in enumerate(combinations):
                                                       spatial_ts_dict,
                                                       snap_dict)
 
-                    all_params = ' \\\n  '.join(["-{} {}".format(k, v) for k, v in all_params_dict.items()])
+                    all_params = ' \\\n  '.join(["-{} {}".format(k, v) for k, v in list(all_params_dict.items())])
 
                     if system == 'debug':
                         redirect = ' 2>&1 | tee {jobs}/job_{job_no}.${job_id}'
@@ -569,10 +569,10 @@ for n, combination in enumerate(combinations):
 scripts = uniquify_list(scripts)
 scripts_combinded = uniquify_list(scripts_combinded)
 scripts_post = uniquify_list(scripts_post)
-print '\n'.join([script for script in scripts])
+print('\n'.join([script for script in scripts]))
 print('\nwritten\n')
-print '\n'.join([script for script in scripts_combinded])
+print('\n'.join([script for script in scripts_combinded]))
 print('\nwritten\n')
-print '\n'.join([script for script in scripts_post])
+print('\n'.join([script for script in scripts_post]))
 print('\nwritten\n')
 

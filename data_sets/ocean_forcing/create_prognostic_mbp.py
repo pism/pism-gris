@@ -52,12 +52,12 @@ nc = NC(infile, 'w')
 
 # create a new dimension for bounds only if it does not yet exist
 time_dim = "time"
-if time_dim not in nc.dimensions.keys():
+if time_dim not in list(nc.dimensions.keys()):
     nc.createDimension(time_dim)
 
 # create a new dimension for bounds only if it does not yet exist
 bnds_dim = "nb2"
-if bnds_dim not in nc.dimensions.keys():
+if bnds_dim not in list(nc.dimensions.keys()):
     nc.createDimension(bnds_dim, 2)
 
 # create time variable
@@ -110,7 +110,7 @@ time_bnds_var[:, 1] = bnds_interval_since_refdate[1::]
 
 
 var = "delta_MBP"
-if (var not in nc.variables.keys()):
+if (var not in list(nc.variables.keys())):
     mbp_var = nc.createVariable(var, 'f', dimensions=(time_dim))
 else:
     mbp_var = nc.variables[var]
@@ -119,7 +119,7 @@ else:
 
 nt = len(time_interval_since_refdate)
 for t in range(nt):
-    print('Processing from {} to {}'.format(bnds_datelist[t], bnds_datelist[t+1]))
+    print(('Processing from {} to {}'.format(bnds_datelist[t], bnds_datelist[t+1])))
     if periodicity in 'DAILY':
         if calendar.isleap(bnds_datelist[t].year):
             mt = 366
@@ -128,7 +128,7 @@ for t in range(nt):
     elif periodicity in 'MONTHLY':
         mt = 12
     else:
-        print('Periodicity {} not recognized'.format(periodicity))
+        print(('Periodicity {} not recognized'.format(periodicity)))
     x = np.mod(t, mt)
     if x < (mt / 2):
         mbp = winter_value
