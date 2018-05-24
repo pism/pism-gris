@@ -15,8 +15,7 @@
 ~/base/gris-analysis/plotting/plotting.py  -o ctrl --plot percent_mass --bounds 1 100 --time_bounds 2008 7000 2018_04_ctrl/scalar_percent/ts_gris_g900m_v3a_rcp_26_id_CTRL_0_5000.nc 2018_04_ctrl/scalar_percent/ts_gris_g900m_v3a_rcp_45_id_CTRL_0_5000.nc 2018_04_ctrl/scalar_percent/ts_gris_g900m_v3a_rcp_85_id_CTRL_0_2000.nc
 
 # Profiles
-~/base/gris-analysis/plotting/plotting.py --bounds 0 12000 --time_bounds 2015 2315  -o rcp45 --plot profile_combined 2018_04_ctrl/profiles/profiles_100m_all_ex_g900m_v3a_rcp_45_id_CTRL_0_1000.nc
-
+~/base/gris-analysis/plotting/plotting.py -c ~/base/gris-analysis/plotting/bath_112.cpt --bounds 0 12000 --time_bounds 2015 2315  -o rcp45 --plot profile_combined 2017_12_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_45_id_CTRL_0_3000.nc
 # Flux Partitioning
 ~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --time_bounds 2008 3000 --no_legend --plot flux_partitioning 2018_04_ctrl/scalar/ts_gris_g900m_v3a_rcp_*id_CTRL_0_1000.nc 2018_04_ctrl/scalar/ts_gris_g900m_v3a_rcp_*id_NTRL_0_1000.nc
 # Basin Flux Partitioning
@@ -27,12 +26,12 @@
 
 
 # grid resolution
-~/base/gris-analysis/plotting/plotting.py  -n 8 -o ctrl --time_bounds 2020 2200 --plot grid_res 2018_04_ctrl/scalar/ts_gris_g600m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_04_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_04_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_04_ctrl/scalar/ts_gris_g3600m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_04_ctrl/scalar/ts_gris_g4500m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_04_ctrl/scalar/ts_gris_g9000m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_04_ctrl/scalar/ts_gris_g18000m_v3a_rcp_*_id_CTRL_0_1000.nc
+~/base/gris-analysis/plotting/plotting.py  -n 8 -o ctrl --time_bounds 2020 2200 --plot grid_res 2018_05_ctrl/scalar/ts_gris_g450m_v3a_rcp_*_id_CTRL_0_200.nc 2018_05_ctrl/scalar/ts_gris_g600m_v3a_rcp_*_id_CTRL_0_200.nc 2018_05_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_05_ctrl/scalar/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_05_ctrl/scalar/ts_gris_g3600m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_05_ctrl/scalar/ts_gris_g4500m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_05_ctrl/scalar/ts_gris_g9000m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_05_ctrl/scalar/ts_gris_g18000m_v3a_rcp_*_id_CTRL_0_1000.nc
 
-~/base/gris-analysis/plotting/plotting.py  -n 8 -o ctrl_d --time_bounds 2020 3000 --plot grid_res 2018_04_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc
+~/base/gris-analysis/plotting/plotting.py  -n 8 -o ctrl_d --time_bounds 2020 3000 --plot grid_res 2018_05_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc
 
-~/base/gris-analysis/plotting/plotting.py -o ctrl --time_bounds 2008 3000 --no_legend --plot station_usurf 2018_04_ctrl/station_ts/profile_g900m_v3a_rcp_*_id_CTRL_0_1000.nc
-~/base/gris-analysis/plotting/plotting.py -o ctrl --time_bounds 2008 3000 --no_legend --plot per_basin_flux 2018_04_ctrl/basins/scalar/ts_b_*_ex_g900m_v3a_rcp_*_id_CTRL_0_2000.nc
+~/base/gris-analysis/plotting/plotting.py -o ctrl --time_bounds 2008 3000 --no_legend --plot station_usurf 2018_05_ctrl/station_ts/profile_g900m_v3a_rcp_*_id_CTRL_0_1000.nc
+~/base/gris-analysis/plotting/plotting.py -o ctrl --time_bounds 2008 3000 --no_legend --plot per_basin_flux 2018_05_ctrl/basins/scalar/ts_b_*_ex_g900m_v3a_rcp_*_id_CTRL_0_2000.nc
 
 
 RCP 85, 20% mass lost in Year 2310
