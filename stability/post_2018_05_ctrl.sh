@@ -1,13 +1,25 @@
 #!/bin/bash
 
+# Scalar fields
+
+odir=2018_05_ctrl
+cd $odir/scalar
+for rcp in 26 45 85; do
+    for run in CTRL; do
+        for grid in 18000 9000 4500 3600 1800; do
+            adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        done
+    done
+done
+cd ../../
 
 odir=2018_05_ctrl
 grid=600
 cd $odir/scalar
 for rcp in 26 45 85; do
     for run in CTRL; do
-        cdo -O mergetime ts_gris_g600m_v3a_rcp_${rcp}_id_CTRL_0_100.nc ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_100_200.nc  ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_200_300.nc  ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_300_400.nc  ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_400_500.nc ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_0_500.nc
-        adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_0_500.nc
+        cdo -O mergetime ts_gris_g600m_v3a_rcp_${rcp}_id_CTRL_0_100.nc ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_100_200.nc  ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_200_300.nc  ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_300_400.nc  ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_400_500.nc ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ts_gris_g600m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
     done
 done
 cd ../../
@@ -16,22 +28,43 @@ odir=2018_05_ctrl
 grid=900
 cd $odir/scalar
 for rcp in 26 45 85; do
-    for run in CTRL NISO NTRL; do
-        cdo -O mergetime ts_gris_g900m_v3a_rcp_${rcp}_id_CTRL_0_500.nc ts_gris_g900m_v3a_rcp_${rcp}_id_${run}_500_1000.nc ts_gris_g900m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
-        adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ts_gris_g900m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+    for run in NISO CTRL NTRL; do
+        cdo -f nc4 -O --sortname mergetime ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_500_1000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
     done
 done
 cd ../../
 
 odir=2018_05_ctrl
 grid=900
+cd $odir/scalar
+run=CTRL
+rcp=26
+cdo -O mergetime ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_500_1000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_1000_1500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_1500_2000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2000_2500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2500_3000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_3000_3500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_3500_4000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_4000_4500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_4500_5000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_5000.nc
+adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_5000.nc
+rcp=45
+cdo -O mergetime ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_500_1000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_1000_1500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_1500_2000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2000_2500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2500_3000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_3000_3500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_3500_4000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_4000_4500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_4500_5000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_5000.nc
+adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_5000.nc
+rcp=85
+cdo -O mergetime ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_500_1000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_1000_1500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_1500_2000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2000_2500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2500_3000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_3000_3500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_5000.nc
+adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_5000.nc
+cd ../../
+
+# Spatial fields
+
+odir=2018_05_ctrl
+grid=900
 mkdir -p $odir/fldsum
 for rcp in 26 45 85; do
-    for run in CTRL; do
-        cdo -L -O fldsum -aexpr,dMdt=tendency_of_ice_mass-tendency_of_ice_mass_due_to_flow -selvar,tendency_of_ice_mass,tendency_of_ice_mass_due_to_flow,tendency_of_ice_mass_due_to_conservation_error,tendency_of_ice_mass_due_to_basal_mass_flux,tendency_of_ice_mass_due_to_surface_mass_flux,tendency_of_ice_mass_due_to_discharge,surface_runoff_rate,surface_accumulation_rate $odir/spatial/ex_gris_g900m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g900m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+    for run in CTRL NTRL; do
+        # cdo -L -O fldsum -aexpr,"dMdt=tendency_of_ice_mass-tendency_of_ice_mass_due_to_flow" -selvar,ice_mass,tendency_of_ice_mass,tendency_of_ice_mass_due_to_flow,tendency_of_ice_mass_due_to_conservation_error,tendency_of_ice_mass_due_to_basal_mass_flux,tendency_of_ice_mass_due_to_surface_mass_flux,tendency_of_ice_mass_due_to_discharge,surface_runoff_rate,surface_accumulation_rate $odir/spatial/ex_gris_g900m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g900m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        ncks -4 -A -v limnsw,ice_area_glacierized $odir/scalar/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        cdo timmean -selyear,2095/2105 $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2100.nc
+        cdo timmean -selyear,2195/2205 $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2200.nc
+        cdo timmean -selyear,2495/2505 $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2500.nc
+        cdo timmean -selyear,2995/3005 $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_3000.nc
     done
 done
-cd ../../
 
 # Extract DGMSL
 odir=2018_05_ctrl
