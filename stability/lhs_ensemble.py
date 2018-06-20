@@ -61,7 +61,7 @@ parser.add_argument("-g", "--grid", dest="grid", type=int,
 parser.add_argument("--i_dir", dest="input_dir",
                     help="input directory", default=abspath(join(script_directory, "..")))
 parser.add_argument("--o_dir", dest="output_dir",
-                    help="output directory", default='.')
+                    help="output directory", default='test_dir')
 parser.add_argument("--o_size", dest="osize",
                     choices=['small', 'medium', 'big', 'big_2d', 'custom'],
                     help="output size type", default='custom')

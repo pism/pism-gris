@@ -20,9 +20,9 @@ while [ $rc -gt 0 ]; do
 
   echo "Error counter: $count"
 
-  rsync --progress -auvhr --delete /import/c1/ICESHEET/aaschwanden/pism-gris/stability/2017_12_ctrl_tmp /archive/u1/uaf/aaschwanden/pism-gris/stability
-  rsync --progress -auvhr --delete /import/c1/ICESHEET/aaschwanden/pism-gris/stability/2017_12_ctrl /archive/u1/uaf/aaschwanden/pism-gris/stability
-  rsync --progress -auvhr --delete /import/c1/ICESHEET/aaschwanden/pism-gris/stability/2017_12_les /archive/u1/uaf/aaschwanden/pism-gris/stability
+  rsync --progress -auvhr --delete /import/c1/ICESHEET/aaschwanden/pism-gris/stability/2018_05_ctrl_tmp /archive/u1/uaf/aaschwanden/pism-gris/stability
+  rsync --progress -auvhr --delete /import/c1/ICESHEET/aaschwanden/pism-gris/stability/2018_05_ctrl /archive/u1/uaf/aaschwanden/pism-gris/stability
+  rsync --progress -auvhr --delete /import/c1/ICESHEET/aaschwanden/pism-gris/stability/2018_01_les /archive/u1/uaf/aaschwanden/pism-gris/stability
 
   rc=$?
 
