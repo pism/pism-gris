@@ -17,7 +17,7 @@ def get_run_stats(tasks, processor_hours):
                 processor_hours.put(0)
                 break
             else:           
-                print(m_file)
+                print('Processing file {}'.format(m_file))
                 nc = NC(m_file, 'r')
                 run_stats = nc.variables['run_stats']
                 processor_hours.put(run_stats.processor_hours)
@@ -58,7 +58,8 @@ if __name__ == "__main__":
         new_process.start()
 
     # Fill task queue
-    all_files = glob(join(options.prefix, 'gris_g1800m*.nc'))
+    all_files = glob(join(options.prefix, 'gris_g*m*.nc'))
+    nf = len(all_files)
     task_list = all_files
     for single_task in task_list:  
         tasks.put(single_task)
@@ -68,6 +69,8 @@ if __name__ == "__main__":
 
     # Read calculation results
     num_finished_processes = 0  
+    np_processor_hours = np.zeros((nf))
+    k = 0
     while True:  
         # Read result
         new_result = processor_hours.get()
@@ -81,19 +84,10 @@ if __name__ == "__main__":
                 break
         else:
             # Output result
-            print('Result: ' + str(new_result))
-    
-    # all_files = glob(join(options.prefix, 'gris_g1800m_*.nc'))
-    # nf = len(all_files)
-    # processor_hours = np.zeros((nf))
-    # wall_clock_hours = np.zeros((nf))
-    # for k, m_file in enumerate(all_files):
-    #     nc = NC(m_file, 'r')
-    #     run_stats = nc.variables['run_stats']
-    #     processor_hours[k] = run_stats.processor_hours
-    #     wall_clock_hours[k] = run_stats.wall_clock_hours
-    #     nc.close()
+            np_processor_hours[k] = new_result
+            k += 1
 
-    # total_processesor_hours = np.sum(processor_hours)
-    # print('Total processor hours: {5.0f}'.format(processor_hours))
+    np_processor_hours = np.array(np_processor_hours)
+    total_processor_hours = np.sum(np_processor_hours)
+    print('Total processor hours: {:2.0f}'.format(total_processor_hours))
         
