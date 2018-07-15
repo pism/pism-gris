@@ -14,6 +14,7 @@
 
 # Profiles
 ~/base/gris-analysis/plotting/plotting.py -c ~/base/gris-analysis/plotting/bath_112.cpt --bounds 0 12000 --time_bounds 2015 2315  -o rcp45 --plot profile_combined 2018_05_ctrl/profiles/profiles_100m_ex_g900m_v3a_rcp_45_id_CTRL_0_1000.nc
+~/base/gris-analysis/plotting/plotting.py -c ~/base/gris-analysis/plotting/bath_112.cpt --bounds 0 12000 --time_bounds 2015 2315  -o rcp45_g450m --plot profile_combined 2018_05_ctrl/profiles/profiles_100m_ex_gris_g450m_v3a_rcp_45_id_CTRL_0_400.nc
 # Flux Partitioning
 ~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --time_bounds 2008 3000 --no_legend --plot flux_partitioning 2018_05_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_CTRL_0_1000.nc 2018_05_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_NTRL_0_1000.nc
 # Basin Flux Partitioning

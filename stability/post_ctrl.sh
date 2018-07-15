@@ -120,5 +120,5 @@ odir=2018_05_ctrl
 grid=450
 mkdir -p ${odir}/profiles
 for rcp in 45; do
-    extract_profiles.py -v velsurf_mag,velbase_mag,thk,usurf,topg ../../gris-outlet-glacier-profiles/gris-outlet-glacier-profiles-100m.shp $odir/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_300.nc $odir/profiles/profiles_100m_ex_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_300.nc
+    extract_profiles.py -v velsurf_mag,velbase_mag,thk,usurf,topg ../../gris-outlet-glacier-profiles/gris-outlet-glacier-profiles-100m.shp $odir/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_400.nc $odir/profiles/profiles_100m_ex_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_400.nc
 done
