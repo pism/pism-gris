@@ -9,7 +9,8 @@ from scipy.stats.distributions import truncnorm, gamma, uniform, randint
 n_samples = 500
 
 # scipy.stats.distributions objects for each distribution, per Table 1 in the paper.  Note that for truncated normal, the bounds are relative to the mean in units of scale, so if we want a positive distribution for a normal with mean 8 and sigma 4, then the lower bound is -8/4=-2
-distributions = {'FICE':  truncnorm(-4/4.,4./4,loc=8,scale=4),
+distributions = {'GCM': randint(0,27),
+                 'FICE':  truncnorm(-4/4.,4./4,loc=8,scale=4),
                  'FSNOW': truncnorm(-4.1/3,4.1/3,loc=4.1,scale=1.5),
                  'PRS':   uniform(loc=5,scale=2),
                  'RFR':   truncnorm(-0.4/0.3,0.4/0.3,loc=0.5,scale=0.2),
