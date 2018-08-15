@@ -1,33 +1,50 @@
 #!/bin/bash
 
+# (c) 2015-2018 Andy Aschwanden
+
+# The script prepares the Greenland BedMachine for use with
+# the Parallel Ice Sheet Model (PISM)
+# The user needs to download the BedMachine file from NSIDC
+# https://nsidc.org/data/idbmg4
+# e.g. run with
+# sh preprocess_mc_bed.sh 4
+
 set -x -e
 
-# run ./preprocess.sh 1 if you havent CDO compiled with OpenMP
+
+# run ./preprocess.sh 1 if you haven't CDO compiled with OpenMP
 NN=4  # default number of processors
 if [ $# -gt 0 ] ; then
   NN="$1"
 fi
+N=$NN
 
-infile_clean=MCdataset-2015-04-27.nc
+
+infile=BedMachineGreenland-2017-09-20.nc
 if [ -n "$2" ]; then
-    infile_clean=$2
+    infile=$2
 fi
-infile=float_$infile_clean
-wget -nc ftp://sidads.colorado.edu/DATASETS/IDBMG4_BedMachineGr/$infile_clean
 
-# ncap2 -O -s "x=double(x); y=double(y); bed=float(bed); thickness=float(thickness); surface=float(surface); errbed=float(errbed);" $infile_clean $infile
-infile=$infile_clean
-ver=2
+ver=3a
 if [ -n "$3" ]; then
     ver=$3
 fi
 
-# username to download MCBs from beauregard
-user=aaschwanden  # default number of processors
-if [ $# -gt 4 ] ; then
-  user="$4"
-fi
 
+run_with_mpi () {
+
+    if [ -z "$SLURM_JOBID" ];
+    then
+        echo "running without SLURM $*"
+        mpiexec -n $*
+    else
+        echo "running under SLURM $*"
+        mpirun -machinefile ./nodes_$SLURM_JOBID -np $*
+    fi
+}
+
+
+# First we download the Bamber 2001 SeaRISE data set
 
 # get file; see page http://websrv.cs.umt.edu/isis/index.php/Present_Day_Greenland
 DATAVERSION=1.1
@@ -66,12 +83,10 @@ nc2cdo.py $PISMVERSION
 echo "done."
 echo
 
-# plummerfile=2008_Jakobshavn.zip
-# wget -nc ftp://data.cresis.ku.edu/data/grids/old_format/$plummerfile
 
 ibcaofile=IBCAO_V3_500m_RR
-# wget -nc http://www.ngdc.noaa.gov/mgg/bathymetry/arctic/grids/version3_0/${ibcaofile}_tif.zip
-# unzip -o ${ibcaofile}_tif.zip
+wget -nc http://www.ngdc.noaa.gov/mgg/bathymetry/arctic/grids/version3_0/${ibcaofile}_tif.zip
+#unzip -o ${ibcaofile}_tif.zip
 
 # Create a buffer that is a multiple of the grid resolution
 # and works for grid resolutions up to 36km.
@@ -83,28 +98,15 @@ xmax=$((864700 + $buffer_x))
 ymax=$((-657600 + $buffer_y))
 
 
-cresis_jakfile=Jakobshavn_2006_2014_Composite_V3
-wget -nc https://data.cresis.ku.edu/data/grids/$cresis_jakfile.zip
-unzip -o $cresis_jakfile.zip
-#source jib_interp.sh
-
-## SERIOUS BUG in GDAL 2.1
-export GDALWARP_DENSIFY_CUTLINE=NO
-CUT="-cutline ../shape_files/gris-domain.shp"
-
 for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
-#for GRID in 3000; do
     outfile_prefix=pism_Greenland_ext_${GRID}m_mcb_jpl_v${ver}
     outfile=${outfile_prefix}.nc
     outfile_ctrl=${outfile_prefix}_ctrl.nc
-    outfile_cresis=${outfile_prefix}_cresisp.nc
     outfile_nb=${outfile_prefix}_no_bath.nc
-    outfile_hot=${outfile_prefix}_970mW_hs.nc
-    outfile_plus=${outfile_prefix}_plus.nc
-    outfile_minus=${outfile_prefix}_minus.nc
     outfile_sm_prefix=pism_Greenland_${GRID}m_mcb_jpl_v${ver}
-    outfile_sm_cresis=${outfile_sm_prefix}_cresisp.nc
+    outfile_sm_ctrl=${outfile_sm_prefix}_ctrl.nc
     outfile_sm_nb=${outfile_sm_prefix}_no_bath.nc
+    
     for var in "bed" "errbed"; do
         rm -f g${GRID}m_${var}_v${ver}.tif g${GRID}m_${var}_v${ver}.nc
         gdalwarp $CUT -overwrite  -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff NETCDF:$infile:$var g${GRID}m_${var}_v${ver}.tif
@@ -130,37 +132,28 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     for var in "errbed" "surface" "thickness" "mask" "source"; do
         ncks -A g${GRID}m_${var}_v${ver}.nc $outfile
     done
-    
-    ncap2 -O -s "where(mask==3) bed=-9999" $outfile $outfile
-    
+        
     # This is not needed, but it can be used by PISM to calculate correct cell volumes, and for remapping scripts"
     ncatted -a proj4,global,o,c,"+init=epsg:3413" $outfile
-    
-    ba13file=Greenland_bedrock_topography_V3_clean
-    rsync -rvu --progress $user@beauregard.gi.alaska.edu:/data/tmp/data_sets/greenland_beds_v3/${ba13file}.nc
-    
-    gdalwarp $CUT -overwrite -r average -s_srs "+proj=stere +ellps=WGS84 +datum=WGS84 +lon_0=-39 +lat_0=90 +lat_ts=71 +units=m" -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -dstnodata -9999 -of GTiff NETCDF:${ba13file}.nc:topg ${ba13file}_epsg3413_g${GRID}m.tif
-    gdal_translate -co "FORMAT=NC4" -of netCDF ${ba13file}_epsg3413_g${GRID}m.tif ${ba13file}_epsg3413_g${GRID}m.nc
-    ncatted -a standard_name,topg,d,,  ${ba13file}_epsg3413_g${GRID}m.nc
-    ncks -A -v topg ${ba13file}_epsg3413_g${GRID}m.nc $outfile
-    ncap2 -O -s "where(thickness==0) {bed=topg;}; where(bed==-9999) {bed=topg;};" $outfile $outfile
 
+    # Add IBCAO bathymetry for the outer part of the domain
     gdalwarp $CUT -overwrite -r average -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff ${ibcaofile}_tif/${ibcaofile}.tif ${ibcaofile}_epsg3413_g${GRID}m.tif
     gdal_translate -co "FORMAT=NC4" -of netCDF  ${ibcaofile}_epsg3413_g${GRID}m.tif  ${ibcaofile}_epsg3413_g${GRID}m.nc
     ncks -A -v Band1 ${ibcaofile}_epsg3413_g${GRID}m.nc $outfile
     ncap2 -O -s "where(bed==-9999) {bed=Band1;}; where(Band1<=-9990) {bed=-9999;};" $outfile $outfile
-
     ncks -O -v Band1,topg -x $outfile $outfile
-    
-    ncks -4 -L 3 -O g${GRID}m_${var}_v${ver}.nc griddes_${GRID}m.nc
+
+    # Remap SeaRISE fields
+    ncks -4 -O g${GRID}m_${var}_v${ver}.nc griddes_${GRID}m.nc
     nc2cdo.py --srs "+init=epsg:3413" griddes_${GRID}m.nc
-    if [[ $NN == 1 ]] ; then
+    if [[ $N == 1 ]] ; then
         REMAP_EXTRAPOLATE=on cdo -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
     else
-        REMAP_EXTRAPOLATE=on cdo -P $NN -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
+        REMAP_EXTRAPOLATE=on cdo -P $N -f nc4 remapbil,griddes_${GRID}m.nc ${PISMVERSION} v${ver}_tmp_${GRID}m_searise.nc
     fi
-    
-    mpiexec -np $NN fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
+
+    # Extrapolate climate and other BC fields onto PISM domain
+    run_with_mpi $NN fill_missing_petsc.py -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp_${GRID}m_searise.nc v${ver}_tmp2_${GRID}m.nc
     ncks -4 -A -v precipitation,ice_surface_temp,bheatflx,climatic_mass_balance v${ver}_tmp2_${GRID}m.nc $outfile
     cdo setmissval,-9999 -selvar,bed $outfile bedmiss_${GRID}m.nc
     ncks -A -v bed bedmiss_${GRID}m.nc $outfile 
@@ -168,19 +161,19 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     ncatted -a long_name,surface,o,c,"ice surface elevation" -a standard_name,surface,o,c,"surface_altitude" -a units,surface,o,c,"meters" $outfile
     ncatted -a long_name,errbed,o,c,"bed topography/ice thickness error" -a units,errbed,o,c,"meters" $outfile
     ncatted -a long_name,thickness,o,c,"ice thickness" -a standard_name,thickness,o,c,"land_ice_thickness" -a units,thickness,o,c,"meters" $outfile
-    ncatted -a units,mask,d,, -a flag_values,mask,o,b,0,1,2,3 -a flag_meanings,mask,o,c,"ocean ice_free_land grounded_ice floating_ice" $outfile
-    ncatted -a units,source,d,, -a flag_values,source,o,b,0,1,2,3,4,6 -a flag_meanings,source,o,c,"ocean gimpdem mass_conservation interpolation hydrodstatic_equilibrium kriging" $outfile
-    ncatted -a Title,global,o,c,"BedMachine: Greenland dataset based on mass conservation" -a Author,global,o,c,"Mathieu Morlighem" -a version,global,o,c,"$ver" -a proj4,global,o,c,"+init=epsg:3413" $outfile
     ncatted -a _FillValue,,d,, -a missing_value,,d,, $outfile
     ncatted -a _FillValue,errbed,o,s,-9999 $outfile
+    ncatted -a valid_range,mask,o,b,0,4 $outfile
+    
     # remove regridding artifacts, give precedence to mask: we set thickness and
     # surface to 0 where mask has ocean
-
-    ncap2 -O -s "where(thickness<0) thickness=0; ftt_mask[\$y,\$x]=1b; where(mask==0) {thickness=0.; surface=0.;};" $outfile $outfile
+    # Make FTT mask: 1 where there is no floating (3) or grounded (2) ice
+    ncap2 -O -s "where(thickness<0) thickness=0; ftt_mask[\$y,\$x]=0b; where(mask==0) {thickness=0.; surface=0.;}; where(mask!=2) ftt_mask=1; where(mask!=3) ftt_mask=1;" $outfile $outfile
 
     ncks -h -O $outfile $outfile_ctrl
     ncks -h -O $outfile $outfile_nb
 
+    # Here we cut out the topography of the Canadian Archipelago
     var=thickness
     gdalwarp -overwrite -dstnodata 0 -cutline  ../shape_files/gris-domain-ismip6.shp NETCDF:$outfile_nb:$var g${GRID}m_nb_${var}_v${ver}.tif
     gdal_translate -of netCDF -co "FORMAT=NC4" g${GRID}m_nb_${var}_v${ver}.tif g${GRID}m_nb_${var}_v${ver}.nc
@@ -191,46 +184,15 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     ncks -A -v $var g${GRID}m_nb_${var}_v${ver}.nc $outfile_nb
     ncatted -a _FillValue,bed,d,, -a _FillValue,thickness,d,, $outfile_nb
     ncap2 -O -s "where(bed==-9999) {mask=0; surface=0; thickness=0;};"  $outfile_nb  $outfile_nb
-    
-    sh create_hot_spot.sh $outfile $outfile_hot
 
-    # CReSIS bed
-    gdalwarp -overwrite  -cutline ../shape_files/jib_cresis_channel_area_cutline.shp -r average -s_srs EPSG:3413 -t_srs EPSG:3413 -te $xmin $ymin $xmax $ymax -tr $GRID $GRID -of GTiff jakobshavn_bedmap_3413_edit.tif g${GRID}m_cresis.tif
-    gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_cresis.tif g${GRID}m_cresis.nc
-    ncrename -O -v Band1,cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis.nc
-    
-    var=bed
-    nccopy g${GRID}m_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    ncks -A -v cresis_bed g${GRID}m_cresis.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    ncatted -a _FillValue,cresis_bed,d,, g${GRID}m_cresis_${var}_v${ver}.nc
-    ncap2 -O -s "where(cresis_bed>-9999) bed=cresis_bed;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    gdalwarp -overwrite -dstnodata 0 -cutline  ../shape_files/jib_interp_buffer.shp NETCDF:g${GRID}m_cresis_${var}_v${ver}.nc:bed g${GRID}m_cresis_${var}_v${ver}_buffered.tif
-    gdal_translate -co "FORMAT=NC4" -of netCDF g${GRID}m_cresis_${var}_v${ver}_buffered.tif g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    ncrename -O -v bed,buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    ncks -O -4 g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    ncatted -a _FillValue,buffer,d,, g${GRID}m_cresis_${var}_v${ver}_buffered.nc
-    ncks -4 -A -v buffer g${GRID}m_cresis_${var}_v${ver}_buffered.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    ncap2 -O -s "where(buffer!=0) bed=9999;" g${GRID}m_cresis_${var}_v${ver}.nc g${GRID}m_cresis_${var}_v${ver}.nc
-    # ncatted -a _FillValue,bed,o,s,9999 g${GRID}m_cresis_${var}_v${ver}.nc
-    mpiexec -np $NN  fill_missing_petsc.py -v bed -f g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
-    ncks -O -v bed tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
-    ncrename -O -v bed,bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc tmp_g${GRID}m_cresis_${var}_v${ver}.nc
-    ncks -O  $outfile $outfile_cresis
-    ncatted -a _FillValue,bed,d,, $outfile_cresis
-    ncks -A -v bed_cresis tmp_g${GRID}m_cresis_${var}_v${ver}.nc $outfile_cresis
-    ncap2 -O -s "where(mask!=0) bed=bed_cresis; where(mask==2) thickness=surface-bed; where(thickness<0) thickness=0.;" $outfile_cresis $outfile_cresis
-    ncks -O -v bed_cresis -x $outfile_cresis $outfile_cresis
-
+    # Cut out smaller domain used for projections
     e0=-638000
     n0=-3349600
     e1=864700
     n1=-657600
 
-    # Add a buffer on each side such that we get nice grids up to a grid spacing
-    # of 36 km.
-
-    # buffer_e=40650
-    # buffer_n=22000
+    buffer_e=40650
+    buffer_n=22000
     e0=$(($e0 - $buffer_e))
     n0=$(($n0 - $buffer_n))
     e1=$(($e1 + $buffer_e))
@@ -242,7 +204,7 @@ for GRID in 18000 9000 6000 4500 3600 3000 2400 1800 1500 1200 900 600 450; do
     e1=$(($e1 - $GRID / 2))
     n1=$(($n1 - $GRID / 2))
 
-    ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1.  $outfile_cresis  $outfile_sm_cresis
+    ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1.  $outfile_ctrl  $outfile_sm_ctrl
     ncks -O -d x,$e0.,$e1. -d y,$n0.,$n1.  $outfile_nb  $outfile_sm_nb
 
 done

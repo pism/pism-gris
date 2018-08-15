@@ -236,6 +236,9 @@ ocs_dict  = {-2.0: 'off', -1.0: 'low', 0.0: 'mid', 1.0: 'high'}
 ocm_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high', 2.0: 'm10', 3.0: 'm15'}
 tct_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
 bd_dict   = {-1.0: 'off', 0.0: 'i0', 1.0: 'ip'}
+gcm_dict = {-1.0: 'cmip5_mean', 0.0: 'model_e', 1.0: 'cmip5_m1s', 2.0: 'cmip5_p1s'}
+cmip_dict = {'cmip5_mean': 'cmip5_mean', 'model_e': 'Amon_GISS-E2-H',
+            'cmip5_m1s': 'cmip5_m1s', 'cmip5_p1s': 'cmip5_p1s'}
 
 tsstep = 'yearly'
 
@@ -264,7 +267,7 @@ for n, combination in enumerate(combinations):
         m_pdd = 0.0
         m_ohc = 0.0
         try:
-            run_id, fice, fsnow, prs, rfr, ocm_v, ocs_v, tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn, m_pdd, m_ohc = combination
+            run_id, fice, fsnow, prs, rfr, ocm_v, ocs_v, tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn, m_pdd, m_ohc, m_gcm = combination
             bed_deformation = bd_dict[m_bd]
             firn = firn_dict[m_firn]
             lapse_rate = m_tlr
@@ -290,9 +293,9 @@ for n, combination in enumerate(combinations):
 
         forcing_files = {'cold' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=-1),
                          'ctrl' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0),
-                         '26'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp26_ensmean_ym_anom_GRIS_0-5000.nc',
-                         '45'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp45_ensmean_ym_anom_GRIS_0-5000.nc',
-                         '85'   : '$input_dir/data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'}
+                         '26'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm]),
+                         '45'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm]),
+                         '85'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm])}
 
         climate_modifier_file = forcing_files[rcp]
 
