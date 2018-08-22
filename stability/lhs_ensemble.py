@@ -237,28 +237,11 @@ ocm_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high', 2.0: 'm10', 3.0: 'm15'}
 tct_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
 bd_dict   = {-1.0: 'off', 0.0: 'i0', 1.0: 'ip'}
 
-gcm_dict = {0.0: 'GISS-E2-H',
+gcm_dict = {-1.0: 'ENSMEAN',
+            0.0: 'GISS-E2-H',
             1.0: 'GISS-E2-R',
             2.0: 'IPSL-CM5A-LR',
             3.0: 'MPI-ESM-LR'}
-
-gcm_26 = {0.0: 'CanESM2',
-            1.0: 'GISS-E2-H',
-            2.0: 'GISS-E2-R',
-            3.0: 'IPSL-CM5A-LR',
-            4.0: 'MIROC5',
-            5.0: 'MPI-ESM-LR'}
-
-gcm_4585 = {0.0: 'CNRM-CM5',
-            1.0: 'GISS-E2-H',
-            2.0: 'GISS-E2-R',
-            3.0: 'CSIRO-CM5',
-            4.0: 'IPSL-CM5A-LR',
-            5.0: 'MPI-ESM-LR'}
-
-gcm_rcp_dict = {'26': gcm_26,
-                '45': gcm_4585,
-                '85': gcm_4585}
 
 tsstep = 'yearly'
 
@@ -287,7 +270,7 @@ for n, combination in enumerate(combinations):
         m_pdd = 0.0
         m_ohc = 0.0
         try:
-            run_id, fice, fsnow, prs, rfr, ocm_v, ocs_v, tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn, m_pdd, m_ohc, m_gcm = combination
+            run_id, gcm, fice, fsnow, prs, rfr, ocm_v, ocs_v, tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn, m_pdd, m_ohc, m_gcm = combination
             bed_deformation = bd_dict[m_bd]
             firn = firn_dict[m_firn]
             lapse_rate = m_tlr
@@ -310,13 +293,6 @@ for n, combination in enumerate(combinations):
         vversion = 'v' + str(version)
         full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
         full_outfile = 'g{grid}m_{experiment}.nc'.format(grid=grid, experiment=full_exp_name)
-
-        # forcing_files = {'cold' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=-1),
-        #                  'ctrl' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0),
-        #                  '26'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm]),
-        #                  '45'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm]),
-        #                  '85'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm])}
-
 
         climate_modifier_file = '$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc'.format(mgcm=gcm_dict[gcm],rcp=rcp)
 
