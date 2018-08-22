@@ -1,5 +1,22 @@
 #!/bin/bash
 
+kg2mmsle=365e12
+odir=2018_05_ctrl
+grid=900
+edir=excess
+mkdir -p ${odir}/${edir}
+for rcp in 26 45 85; do
+    for run in CTRL; do
+        cdo -L setattribute,"ice_mass@units=mm" -divc,${kg2mmsle} -fldsum -selvar,ice_mass ${odir}/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc ${odir}/${edir}/fldsum_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        cdo -L fldsum -expr,"ice_mass=ice_mass*(mask==2);" -selvar,ice_mass,mask ${odir}/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc ${odir}/${edir}/fldsum_adj_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        cdo -L setattribute,"ice_mass@units=mm" -divc,${kg2mmsle} -sub -selvar,ice_mass ${odir}/${edir}/fldsum_adj_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selvar,ice_mass ${odir}/${edir}/fldsum_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc ${odir}/${edir}/fldsum_excess_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc 
+        for year in 2100 2200 2500 3000; do
+            cdo selyear,${year} ${odir}/${edir}/fldsum_excess_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc ${odir}/${edir}/fldsum_excess_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_${year}.nc 
+        done
+    done
+done
+
+
 # Scalar fields
 
 odir=2018_05_ctrl

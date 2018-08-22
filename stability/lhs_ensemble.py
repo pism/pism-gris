@@ -220,7 +220,7 @@ phi_max  = 40.
 topg_min = -700
 topg_max = 700
 
-rcps            = ['cold', '26', '45', '85']
+rcps            = ['26', '45', '85']
 std_dev         = 4.23
 firn            = 'ctrl'
 lapse_rate      = 6
@@ -236,9 +236,29 @@ ocs_dict  = {-2.0: 'off', -1.0: 'low', 0.0: 'mid', 1.0: 'high'}
 ocm_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high', 2.0: 'm10', 3.0: 'm15'}
 tct_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
 bd_dict   = {-1.0: 'off', 0.0: 'i0', 1.0: 'ip'}
-gcm_dict = {-1.0: 'cmip5_mean', 0.0: 'model_e', 1.0: 'cmip5_m1s', 2.0: 'cmip5_p1s'}
-cmip_dict = {'cmip5_mean': 'cmip5_mean', 'model_e': 'Amon_GISS-E2-H',
-            'cmip5_m1s': 'cmip5_m1s', 'cmip5_p1s': 'cmip5_p1s'}
+
+gcm_dict = {0.0: 'GISS-E2-H',
+            1.0: 'GISS-E2-R',
+            2.0: 'IPSL-CM5A-LR',
+            3.0: 'MPI-ESM-LR'}
+
+gcm_26 = {0.0: 'CanESM2',
+            1.0: 'GISS-E2-H',
+            2.0: 'GISS-E2-R',
+            3.0: 'IPSL-CM5A-LR',
+            4.0: 'MIROC5',
+            5.0: 'MPI-ESM-LR'}
+
+gcm_4585 = {0.0: 'CNRM-CM5',
+            1.0: 'GISS-E2-H',
+            2.0: 'GISS-E2-R',
+            3.0: 'CSIRO-CM5',
+            4.0: 'IPSL-CM5A-LR',
+            5.0: 'MPI-ESM-LR'}
+
+gcm_rcp_dict = {'26': gcm_26,
+                '45': gcm_4585,
+                '85': gcm_4585}
 
 tsstep = 'yearly'
 
@@ -272,7 +292,7 @@ for n, combination in enumerate(combinations):
             firn = firn_dict[m_firn]
             lapse_rate = m_tlr
         except:
-            run_id, fice, fsnow, prs, rfr, ocm_v, ocs_v, tct_v, vcm, ppq, sia_e = combination
+            run_id, gcm, fice, fsnow, prs, rfr, ocm_v, ocs_v, tct_v, vcm, ppq, sia_e = combination
 
         ocm = ocm_dict[ocm_v]
         ocs = ocs_dict[ocs_v]
@@ -291,13 +311,14 @@ for n, combination in enumerate(combinations):
         full_exp_name =  '_'.join([vversion, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
         full_outfile = 'g{grid}m_{experiment}.nc'.format(grid=grid, experiment=full_exp_name)
 
-        forcing_files = {'cold' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=-1),
-                         'ctrl' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0),
-                         '26'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm]),
-                         '45'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm]),
-                         '85'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm])}
+        # forcing_files = {'cold' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=-1),
+        #                  'ctrl' : 'pism_warming_climate_{tempmax}K.nc'.format(tempmax=0),
+        #                  '26'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp26_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm]),
+        #                  '45'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp45_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm]),
+        #                  '85'   : '$input_dir/data_sets/climate_forcing/tas_{cmip}_rcp85_ensmean_ym_anom_GRIS_0-5000.nc'.format(cmip=gcm_dict[m_gcm])}
 
-        climate_modifier_file = forcing_files[rcp]
+
+        climate_modifier_file = '$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc'.format(mgcm=gcm_dict[gcm],rcp=rcp)
 
         if m_ohc == 0:
             ocean_modifier_file = climate_modifier_file
