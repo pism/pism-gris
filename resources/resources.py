@@ -824,6 +824,9 @@ systems['pleiades_haswell']['queue'] = {'long' : 24, 'normal': 24}
 systems['pleiades_ivy'] = systems['pleiades'].copy()
 systems['pleiades_ivy']['queue'] = {'long' : 20, 'normal': 20}
 
+systems['pleiades_sandy'] = systems['pleiades'].copy()
+systems['pleiades_sandy']['queue'] = {'long' : 16, 'normal': 16}
+
 systems['pleiades_broadwell'] = systems['pleiades'].copy()
 systems['pleiades_broadwell']['queue'] = {'long' : 28, 'normal': 28}
 
@@ -911,6 +914,21 @@ systems['pleiades_broadwell']['header'] = """#PBS -S /bin/bash
 #PBS -W group_list=s1878
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=bro
+#PBS -j oe
+
+module list
+
+cd $PBS_O_WORKDIR
+
+"""
+
+systems['pleiades_sandy']['header'] = """#PBS -S /bin/bash
+#PBS -N cfd
+#PBS -l walltime={walltime}
+#PBS -m e
+#PBS -W group_list=s1878
+#PBS -q {queue}
+#PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=san
 #PBS -j oe
 
 module list

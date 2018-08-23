@@ -1,35 +1,25 @@
 #!/bin/bash
 
-odir=2018_08_les
-s=pleiades_ivy
-q=long
-n=140
-grid=1800
-
-./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 100:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
-
-odir=2018_01_les
-s=pleiades_ivy
+odir=2018_08_les_sky
+s=electra_skylake
 q=long
 n=160
 grid=1800
 
-./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_20180107.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 48:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 80:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
+for id in {000..099}; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_sky/run_scripts/lhs_g1800m_v3a_rcp_85_id_${id}_j.sh; done
 
-for id2 in `seq 0 5`;
-do
-for id1 in `seq 0 9`;
-do
-for id in `seq 0 9`;
-do
-for rcp in 26 45 85;
-do
-qsub 2018_01_les/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id2}${id1}${id}_j.sh 
-done
-done
-done
-done
+odir=2018_08_les_sky
+s=electra_skylake
+q=long
+n=160
+grid=1800
+
+./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 80:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+for id in {000..099}; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_sky/run_scripts/lhs_g1800m_v3a_rcp_85_id_${id}_j.sh; done
+
 
 
 odir=2018_08_ctrl
