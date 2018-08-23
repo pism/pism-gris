@@ -829,6 +829,9 @@ systems['pleiades_broadwell']['queue'] = {'long' : 28, 'normal': 28}
 
 systems['electra_broadwell'] = systems['pleiades_broadwell'].copy()
 
+systems['electra_skylake'] = systems['pleiades'].copy()
+systems['electra_skylake']['queue'] = {'long' : 40, 'normal': 40}
+
 
 # headers for batch jobs
 #
@@ -938,6 +941,21 @@ systems['pleiades_ivy']['header'] = """#PBS -S /bin/bash
 #PBS -W group_list=s1878
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=ivy
+#PBS -j oe
+
+module list
+
+cd $PBS_O_WORKDIR
+
+"""
+
+systems['electra_skylake']['header'] = """#PBS -S /bin/bash
+#PBS -N cfd
+#PBS -l walltime={walltime}
+#PBS -m e
+#PBS -W group_list=s1878
+#PBS -q {queue}
+#PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=sky_ele
 #PBS -j oe
 
 module list
