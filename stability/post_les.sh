@@ -8,23 +8,40 @@
 
 cd $SLURM_SUBMIT_DIR
 
-# odir=2018_01_les
-# grid=1800
-# mkdir -p $odir/scalar_pruned
-# mkdir -p $odir/scalar_clean
-# mkdir -p $odir/scalar_ensstat
-# rsync -rvu --progress --min-size=470KB $odir/scalar/* $odir/scalar_pruned/
-# cd $odir/scalar_pruned/
-# for file in ts_*.nc; do
-#     cdo selvar,tendency*,surface*,li*,ice_*,dt,basal* $file ../scalar_clean/$file
-# done
-# cd ../../
-# for rcp in 26 45 85; do
-#     for pctl in 16 50 84; do
-#         cdo -O -P 7 enspctl,$pctl $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}*0_1000.nc  $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
-#     done
-# done
+odir=2018_08_les
+grid=1800
+mkdir -p $odir/scalar_pruned
+mkdir -p $odir/scalar_clean
+mkdir -p $odir/scalar_ensstat
+rsync -rvu --progress --delete --min-size=478KB ${odir}_*/scalar/* $odir/scalar_pruned/
+cd $odir/scalar_pruned/
+for file in ts_*.nc; do
+    cdo selvar,tendency*,surface*,li*,ice_*,dt,basal* $file ../scalar_clean/$file
+done
+cd ../../
+for rcp in 26 45 85; do
+    for pctl in 16 50 84; do
+        cdo -O -P 7 --sortname enspctl,$pctl $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}*0_1000.nc  $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+    done
+done
 
+
+#PBS -l select=1:mem=250GB
+#PBS -l walltime=24:00:00
+#PBS -q ldan
+
+cd $PBS_O_WORKDIR
+
+odir=2018_08_les
+grid=1800
+
+for file in ${odir}_*/state/*_0_1000.nc; do
+    echo $file
+    ofile=${odir}/state/${file##*/}
+    if [ ! -f "$ofile" ]; then
+        ncks -O -4 -L 3 $file $ofile
+    fi
+done
 
 odir=2018_01_les
 grid=1800

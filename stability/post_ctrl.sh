@@ -10,7 +10,7 @@ for rcp in 26 45 85; do
         cdo -L setattribute,"ice_mass@units=mm" -divc,${kg2mmsle} -fldsum -selvar,ice_mass ${odir}/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc ${odir}/${edir}/fldsum_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
         cdo -L fldsum -expr,"ice_mass=ice_mass*(mask==2);" -selvar,ice_mass,mask ${odir}/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc ${odir}/${edir}/fldsum_adj_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
         cdo -L setattribute,"ice_mass@units=mm" -divc,${kg2mmsle} -sub -selvar,ice_mass ${odir}/${edir}/fldsum_adj_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selvar,ice_mass ${odir}/${edir}/fldsum_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc ${odir}/${edir}/fldsum_excess_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc 
-        for year in 2100 2200 2500 3000; do
+        for year in 2100 2200 2300 3000; do
             cdo selyear,${year} ${odir}/${edir}/fldsum_excess_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc ${odir}/${edir}/fldsum_excess_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_${year}.nc 
         done
     done
@@ -19,7 +19,7 @@ done
 
 # Scalar fields
 
-odir=2018_05_ctrl
+odir=2018_08_ctrl
 cd $odir/scalar
 for rcp in 26 45 85; do
     for run in CTRL; do
@@ -30,7 +30,7 @@ for rcp in 26 45 85; do
 done
 cd ../../
 
-odir=2018_05_ctrl
+odir=2018_08_ctrl
 grid=600
 cd $odir/scalar
 for rcp in 26 45 85; do
@@ -41,18 +41,19 @@ for rcp in 26 45 85; do
 done
 cd ../../
 
-odir=2018_05_ctrl
+odir=2018_08_ctrl
 grid=900
+mkdir $odir/scalar_clean
 cd $odir/scalar
 for rcp in 26 45 85; do
-    for run in NISO CTRL NTRL; do
-        cdo -f nc4 -O --sortname mergetime ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_500.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_500_1000.nc ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
-        adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+    for run in CTRL NTRL; do
+        ncks -O ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc ../scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ../scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
     done
 done
 cd ../../
 
-odir=2018_05_ctrl
+odir=2018_08_ctrl
 grid=900
 cd $odir/scalar
 run=CTRL
@@ -69,7 +70,7 @@ cd ../../
 
 # Spatial fields
 
-odir=2018_05_ctrl
+odir=2018_08_ctrl
 grid=900
 mkdir -p $odir/fldsum
 for rcp in 26 45 85; do
@@ -84,7 +85,7 @@ for rcp in 26 45 85; do
 done
 
 # Extract DGMSL
-odir=2018_05_ctrl
+odir=2018_08_ctrl
 grid=900
 mkdir -p $odir/dgmsl
 for rcp in 26 45 85; do
@@ -96,7 +97,7 @@ for rcp in 26 45 85; do
 done
 
 # Extract DGMSL from basins
-odir=2018_05_ctrl
+odir=2018_08_ctrl
 grid=900
 mkdir -p $odir/basins/dgmsl
 for rcp in 26 45 85; do
@@ -110,11 +111,11 @@ for rcp in 26 45 85; do
 done
 
 
-odir=2018_05_ctrl
+odir=2018_08_ctrl
 grid=900
 mkdir -p $odir/final_states
 cd $odir/state
-for file in gris_g${grid}m*CTRL_500_1000.nc; do
+for file in gris_g${grid}m*CTRL_0_1000.nc; do
     cdo aexpr,usurf=topg+thk -selvar,topg,thk,velsurf_mag $file ../final_states/$file
     ncap2 -4 -L 5 -O -s "where(topg<0) {topg=0.;}; where(thk<10) {velsurf_mag=-2e9; usurf=0.;};" ../final_states/$file ../final_states/$file
     gdal_translate NETCDF:../final_states/$file:velsurf_mag ../final_states/velsurf_mag_$file.tif
@@ -126,14 +127,14 @@ done
 cd ../../
 
 
-odir=2018_05_ctrl
+odir=2018_08_ctrl
 grid=900
 mkdir -p ${odir}/profiles
 for rcp in 45 85 26; do
     extract_profiles.py -v velsurf_mag,velbase_mag,thk,usurf,topg ../../gris-outlet-glacier-profiles/gris-outlet-glacier-profiles-100m.shp $odir/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc $odir/profiles/profiles_100m_ex_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
 done
 
-odir=2018_05_ctrl
+odir=2018_08_ctrl
 grid=450
 mkdir -p ${odir}/profiles
 for rcp in 45; do

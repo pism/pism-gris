@@ -1,11 +1,15 @@
 #!/bin/bash
 
+# GCM forcing
+~/base/gris-analysis/plotting/plotting.py  -o gcm_2300 --plot cmip5_rcp --time_bounds 2008 2300 ../data_sets/climate_forcing/tas_cmip5_rcp*ensstd**anom*.nc ../data_sets/climate_forcing/tas_Amon_*_rcp*_r1i1p1_ym_anom_GRIS_0-5000.nc
+
 # CMIP forcing
-~/base/gris-analysis/plotting/plotting.py  -o giss --plot cmip5 --time_bounds 2008 3000 ../data_sets/climate_forcing/tas_Amon_GISS-E2-H_rcp*0-5000.nc ../data_sets/climate_forcing/tas_cmip5_rcp*ensstd**anom*.nc
+~/base/gris-analysis/plotting/plotting.py  -o gcm --plot cmip5 --time_bounds 2008 3000 ../data_sets/climate_forcing/tas_Amon_*_rcp*_r1i1p1_ym_anom_GRIS_0-5000.nc
+
 # Cumulative contribution LES and CTRL
-~/base/gris-analysis/plotting/plotting.py  -o les18 --time_bounds 2008 3000 --ctrl_file 2018_05_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2018_01_les/scalar_ensstat/ens*_0_1000.nc
+~/base/gris-analysis/plotting/plotting.py  -o les18 --time_bounds 2008 3000 --ctrl_file 2018_08_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_mass 2018_08_les/scalar_ensstat/ens*_0_1000.nc
 # Rates of GMSL rise LES and CTRL
-~/base/gris-analysis/plotting/plotting.py -o les18 --time_bounds 2008 3000 --no_legend --ctrl_file 2018_05_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2018_01_les/scalar_ensstat/ens*_0_1000.nc
+~/base/gris-analysis/plotting/plotting.py -o les18 --time_bounds 2008 3000 --no_legend --ctrl_file 2018_08_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc --plot rcp_flux 2018_01_les/scalar_ensstat/ens*_0_1000.nc
 # Ice discharge CTRL
 ~/base/gris-analysis/plotting/plotting.py -o rcp_d --bounds 0 1.75 --time_bounds 2008 3000 --no_legend --plot rcp_d  2018_05_ctrl/scalar/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc
 
