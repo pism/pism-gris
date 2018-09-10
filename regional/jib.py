@@ -48,8 +48,8 @@ parser.add_argument("--calving", dest="calving",
                     choices=['float_kill', 'vonmises_calving'],
                     help="calving", default='vonmises_calving')
 parser.add_argument("-d", "--domain", dest="domain",
-                    choices=['gris', 'gris_ext'],
-                    help="sets the modeling domain", default='gris')
+                    choices=['gris', 'gris_ext', 'jib'],
+                    help="sets the modeling domain", default='jib')
 parser.add_argument("--exstep", dest="exstep",
                     help="Writing interval for spatial time series", default=10)
 parser.add_argument("-f", "--o_format", dest="oformat",

@@ -32,19 +32,19 @@ def generate_domain(domain):
     if domain.lower() in ('greenland', 'gris', 'gris_ext'):
         pism_exec = 'pismr'
     elif domain.lower() in ('og'):
-        pism_exec = 'pismo -no_model_strip 0 -calving_wrap_around'
+        pism_exec = 'pismr -no_model_strip 0 -calving_wrap_around'
     elif domain.lower() in ('hia'):
         x_min = -652200.
         x_max = -232600.
         y_min = -1263900.
         y_max = -943500.
-        pism_exec = '''pismo -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)        
+        pism_exec = '''pismr -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)        
     elif domain.lower() in ('jakobshavn', 'jib'):
         x_min = -280000.
         x_max = 320000.
         y_min = -2410000.
         y_max = -2020000.
-        pism_exec = '''pismo -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
+        pism_exec = '''pismr -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
     else:
         print(('Domain {} not recognized, exiting'.format(domain)))
         import sys
@@ -475,6 +475,38 @@ def generate_grid_description(grid_resolution, domain, restart=False):
             skip_max = 20
             mz = 101
             mzb = 11
+
+    elif domain.lower() in ('jakobshavn', 'jib'):
+    
+        mx_max = 4000
+        my_max = 2600
+
+        resolution_max = 150
+
+        accepted_resolutions = (150, 300, 450, 600, 900, 1200, 1500, 1800, 2400, 3000, 3600, 4500, 6000, 9000, 18000, 36000)
+
+        try:
+            grid_resolution in accepted_resolutions
+            pass
+        except:
+            print(('grid resolution {}m not recognized'.format(grid_resolution)))
+
+        if grid_resolution < 1200:
+            skip_max = 200
+            mz = 201
+            mzb = 21
+        elif (grid_resolution >= 1200) and (grid_resolution < 4500):
+            skip_max = 100
+            mz = 201
+            mzb = 21
+        elif (grid_resolution >= 4500) and (grid_resolution < 18000):
+            skip_max = 50
+            mz = 201
+            mzb = 21
+        else:
+            skip_max = 20
+            mz = 101
+            mzb = 11
             
     elif domain.lower() in ('og'):
 
@@ -506,7 +538,7 @@ def generate_grid_description(grid_resolution, domain, restart=False):
 
     vertical_grid = OrderedDict()
     ## This sould be a temporary hack to restart from an older simulation
-    if domain.lower() in ('gris', 'og'):
+    if domain.lower() in ('gris', 'og', 'jib', 'jakobshavn'):
         vertical_grid['Lz'] = 4000
     else:
         vertical_grid['Lz'] = 5000

@@ -29,4 +29,4 @@ for k, infile in enumerate(infiles):
     data[1, k] = dgmsl
     nc.close()
 
-np.savetxt(outfile, np.transpose(data), fmt=['%i', '%1.0d'], delimiter=',', header='run,dgmsl(mm)')
+np.savetxt(outfile, np.transpose(data), fmt=['%i', '%4.0f'], delimiter=',', header='run,dgmsl(cm)')
