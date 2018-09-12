@@ -15,27 +15,6 @@ for rcp in 26 45 85; do
 done
 cd ../../
 
-odir=2018_08_ctrl
-grid=600
-cd $odir/scalar
-for rcp in 26 45 85; do
-    for run in CTRL; do
-        cdo -O mergetime ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_*0.nc   ../scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
-        adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
-    done
-done
-cd ../../
-
-odir=2018_08_ctrl
-grid=450
-cd $odir/scalar
-for rcp in 45; do
-    for run in CTRL; do
-        cdo -O mergetime ts_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_*0.nc ../scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
-        adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
-    done
-done
-cd ../../
 
 odir=2018_08_ctrl
 grid=900
@@ -80,6 +59,7 @@ for rcp in 26 45 85; do
     done
 done
 
+
 # Extract DGMSL
 odir=2018_08_ctrl
 grid=900
@@ -87,7 +67,23 @@ mkdir -p $odir/dgmsl
 for rcp in 26 45 85; do
     for year in 2100 2200 2300 3000; do
         for run in CTRL NISO NTRL; do
-            cdo -L setattribute,limnsw@units="cm" -setattribute,long_mame="contribution to global mean sea level" -divc,365 -divc,-1e13 -selvar,limnsw -sub -selyear,$year $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgmsl_g${grid}m_rcp_${rcp}_${run}_${year}.nc
+            cdo -L setattribute,limnsw@units="cm" -setattribute,limnsw@long_mame="contribution to global mean sea level" -divc,365 -divc,-1e13 -selvar,limnsw -sub -selyear,$year $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl/dgmsl_g${grid}m_rcp_${rcp}_${run}_${year}.nc
+        done
+    done
+done
+
+# Extract DGMSL
+odir=2018_08_ctrl
+grid=900
+mkdir -p $odir/contrib_absolute
+mkdir -p $odir/contrib_percent
+for rcp in 26 45 85; do
+    for run in CTRL NISO NTRL; do
+        cdo -L  setattribute,discharge_contrib@units="cm" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_accumulation_rate)*tendency_of_ice_mass" -divc,365 -divc,-1e13 -timcumsum  $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_absolute/dgmsl_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+        cdo -L  setattribute,discharge_contrib@units="" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_accumulation_rate)*100" -divc,365 -divc,-1e13 -timcumsum  $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_percent/dgmsl_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+        for year in 2100 2200 2300 3000; do
+            cdo -L  setattribute,discharge_contrib@units="cm" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_accumulation_rate)*tendency_of_ice_mass" -divc,365 -divc,-1e13 -selyear,${year} -timcumsum $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib/dgmsl_g${grid}m_rcp_${rcp}_${run}_${year}.nc
+            cdo -L  setattribute,discharge_contrib@units="" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_accumulation_rate)*100" -divc,365 -divc,-1e13 -selyear,${year} -timcumsum $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_percent/dgmsl_g${grid}m_rcp_${rcp}_${run}_${year}.nc
         done
     done
 done

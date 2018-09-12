@@ -115,6 +115,18 @@ done
 
 # Extract DGMSL
 odir=2018_08_ctrl
+grid=900
+mkdir -p $odir/dgmsl_ex
+for rcp in 26 45 85; do
+    for year in 2100 2200 2300 3000; do
+        for run in CTRL; do
+            cdo -L setattribute,limnsw@units="cm" -setattribute,long_mame="contribution to global mean sea level" -divc,365 -divc,-1e13 -selvar,limnsw -sub -selyear,$year $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc -selyear,2008 $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/dgmsl_ex/dgmsl_g${grid}m_rcp_${rcp}_${run}_${year}.nc
+        done
+    done
+done
+
+# Extract DGMSL
+odir=2018_08_ctrl
 grid=18000
 mkdir -p $odir/dgmsl
 for rcp in 26 45 85; do
