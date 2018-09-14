@@ -263,6 +263,8 @@ if restart_step > (simulation_end_year - simulation_start_year):
 batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
 post_header = make_batch_post_header(system)
 
+m_sb = None
+
 for n, combination in enumerate(combinations):
 
     for rcp in rcps:
