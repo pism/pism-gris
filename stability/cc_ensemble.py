@@ -220,7 +220,7 @@ phi_max  = 40.
 topg_min = -700
 topg_max = 700
 
-ccs            = ['-1.0', '-1.5', '-2.0']
+ccs            = ['-0.5', '-1.0', '-1.5', '-2.0']
 std_dev         = 4.23
 firn            = 'ctrl'
 lapse_rate      = 6
@@ -233,8 +233,8 @@ except:
 
 firn_dict = {-1.0: 'low', 0.0: 'off', 1.0: 'ctrl'}
 ocs_dict  = {-2.0: 'off', -1.0: 'low', 0.0: 'mid', 1.0: 'high'}
-ocm_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high', 2.0: 'm10', 3.0: 'm15'}
-tct_dict  = {-1.0: 'low', 0.0: 'mid', 1.0: 'high'}
+ocm_dict  = {-2.0: 'vlow', -1.0: 'low', 0.0: 'mid', 1.0: 'high', 2.0: 'm10', 3.0: 'm15'}
+tct_dict  = {-3.0: 'ulow', -2.0: 'vlow', -1.0: 'low', 0.0: 'mid', 1.0: 'high'}
 bd_dict   = {-1.0: 'off', 0.0: 'i0', 1.0: 'ip'}
 sb_dict   = {0.0: 'ssa+sia', 1.0: 'sia'}
 gcm_dict = {-1.0: 'ENSMEAN',
@@ -266,6 +266,7 @@ post_header = make_batch_post_header(system)
 for n, combination in enumerate(combinations):
 
     for cc in ccs:
+        print(cc)
         m_bd = None
         m_pdd = 0.0
         m_ohc = 0.0
@@ -279,7 +280,7 @@ for n, combination in enumerate(combinations):
 
         ocm = ocm_dict[ocm_v]
         ocs = ocs_dict[ocs_v]
-        tct = ocs_dict[tct_v]
+        tct = tct_dict[tct_v]
 
         ttphi = '{},{},{},{}'.format(phi_min, phi_max, topg_min, topg_max)
 
@@ -396,6 +397,9 @@ for n, combination in enumerate(combinations):
                     if m_sb:
                         stress_balance = sb_dict[m_sb]
                     stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
+                    # delete slippery grounding lines
+                    if 'tauc_slippery_grounding_lines' in stress_balance_params_dict:
+                        del stress_balance_params_dict['tauc_slippery_grounding_lines']
 
                     firn_files = {'off' : '$input_dir/data_sets/climate_forcing/firn_forcing_off.nc',
                                   'ctrl': '$input_dir/data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc'}
@@ -423,7 +427,8 @@ for n, combination in enumerate(combinations):
                     if m_pdd == 1.0:
                         setattr(climate_params_dict, 'pdd_aschwanden', '')
 
-                    ocean_files = {'low' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc',
+                    ocean_files = {'vlow' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_200myr_71n_10myr_80n.nc',
+                                   'low' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc',
                                    'mid' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc',
                                    'high': '$input_dir/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc',
                                    'm10' : '$input_dir/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc',
@@ -431,10 +436,11 @@ for n, combination in enumerate(combinations):
 
                     ocean_file = ocean_files[ocm]
 
-                    calving_thresholds = {'low' : '$input_dir/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc',
+                    calving_thresholds = {'ulow' : '$input_dir/data_sets/ocean_forcing/tct_forcing_200myr_74n_50myr_76n.nc',
+                                          'vlow' : '$input_dir/data_sets/ocean_forcing/tct_forcing_300myr_74n_50myr_76n.nc',
+                                          'low' : '$input_dir/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc',
                                           'mid' : '$input_dir/data_sets/ocean_forcing/tct_forcing_500myr_74n_100myr_76n.nc',
                                           'high': '$input_dir/data_sets/ocean_forcing/tct_forcing_600myr_74n_150myr_76n.nc'}
-
                     tct_file = calving_thresholds[tct]
 
                     ocs_params = {'off': (1.0, 1.0),
