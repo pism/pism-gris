@@ -266,7 +266,6 @@ post_header = make_batch_post_header(system)
 for n, combination in enumerate(combinations):
 
     for cc in ccs:
-        print(cc)
         m_bd = None
         m_pdd = 0.0
         m_ohc = 0.0
