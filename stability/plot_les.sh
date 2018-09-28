@@ -6,13 +6,10 @@
 # LES
 ~/base/gris-analysis/plotting/plotting.py  -o les18 --time_bounds 2008 3000 --ctrl_file 2018_08_ctrl/scalar_clean/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/contrib_flux_percent/*_0_1000.nc 2018_08_ctrl/contrib_flux_absolute/*_0_1000.nc --plot les 2018_09_les/scalar_ensstat/ens*_0_1000.nc ../data_sets/climate_forcing/tas_cmip5_rcp*ensstd**anom*.nc ../data_sets/climate_forcing/tas_Amon_*_rcp*_r1i1p1_ym_anom_GRIS_0-5000.nc  2018_09_les/contrib_flux_percent/ens*_0_1000.nc 2018_09_les/contrib_flux_absolute/ens*_0_1000.nc
 
-# Contribution of discharge
-~/base/gris-analysis/plotting/plotting.py  -o gcm_p --time_bounds 2020 3000  --ctrl 2018_08_ctrl/contrib_*/*_0_1000.nc --plot d_contrib 2018_08_les/contrib_percent/ens*_0_1000.nc 2018_08_les/contrib_absolute/ens*_0_1000.nc
-
 # Profiles
-~/base/gris-analysis/plotting/plotting.py -c ~/base/gris-analysis/plotting/bath_112.cpt --bounds 0 12000 --time_bounds 2015 2315  -o rcp45 --plot profile_combined 2018_08_ctrl/profiles/profiles_100m_ex_gris_g900m_v3a_rcp_45_id_CTRL_0_1000.nc
+~/base/gris-analysis/plotting/plotting.py -c ~/base/gris-analysis/plotting/bath_112.cpt --bounds 0 12000 --time_bounds 2015 2315  -o rcp45 --plot profile 2018_08_ctrl/profiles/profiles_100m_ex_gris_g900m_v3a_rcp_45_id_CTRL_0_1000.nc
 
-~/base/gris-analysis/plotting/plotting.py -c ~/base/gris-analysis/plotting/bath_112.cpt --bounds 0 12000 --time_bounds 2015 2315  -o rcp45_g450m --plot profile_combined 2018_08_ctrl/profiles/profiles_100m_ex_gris_g450m_v3a_rcp_45_id_CTRL_0_400.nc
+~/base/gris-analysis/plotting/plotting.py -c ~/base/gris-analysis/plotting/bath_112.cpt --bounds 0 12000 --time_bounds 2015 2315  -o rcp45_g450m --plot profile 2018_08_ctrl/profiles/profiles_100m_ex_gris_g450m_v3a_rcp_45_id_CTRL_0_400.nc
 
 # Flux Partitioning
 ~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --time_bounds 2008 3000 --no_legend --plot flux_partitioning 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_CTRL_0_1000.nc 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_NTRL_0_1000.nc
@@ -27,3 +24,4 @@
 
 # Random ice discharge
 ~/base/gris-analysis/plotting/plotting.py -n 4 -o test  --time_bounds 2008 3000 --plot random_flux 2018_09_les/scalar_clean/ts_gris_g1800m_v3a_rcp_85_*.nc
+
