@@ -25,7 +25,7 @@ for k, infile in enumerate(infiles):
     nc = NC(infile)
     id = re.search('id_(.+?)_', infile).group(1)
     data[0, k] = id
-    dgmsl = nc.variables['limnsw'][-1]    
+    dgmsl = nc.variables['limnsw'][-1]
     data[1, k] = dgmsl
     nc.close()
 

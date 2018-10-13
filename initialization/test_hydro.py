@@ -29,7 +29,8 @@ parser.add_argument("--climate", dest="climate",
                     choices=['const', 'paleo'],
                     help="Climate", default='const')
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
+                    choices=['float_kill', 'ocean_kill', 'eigen_calving',
+                             'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
                     help="claving", default='ocean_kill')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
@@ -101,7 +102,7 @@ version = options.version
 domain = options.domain
 pism_exec = generate_domain(domain)
 
-    
+
 infile = ''
 if domain.lower() in ('greenland_ext', 'gris_ext'):
     pism_dataname = 'pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc'.format(grid, version, bed_type)
@@ -111,7 +112,7 @@ else:
 if regridfile is not None:
     regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 
-    
+
 pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
@@ -146,7 +147,8 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(till_reference_void_ratio_values, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+combinations = list(itertools.product(till_reference_void_ratio_values, ppq_values, tefo_values,
+                                      phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
 
@@ -166,16 +168,16 @@ for n, combination in enumerate(combinations):
     name_options['ppq'] = ppq
     name_options['tefo'] = tefo
     name_options['trvr'] = till_reference_void_ratio
-    
-    vversion = 'v' + str(version)
-    experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
 
-        
+    vversion = 'v' + str(version)
+    experiment = '_'.join([climate, vversion, bed_type, '_'.join(
+        ['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
+
     script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
     script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, experiment)
     scripts_post.append(script_post)
-    
+
     for filename in (script):
         try:
             os.remove(filename)
@@ -183,14 +185,14 @@ for n, combination in enumerate(combinations):
             pass
 
     batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
-            
+
     with open(script, 'w') as f:
 
         f.write(batch_header)
 
         outfile = '{domain}_g{grid}m_straight_{experiment}.nc'.format(domain=domain.lower(),
-                                                                        grid=grid,
-                                                                        experiment=experiment)
+                                                                      grid=grid,
+                                                                      experiment=experiment)
 
         prefix = generate_prefix_str(pism_exec)
 
@@ -211,7 +213,7 @@ for n, combination in enumerate(combinations):
             general_params_dict['bed_def'] = bed_deformation
         if forcing_type in ('e_age'):
             general_params_dict['e_age_coupling'] = ''
-        
+
         grid_params_dict = generate_grid_description(grid, domain)
 
         sb_params_dict = OrderedDict()
@@ -233,11 +235,12 @@ for n, combination in enumerate(combinations):
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir_tmp, split=True)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
 
-        
-        all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
+        all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict,
+                                      ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict)
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
-        
-        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
+
+        cmd = ' '.join([batch_system['mpido'], prefix, all_params,
+                        '> {outdir}/job.${batch}  2>&1'.format(outdir=odir, batch=batch_system['job_id'])])
 
         f.write(cmd)
         f.write('\n')
@@ -252,7 +255,7 @@ for n, combination in enumerate(combinations):
         cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, outfile), os.path.join(odir, outfile), '\n'])
         f.write(cmd)
 
-    
+
 scripts = uniquify_list(scripts)
 scripts_post = uniquify_list(scripts_post)
 print('\n'.join([script for script in scripts]))

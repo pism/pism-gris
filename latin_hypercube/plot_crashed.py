@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import pylab as plt
-import csv, re
+import csv
+import re
 import numpy as np
 
 # get IDs of failed runs
@@ -13,8 +14,8 @@ with open("files.txt", "r") as f:
         failed_ids.append(int(match.group(1)))
 
 # get parameters from the CSV file
-headers  = []
-failed   = []
+headers = []
+failed = []
 all_runs = []
 
 with open("lhs_samples_20171022.csv", "rb") as f:
@@ -49,15 +50,17 @@ plt.clf()
 # number of parameters
 N = len(headers) - 1
 
+
 def array_range(a):
     return a.min(), a.max()
+
 
 for r in range(1, N + 1):
     for c in range(1, N + 1):
         n = N * (r - 1) + c
         plt.subplot(N, N, n)
-        x_min, x_max = array_range(all_runs[:,c])
-        y_min, y_max = array_range(all_runs[:,r])
+        x_min, x_max = array_range(all_runs[:, c])
+        y_min, y_max = array_range(all_runs[:, r])
         plt.scatter(all_runs[:, c], all_runs[:, r], s=1)
         plt.scatter(failed[:, c], failed[:, r], s=4)
         plt.axis([x_min, x_max, y_min, y_max])

@@ -30,7 +30,8 @@ parser.add_argument("--climate", dest="climate",
                     choices=['const', 'paleo'],
                     help="Climate", default='paleo')
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
+                    choices=['float_kill', 'ocean_kill', 'eigen_calving',
+                             'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
                     help="claving", default='vonmises_calving')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
@@ -116,7 +117,7 @@ else:
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk,tillphi'
 save_times = [-12000, -12000]
 
-    
+
 pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
@@ -152,7 +153,8 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(ocean_melt_power_values, thickness_calving_threshold_vales, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+combinations = list(itertools.product(ocean_melt_power_values, thickness_calving_threshold_vales,
+                                      ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
 
@@ -177,17 +179,20 @@ for n, combination in enumerate(combinations):
         name_options['threshold'] = thickness_calving_threshold
     name_options['ocean_n'] = ocean_melt_power
     name_options['forcing_type'] = forcing_type
-    
+
     vversion = 'v' + str(version)
-    full_exp_name =  '_'.join(['hp_prep', climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
-    full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=full_exp_name)
+    full_exp_name = '_'.join(['hp_prep', climate, vversion, bed_type, '_'.join(
+        ['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
+    full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(
+        domain=domain.lower(), grid=grid, experiment=full_exp_name)
 
     outfiles = []
 
     start = paleo_start_year
     end = paleo_end_year
 
-    experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())]), '{}'.format(start), '{}'.format(end)])
+    experiment = '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)])
+                                                                  for k, v in list(name_options.items())]), '{}'.format(start), '{}'.format(end)])
 
     script = 'hc_prep_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
@@ -204,7 +209,8 @@ for n, combination in enumerate(combinations):
 
         f.write(batch_header)
 
-        outfile = '{domain}_g{grid}m_straight_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+        outfile = '{domain}_g{grid}m_straight_{experiment}.nc'.format(
+            domain=domain.lower(), grid=grid, experiment=experiment)
 
         prefix = generate_prefix_str(pism_exec)
 
@@ -238,9 +244,11 @@ for n, combination in enumerate(combinations):
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate, atmosphere_searise_greenland_file=pism_dataname)
-        ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc', ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
+        ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc',
+                                           ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
         hydro_params_dict = generate_hydrology(hydrology)
-        calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
+        calving_params_dict = generate_calving(
+            calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
 
         exvars = init_spatial_ts_vars()
         spatial_ts_dict = generate_spatial_ts(full_outfile, exvars, exstep, odir=odir_tmp, split=True)
@@ -250,16 +258,17 @@ for n, combination in enumerate(combinations):
                                             odir=odir)
         snap_shot_dict = generate_snap_shots(outfile, save_times, odir=odir)
 
-        all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
+        all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict,
+                                      ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
 
-        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
+        cmd = ' '.join([batch_system['mpido'], prefix, all_params,
+                        '> {outdir}/job.${batch}  2>&1'.format(outdir=odir, batch=batch_system['job_id'])])
 
         f.write(cmd)
         f.write('\n')
 
         outfiles.append(outfile)
-
 
     script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, full_exp_name)
     scripts_post.append(script_post)
@@ -271,7 +280,8 @@ for n, combination in enumerate(combinations):
         f.write(post_header)
 
         extra_file = spatial_ts_dict['extra_file']
-        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(paleo_start_year+exstep, paleo_end_year, exstep)])
+        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k)
+                            for k in range(paleo_start_year+exstep, paleo_end_year, exstep)])
         myoutfile = extra_file + '.nc'
         myoutfile = os.path.join(odir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
@@ -280,11 +290,10 @@ for n, combination in enumerate(combinations):
             cmd = ' '.join(['ncks -O -4', os.path.join(odir, myfile), os.path.join(odir, myfile), '\n'])
             f.write(cmd)
 
-    
+
 scripts = uniquify_list(scripts)
 scripts_post = uniquify_list(scripts_post)
 print('\n'.join([script for script in scripts]))
 print('\nwritten\n')
 print('\n'.join([script for script in scripts_post]))
 print('\nwritten\n')
-
