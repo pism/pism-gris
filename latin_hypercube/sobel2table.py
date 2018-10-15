@@ -8,7 +8,6 @@ def input_filename(prefix, rcp, year):
     return '{prefix}_rcp{rcp}_{year}sobel.txt'.format(prefix=prefix, rcp=rcp, year=year)
 
 def read_sobel_file(filename):
-
     data = np.loadtxt(filename, usecols=(1))
     return data
 
