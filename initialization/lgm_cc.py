@@ -30,7 +30,8 @@ parser.add_argument("--climate", dest="climate",
                     choices=['paleo_const'],
                     help="Climate", default='paleo')
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
+                    choices=['float_kill', 'ocean_kill', 'eigen_calving',
+                             'thickness_calving', 'vonmises_calving', 'hybrid_calving'],
                     help="claving", default='vonmises_calving')
 parser.add_argument("--ocean", dest="ocean",
                     choices=['paleo', 'paleo_mbp', 'given'],
@@ -121,7 +122,7 @@ if params_list is not None:
     if 'fice' in params:
         do_fice = True
     if 'fsnow' in params:
-        do_fsnow = True    
+        do_fsnow = True
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -145,7 +146,7 @@ else:
     print(('Precip model {} not support. How did we get here?'.format(precip)))
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,Href,thk'
 
-    
+
 pism_config = 'init_config'
 pism_config_nc = '.'.join([pism_config, 'nc'])
 pism_config_cdl = os.path.join('../config', '.'.join([pism_config, 'cdl']))
@@ -230,11 +231,13 @@ for n, combination in enumerate(combinations):
     if ocean == 'paleo_mbp':
         name_options['ocean_mbp'] = backpressure_max
     name_options['forcing_type'] = forcing_type
-    
+
     vversion = 'v' + str(version)
-    full_exp_name =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
-    full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name)
-    
+    full_exp_name = '_'.join([climate, vversion, bed_type, '_'.join(
+        ['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
+    full_outfile = '{domain}_g{grid}m_{experiment}.nc'.format(
+        domain=domain.lower(), grid=grid, experiment=full_exp_name)
+
     # All runs in one script file for coarse grids that fit into max walltime
     script_combined = 'lgm_{}_g{}m_{}.sh'.format(domain.lower(), grid, full_exp_name)
     with open(script_combined, 'w') as f_combined:
@@ -245,7 +248,8 @@ for n, combination in enumerate(combinations):
 
             end = start + restart_step
 
-            experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())]), '{}'.format(start), '{}'.format(end)])
+            experiment = '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)])
+                                                                          for k, v in list(name_options.items())]), '{}'.format(start), '{}'.format(end)])
 
             script = 'lgm_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
             scripts.append(script)
@@ -264,7 +268,8 @@ for n, combination in enumerate(combinations):
 
                 f.write(batch_header)
 
-                outfile = '{domain}_g{grid}m_{experiment}.nc'.format(domain=domain.lower(),grid=grid, experiment=experiment)
+                outfile = '{domain}_g{grid}m_{experiment}.nc'.format(
+                    domain=domain.lower(), grid=grid, experiment=experiment)
 
                 prefix = generate_prefix_str(pism_exec)
 
@@ -313,7 +318,8 @@ for n, combination in enumerate(combinations):
                 ocean_params_dict = generate_ocean(ocean,
                                                    ocean_given_file=input_file,
                                                    ocean_delta_SL_file='pism_dSL_lgm.nc',
-                                                   ocean_frac_mass_flux_file='pism_ocean_modifiers_b_{}_n_{}_lgm.nc'.format(backpressure_max, ocean_melt_power),
+                                                   ocean_frac_mass_flux_file='pism_ocean_modifiers_b_{}_n_{}_lgm.nc'.format(
+                                                       backpressure_max, ocean_melt_power),
                                                    ocean_delta_MBP_file='pism_ocean_modifiers_b_{}_n_{}_lgm.nc'.format(backpressure_max, ocean_melt_power))
                 hydro_params_dict = generate_hydrology(hydrology)
                 if start == paleo_start_year:
@@ -348,17 +354,18 @@ for n, combination in enumerate(combinations):
                 all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
 
                 if system in ('debug'):
-                    cmd = ' '.join([batch_system['mpido'], prefix, all_params, '2>&1 | tee {outdir}/job.${batch}'.format(outdir=odir,batch=batch_system['job_id'])])
+                    cmd = ' '.join([batch_system['mpido'], prefix, all_params,
+                                    '2>&1 | tee {outdir}/job.${batch}'.format(outdir=odir, batch=batch_system['job_id'])])
                 else:
-                    cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
-
+                    cmd = ' '.join([batch_system['mpido'], prefix, all_params,
+                                    '> {outdir}/job.${batch}  2>&1'.format(outdir=odir, batch=batch_system['job_id'])])
 
                 f.write(cmd)
                 f.write('\n')
 
                 f_combined.write(cmd)
                 f_combined.write('\n\n')
-                
+
                 regridfile = os.path.join(odir, outfile)
                 outfiles.append(outfile)
 
@@ -374,19 +381,22 @@ for n, combination in enumerate(combinations):
         f.write(post_header)
 
         extra_file = spatial_ts_dict['extra_file']
-        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k) for k in range(simulation_start_year+exstep, simulation_end_year, exstep)])
+        myfiles = ' '.join(['{}_{}.000.nc'.format(extra_file, k)
+                            for k in range(simulation_start_year+exstep, simulation_end_year, exstep)])
         myoutfile = extra_file + '.nc'
         myoutfile = os.path.join(odir, spatial_dir, os.path.split(myoutfile)[-1])
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
-        ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(domain=domain.lower(), grid=grid, experiment=full_exp_name))
-        myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step) for k in range(simulation_start_year, simulation_end_year, restart_step)])
+        ts_file = os.path.join(odir, scalar_dir, 'ts_{domain}_g{grid}m_{experiment}'.format(
+            domain=domain.lower(), grid=grid, experiment=full_exp_name))
+        myfiles = ' '.join(['{}_{}_{}.nc'.format(ts_file, k, k + restart_step)
+                            for k in range(simulation_start_year, simulation_end_year, restart_step)])
         myoutfile = '_'.join(['{}_{}_{}.nc'.format(ts_file, simulation_start_year, simulation_end_year)])
         myoutfile = os.path.split(myoutfile)[-1]
         cmd = ' '.join(['ncrcat -O -6 -h', myfiles, myoutfile, '\n'])
         f.write(cmd)
 
-    
+
 scripts = uniquify_list(scripts)
 scripts_combinded = uniquify_list(scripts_combinded)
 scripts_post = uniquify_list(scripts_post)
@@ -396,4 +406,3 @@ print('\n'.join([script for script in scripts_combinded]))
 print('\nwritten\n')
 print('\n'.join([script for script in scripts_post]))
 print('\nwritten\n')
-

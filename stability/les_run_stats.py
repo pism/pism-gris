@@ -7,30 +7,34 @@ from os.path import join
 from glob import glob
 import multiprocessing as mp
 
-def get_run_stats(tasks, processor_hours):
-        while True:
-            m_file = tasks.get()
-            if not isinstance(m_file, str):
-                print('[%s] evaluation routine quits' % process_name)
 
-                # Indicate finished
-                processor_hours.put(0)
-                break
-            else:           
-                print('Processing file {}'.format(m_file))
-                nc = NC(m_file, 'r')
-                run_stats = nc.variables['run_stats']
-                processor_hours.put(run_stats.processor_hours)
-                nc.close()
-        return
+def get_run_stats(tasks, processor_hours):
+    while True:
+        m_file = tasks.get()
+        if not isinstance(m_file, str):
+            print("[%s] evaluation routine quits" % process_name)
+
+            # Indicate finished
+            processor_hours.put(0)
+            break
+        else:
+            print("Processing file {}".format(m_file))
+            nc = NC(m_file, "r")
+            run_stats = nc.variables["run_stats"]
+            processor_hours.put(run_stats.processor_hours)
+            nc.close()
+    return
 
 
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.description = "Generate tables for the paper"
-    parser.add_argument("--prefix", dest="prefix",
-                        help="the directory containing output files from the study",
-                        default="/import/c1/ICESHEET/aaschwanden/pism-gris/stability/2018_01_les/state/")
+    parser.add_argument(
+        "--prefix",
+        dest="prefix",
+        help="the directory containing output files from the study",
+        default="/import/c1/ICESHEET/aaschwanden/pism-gris/stability/2018_01_les/state/",
+    )
     options = parser.parse_args()
 
     manager = mp.Manager()
@@ -40,13 +44,13 @@ if __name__ == "__main__":
     processor_hours = mp.Queue()
 
     num_processes = 4
-    pool = mp.Pool(processes=num_processes)  
+    pool = mp.Pool(processes=num_processes)
     processes = []
-    
+
     for i in range(num_processes):
 
         # Set process name
-        process_name = 'P%i' % i
+        process_name = "P%i" % i
 
         # Create the process, and connect it to the worker function
         new_process = mp.Process(target=get_run_stats, args=(tasks, processor_hours))
@@ -58,20 +62,20 @@ if __name__ == "__main__":
         new_process.start()
 
     # Fill task queue
-    all_files = glob(join(options.prefix, 'gris_g*m*.nc'))
+    all_files = glob(join(options.prefix, "gris_g*m*.nc"))
     nf = len(all_files)
     task_list = all_files
-    for single_task in task_list:  
+    for single_task in task_list:
         tasks.put(single_task)
 
-    for i in range(num_processes):  
+    for i in range(num_processes):
         tasks.put(0)
 
     # Read calculation results
-    num_finished_processes = 0  
+    num_finished_processes = 0
     np_processor_hours = np.zeros((nf))
     k = 0
-    while True:  
+    while True:
         # Read result
         new_result = processor_hours.get()
 
@@ -89,5 +93,4 @@ if __name__ == "__main__":
 
     np_processor_hours = np.array(np_processor_hours)
     total_processor_hours = np.sum(np_processor_hours)
-    print('Total processor hours: {:2.0f}'.format(total_processor_hours))
-        
+    print("Total processor hours: {:2.0f}".format(total_processor_hours))
