@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 import numpy as np
 
+
 def input_filename(prefix, rcp, year):
     return '{prefix}_rcp{rcp}_{year}sobel.txt'.format(prefix=prefix, rcp=rcp, year=year)
 
@@ -17,7 +18,7 @@ def sobel_table(ifiles):
     rcps = [26, 45, 85]
 
     result = []
-    
+
     for rcp in rcps:
         for year in years:
             filename = input_filename(prefix, rcp, year)
@@ -56,21 +57,20 @@ if __name__ == "__main__":
     ifiles = options.FILE
     prefix = 'les_gcm'
     print("% Sobel Indices")
-    labels = ['GCM',
-          '$f_{\\text{i}}$', 
-          '$f_{\\text{s}}$', 
-          '$\omega$',
-          '$\psi$', 
-          '$\dot m^{\\text{o}}_{x}$', 
-          '$\dot m^{\\text{o}}_{t}$',
-          '$h_{\\text{min}}$',
-          '$\sigma_{\\text{max}}$',
-          '$q$', 
-          '$E$']    
-    for k, row in enumerate(sobel_table(prefix)) :
+    labels = ['$\Delta T_{\\textrm{air}}$',
+              '$f_{\\text{i}}$',
+              '$f_{\\text{s}}$',
+              '$\omega$',
+              '$\psi$',
+              '$\dot m^{\\text{o}}_{x}$',
+              '$\dot m^{\\text{o}}_{t}$',
+              '$h_{\\text{min}}$',
+              '$\sigma_{\\text{max}}$',
+              '$q$',
+              '$E$']
+    for k, row in enumerate(sobel_table(prefix)):
         table_row = labels[k]
         for x in row:
             table_row += " & " + "{:.0f}".format(x)
         table_row += " \\\\"
         print(table_row)
-    

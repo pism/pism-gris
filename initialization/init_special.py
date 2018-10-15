@@ -28,7 +28,8 @@ parser.add_argument("--climate", dest="climate",
                     choices=['const', 'paleo'],
                     help="Climate", default='paleo')
 parser.add_argument("--calving", dest="calving",
-                    choices=['float_kill', 'ocean_kill', 'eigen_calving', 'thickness_calving', 'vonmises_calving', 'hybrid'],
+                    choices=['float_kill', 'ocean_kill', 'eigen_calving',
+                             'thickness_calving', 'vonmises_calving', 'hybrid'],
                     help="claving", default='vonmises_calving')
 parser.add_argument("-d", "--domain", dest="domain",
                     choices=['gris', 'gris_ext'],
@@ -140,7 +141,8 @@ phi_min_values = [5.0]
 phi_max_values = [40.]
 topg_min_values = [-700]
 topg_max_values = [700]
-combinations = list(itertools.product(ocean_melt_power_values, thickness_calving_threshold_vales, ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
+combinations = list(itertools.product(ocean_melt_power_values, thickness_calving_threshold_vales,
+                                      ppq_values, tefo_values, phi_min_values, phi_max_values, topg_min_values, topg_max_values))
 
 tsstep = 'yearly'
 exstep = 100
@@ -168,14 +170,14 @@ for n, combination in enumerate(combinations):
     name_options['forcing_type'] = forcing_type
 
     vversion = 'v' + str(version)
-    experiment =  '_'.join([climate, vversion, bed_type, '_'.join(['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
+    experiment = '_'.join([climate, vversion, bed_type, '_'.join(
+        ['_'.join([k, str(v)]) for k, v in list(name_options.items())])])
 
-        
     script = 'init_{}_g{}m_{}.sh'.format(domain.lower(), grid, experiment)
     scripts.append(script)
     script_post = 'init_{}_g{}m_{}_post.sh'.format(domain.lower(), grid, experiment)
     scripts_post.append(script_post)
-    
+
     for filename in (script):
         try:
             os.remove(filename)
@@ -183,23 +185,24 @@ for n, combination in enumerate(combinations):
             pass
 
     batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
-    
+
     with open(script, 'w') as f:
 
         f.write(batch_header)
 
         outfile = '{domain}_g{grid}m_special_{experiment}_0.nc'.format(domain=domain.lower(),
-                                                                      grid=grid,
-                                                                      experiment=experiment)
+                                                                       grid=grid,
+                                                                       experiment=experiment)
 
         prefix = generate_prefix_str(pism_exec)
-        
+
         general_params_dict = OrderedDict()
         general_params_dict['i'] = pism_dataname
         general_params_dict['bootstrap'] = ''
         if grid_mapping[grid] > 0:
-            previous_grid =  [k for k, v in grid_mapping.items() if v == grid_mapping[grid] -1][0]
-            regridfile = os.path.join(odir, 'save_{domain}_g{grid}m_refine_{experiment}_0_{start}.000.nc'.format(domain=domain.lower(), grid=previous_grid, experiment=experiment, start=start))
+            previous_grid = [k for k, v in grid_mapping.items() if v == grid_mapping[grid] - 1][0]
+            regridfile = os.path.join(odir, 'save_{domain}_g{grid}m_refine_{experiment}_0_{start}.000.nc'.format(
+                domain=domain.lower(), grid=previous_grid, experiment=experiment, start=start))
             general_params_dict['regrid_file'] = regridfile
             general_params_dict['regrid_vars'] = regridvars
             general_params_dict['regrid_special'] = ''
@@ -214,7 +217,7 @@ for n, combination in enumerate(combinations):
             general_params_dict['bed_def'] = bed_deformation
         if forcing_type in ('e_age'):
             general_params_dict['e_age_coupling'] = ''
-        
+
         grid_params_dict = generate_grid_description(grid, domain)
 
         sb_params_dict = OrderedDict()
@@ -228,19 +231,23 @@ for n, combination in enumerate(combinations):
 
         stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
         climate_params_dict = generate_climate(climate)
-        ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc', ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
+        ocean_params_dict = generate_ocean(climate, ocean_given_file='ocean_forcing_latitudinal_ctrl.nc',
+                                           ocean_frac_mass_flux_file='pism_fSMB_n_{}.nc'.format(ocean_melt_power))
         hydro_params_dict = generate_hydrology(hydrology)
-        calving_params_dict = generate_calving(calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
-        
+        calving_params_dict = generate_calving(
+            calving, thickness_calving_threshold=thickness_calving_threshold, eigen_calving_k=eigen_calving_k, ocean_kill_file=pism_dataname)
+
         exvars = init_spatial_ts_vars()
         spatial_ts_dict = generate_spatial_ts(outfile, exvars, exstep, odir=odir_tmp, split=True)
         scalar_ts_dict = generate_scalar_ts(outfile, tsstep, start=start, end=end, odir=odir)
         snap_shot_dict = generate_snap_shots(outfile, save_times[grid_mapping[grid]+1::], odir=odir)
-        
-        all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict, ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
+
+        all_params_dict = merge_dicts(general_params_dict, grid_params_dict, stress_balance_params_dict, climate_params_dict,
+                                      ocean_params_dict, hydro_params_dict, calving_params_dict, spatial_ts_dict, scalar_ts_dict, snap_shot_dict)
         all_params = ' '.join([' '.join(['-' + k, str(v)]) for k, v in list(all_params_dict.items())])
-        
-        cmd = ' '.join([batch_system['mpido'], prefix, all_params, '> {outdir}/job.${batch}  2>&1'.format(outdir=odir,batch=batch_system['job_id'])])
+
+        cmd = ' '.join([batch_system['mpido'], prefix, all_params,
+                        '> {outdir}/job.${batch}  2>&1'.format(outdir=odir, batch=batch_system['job_id'])])
 
         f.write(cmd)
         f.write('\n')
@@ -258,9 +265,8 @@ for n, combination in enumerate(combinations):
             snap_file = '{}_{}.000.nc'.format(snap_shot_dict['save_file'], t)
             cmd = ' '.join(['ncks -O -4 -L 3', os.path.join(odir, snap_file), os.path.join(odir, snap_file), '\n'])
         f.write(cmd)
-    
+
 scripts = uniquify_list(scripts)
 scripts_post = uniquify_list(scripts_post)
 print('\n'.join([script for script in scripts]))
 print('written')
-

@@ -1,77 +1,78 @@
 #!/bin/bash
 
-odir=2018_08_les_sky2
+16.9.18: 9:00
+rcp26: 000..349
+rcp26: 400..499
+
+
+rcp45: 000..399
+rcp45: 400..499
+rcp85: 000..499
+
+odir=2018_09_les
 s=electra_skylake
+q=long
+n=160
+grid=1800
+
+./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 60:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+
+rcp=26
+for id in {350..399} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
+
+for id in {200..299} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
+
+rcp=45
+for id in {000..099} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
+
+for id in {150..199} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
+
+
+odir=2018_09_les
+s=pleiades_ivy
 q=long
 n=160
 grid=1800
 
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 100:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
-26, 036
-26, 069
-26, 092
-26, 160
-26, 236
-26, 310
-26, 383
-26, 392
-26, 421
-26, 456
-26, 458
-
 rcp=26
-for id in 036 069 092 160 236 310 383 392 421 56 458 ; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_sky2/run_scripts/lhs_g1800m_v3a_rcp_85_id_${id}_j.sh; done
+#for id in {350..399} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
 
-45, 025
-45, 069
-45, 092
-45, 109
-45, 117
-45, 128
-45, 160
-45, 306
-45, 310
-45, 328
-45, 338
-45, 392
-45, 406
-45, 432
-45, 456
-45, 487
+for id in {400..499} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
 
 rcp=45
-for id in 025 069 092 109 117 128 160 306 310 328 338 392 406 432 456 487 ; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_sky2/run_scripts/lhs_g1800m_v3a_rcp_85_id_${id}_j.sh; done
+for id in {350..399} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
 
- 005
- 014
- 036
- 059
- 080
- 128
- 146
- 147
- 149
- 160
- 196
- 198
- 236
- 269
- 310
- 338
- 343
- 383
- 406
- 409
- 409
- 410
- 410
- 415
- 434
 
 rcp=85
-for id in  005 014 036 059 080 128 146 147 149 160 196 198 236 269 310 338 343 383 406 409 410 415 434 ; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_sky2/run_scripts/lhs_g1800m_v3a_rcp_85_id_${id}_j.sh; done
+for id in {450..499} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
 
+
+
+odir=2018_09_les
+s=pleiades_broadwell
+q=long
+n=168
+grid=1800
+
+./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 100:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+rcp=85
+for id in {100..149} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
+
+
+odir=2018_09_les
+s=pleiades_ivy
+q=long
+n=160
+grid=1800
+
+./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 100:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+rcp=85
+for id in {400..499} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
 
 odir=2018_08_les_sky
 s=electra_skylake
@@ -95,34 +96,9 @@ for id in {500..539}; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_l
 
 for id in {450..499}; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_san/run_scripts/lhs_g1800m_v3a_rcp_45_id_${id}_j.sh; done
 
-# final run
-
-for id in 338; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_san/run_scripts/lhs_g1800m_v3a_rcp_45_id_${id}_j.sh; done
 
 
-for id in {527..549}; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_san/run_scripts/lhs_g1800m_v3a_rcp_85_id_${id}_j.sh; done
-
-for id in {474..499}; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_san/run_scripts/lhs_g1800m_v3a_rcp_85_id_${id}_j.sh; done
-
-odir=2018_08_les_bro
-s=pleiades_broadwell
-q=long
-n=168
-grid=1800
-
-./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 100:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
-
-for id in {330..349}; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_bro/run_scripts/lhs_g1800m_v3a_rcp_26_id_${id}_j.sh; done
-
-for id in {362..379}; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_bro/run_scripts/lhs_g1800m_v3a_rcp_26_id_${id}_j.sh; done
-
-for id in {580..599}; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_bro/run_scripts/lhs_g1800m_v3a_rcp_26_id_${id}_j.sh; done
-
-# Final Runs
-for id in 005 006 012 014 030 036 069 092 ; do qsub /nobackupp8/aaschwan/pism-gris/stability/2018_08_les_bro/run_scripts/lhs_g1800m_v3a_rcp_26_id_${id}_j.sh; done
-
-
-odir=2018_08_les_chi
+odir=2018_09_les_chi
 s=chinook
 q=t2standard
 n=168
@@ -130,15 +106,24 @@ grid=1800
 
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 80:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
-for id in {550..599}; do sbatch /import/c1/ICESHEET/aaschwanden/pism-gris/stability/2018_08_les_chi/run_scripts/lhs_g1800m_v3a_rcp_85_id_${id}_j.sh; done
+rcp=26
+for id in {400..449}; do sbatch /import/c1/ICESHEET/aaschwanden/pism-gris/stability/2018_09_les_chi/run_scripts/lhs_g1800m_v3a_rcp_26_id_${id}_j.sh; done
 
-odir=2018_09_cc
+odir=2018_09_cc_stable
 s=chinook
 q=t2standard
 n=144
 grid=1800
 
 ./cc_ensemble.py -e ../latin_hypercube/cc_control.csv --o_dir ${odir} --exstep 10 -n ${n} -w 160:00:00 -g ${grid} -s ${s} -q ${q} --step 5000 --duration 5000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+odir=2018_09_cc_stable
+s=chinook
+q=t2standard
+n=192
+grid=1500
+
+./cc_ensemble.py -e ../latin_hypercube/cc_control.csv --o_dir ${odir} --exstep monthly -n ${n} -w 160:00:00 -g ${grid} -s ${s} -q ${q} --step 5000 --duration 5000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
 
@@ -274,3 +259,7 @@ n=80
 grid=3600
 
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_20171104.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 10:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+
+# Walltime
+4615660: rcp45_id_34??
