@@ -44,7 +44,7 @@ def generate_domain(domain):
         x_max = 320000.
         y_min = -2410000.
         y_max = -2020000.
-        pism_exec = '''pismr -regional -x_range {x_min},{x_max} -y_range {y_min},{y_max}'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
+        pism_exec = '''pismr -regional -x_range {x_min},{x_max} -y_range {y_min},{y_max}b'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
     else:
         print(('Domain {} not recognized, exiting'.format(domain)))
         import sys

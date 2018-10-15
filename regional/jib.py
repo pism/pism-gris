@@ -141,8 +141,6 @@ ensemble_file = options.ensemble_file
 domain = options.domain
 pism_exec = generate_domain(domain)
 
-save_times = [92, 192, 492, 992]
-
 if options.FILE is None:
     print('Missing input file')
     import sys
@@ -160,7 +158,7 @@ climate_file = '$input_dir/data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2
 regridvars = 'litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume,thk'
 
 dirs = {"output": "$output_dir", "spatial_tmp": "$spatial_tmp_dir"}
-for d in ["performance", "state", "scalar", "spatial", "snap", "jobs", "basins"]:
+for d in ["performance", "state", "scalar", "spatial", "jobs", "basins"]:
     dirs[d] = "$output_dir/{dir}".format(dir=d)
 
 if spatial_ts == 'none':
