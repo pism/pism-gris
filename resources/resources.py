@@ -30,26 +30,6 @@ def generate_domain(domain):
     Generate domain specific options
 
     Returns: string
-<<<<<<< HEAD
-    '''
-    
-    if domain.lower() in ('greenland', 'gris', 'gris_ext'):
-        pism_exec = 'pismr'
-    elif domain.lower() in ('og'):
-        pism_exec = 'pismr -no_model_strip 0 -calving_wrap_around'
-    elif domain.lower() in ('hia'):
-        x_min = -652200.
-        x_max = -232600.
-        y_min = -1263900.
-        y_max = -943500.
-        pism_exec = '''pismr -x_range {x_min},{x_max} -y_range {y_min},{y_max} -bootstrap'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)        
-    elif domain.lower() in ('jakobshavn', 'jib'):
-        x_min = -280000.
-        x_max = 320000.
-        y_min = -2410000.
-        y_max = -2020000.
-        pism_exec = '''pismr -regional -x_range {x_min},{x_max} -y_range {y_min},{y_max}b'''.format(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max)
-=======
     """
 
     if domain.lower() in ("greenland", "gris", "gris_ext"):
@@ -69,10 +49,9 @@ def generate_domain(domain):
         x_max = 320000.0
         y_min = -2410000.0
         y_max = -2020000.0
-        pism_exec = """pismr -regional -x_range {x_min},{x_max} -y_range {y_min},{y_max}""".format(
+        pism_exec = """pismr -regional -x_range {x_min},{x_max} -y_range {y_min},{y_max}  -bootstrap -regional.zero_gradient true -regional.no_model_strip 4.5""".format(
             x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max
         )
->>>>>>> 6d66fe537727967a80fd853e55170147597bd2f7
     else:
         print(("Domain {} not recognized, exiting".format(domain)))
         import sys
@@ -372,7 +351,9 @@ def init_spatial_ts_vars():
     return exvars
 
 
-def generate_spatial_ts(outfile, exvars, step, start=None, end=None, split=None, odir=None):
+def generate_spatial_ts(
+    outfile, exvars, step, start=None, end=None, split=None, odir=None
+):
     """
     Return dict to generate spatial time series
 
@@ -659,7 +640,9 @@ def generate_stress_balance(stress_balance, additional_params_dict):
 
     if stress_balance not in accepted_stress_balances:
         print(("{} not in {}".format(stress_balance, accepted_stress_balances)))
-        print(("available stress balance solvers are {}".format(accepted_stress_balances)))
+        print(
+            ("available stress balance solvers are {}".format(accepted_stress_balances))
+        )
         import sys
 
         sys.exit(0)
@@ -721,7 +704,12 @@ def generate_calving(calving, **kwargs):
         params_dict["calving"] = "{},thickness_calving".format(calving)
     elif calving in ("hybrid_calving"):
         params_dict["calving"] = "eigen_calving,vonmises_calving,thickness_calving"
-    elif calving in ("float_kill", "float_kill,ocean_kill", "vonmises_calving,ocean_kill", "eigen_calving,ocean_kill"):
+    elif calving in (
+        "float_kill",
+        "float_kill,ocean_kill",
+        "vonmises_calving,ocean_kill",
+        "eigen_calving,ocean_kill",
+    ):
         params_dict["calving"] = calving
     else:
         print(("calving {} not recognized, exiting".format(calving)))
@@ -754,9 +742,13 @@ def generate_climate(climate, **kwargs):
     elif climate in ("abrupt_glacial"):
         params_dict["atmosphere"] = "searise_greenland,delta_T,paleo_precip"
         if "atmosphere_paleo_precip_file" not in kwargs:
-            params_dict["atmosphere_paleo_precip_file"] = "pism_abrupt_glacial_climate_forcing.nc"
+            params_dict[
+                "atmosphere_paleo_precip_file"
+            ] = "pism_abrupt_glacial_climate_forcing.nc"
         if "atmosphere_delta_T_file" not in kwargs:
-            params_dict["atmosphere_delta_T_file"] = "pism_abrupt_glacial_climate_forcing.nc"
+            params_dict[
+                "atmosphere_delta_T_file"
+            ] = "pism_abrupt_glacial_climate_forcing.nc"
         params_dict["surface"] = "pdd"
         params_dict["pdd_std_dev_method"] = "quadratic"  # Wake and Marshall (2015)
     elif climate in ("warming"):
@@ -767,7 +759,9 @@ def generate_climate(climate, **kwargs):
     elif climate in ("warming_precip"):
         params_dict["atmosphere"] = "given,lapse_rate,delta_T,paleo_precip"
         if "atmosphere_paleo_precip_file" not in kwargs:
-            params_dict["atmosphere_paleo_precip_file"] = "pism_warming_climate_forcing.nc"
+            params_dict[
+                "atmosphere_paleo_precip_file"
+            ] = "pism_warming_climate_forcing.nc"
         if "atmosphere_delta_T_file" not in kwargs:
             params_dict["atmosphere_delta_T_file"] = "pism_warming_climate_forcing.nc"
         params_dict["surface"] = "pdd"
@@ -818,11 +812,15 @@ def generate_ocean(ocean, **kwargs):
     elif ocean == "abrupt_glacial":
         params_dict["ocean"] = "given,delta_SL,frac_SMB"
         if "ocean_delta_SL_file" not in kwargs:
-            params_dict["ocean_delta_SL_file"] = "pism_abrupt_glacial_climate_forcing.nc"
+            params_dict[
+                "ocean_delta_SL_file"
+            ] = "pism_abrupt_glacial_climate_forcing.nc"
     elif ocean == "abrupt_glacial_mbp":
         params_dict["ocean"] = "given,delta_SL,frac_SMB,delta_MBP"
         if "ocean_delta_SL_file" not in kwargs:
-            params_dict["ocean_delta_SL_file"] = "pism_abrupt_glacial_climate_forcing.nc"
+            params_dict[
+                "ocean_delta_SL_file"
+            ] = "pism_abrupt_glacial_climate_forcing.nc"
     elif ocean == "paleo_mbp":
         params_dict["ocean"] = "given,delta_SL,frac_SMB,delta_MBP"
         if "ocean_delta_SL_file" not in kwargs:
@@ -874,7 +872,17 @@ def list_bed_types():
     Return a list of supported bed types.
     """
 
-    list = ["ctrl", "cresis", "cresisp", "minus", "plus", "ba01_bed", "970mW_hs", "jak_1985", "no_bath"]
+    list = [
+        "ctrl",
+        "cresis",
+        "cresisp",
+        "minus",
+        "plus",
+        "ba01_bed",
+        "970mW_hs",
+        "jak_1985",
+        "no_bath",
+    ]
 
     return list
 
@@ -882,14 +890,25 @@ def list_bed_types():
 # information about systems
 systems = {}
 
-systems["debug"] = {"mpido": "mpiexec -n {cores}", "submit": "echo", "job_id": "PBS_JOBID", "queue": {}}
+systems["debug"] = {
+    "mpido": "mpiexec -n {cores}",
+    "submit": "echo",
+    "job_id": "PBS_JOBID",
+    "queue": {},
+}
 
 systems["chinook"] = {
     "mpido": "mpirun -np {cores} -machinefile ./nodes_$SLURM_JOBID",
     "submit": "sbatch",
     "work_dir": "SLURM_SUBMIT_DIR",
     "job_id": "SLURM_JOBID",
-    "queue": {"t1standard": 24, "t1small": 24, "t2standard": 24, "t2small": 24, "debug": 24},
+    "queue": {
+        "t1standard": 24,
+        "t1small": 24,
+        "t2standard": 24,
+        "t2small": 24,
+        "debug": 24,
+    },
 }
 
 systems["pleiades"] = {
@@ -1084,15 +1103,7 @@ cd $PBS_O_WORKDIR
 
 systems["debug"][
     "header"
-] = """#!/bin/bash
-#PBS -q {queue}
-#PBS -l walltime={walltime}
-#PBS -l nodes={nodes}:ppn={ppn}
-#PBS -j oe
-
-module list
-
-cd $PBS_O_WORKDIR
+] = """
 
 """
 
@@ -1156,7 +1167,9 @@ def make_batch_header(system_name, n_cores, walltime, queue):
             ppn = system["queue"][queue]
         except:
             raise ValueError(
-                "There is no queue {} on {}. Pick one of {}.".format(queue, system_name, list(system["queue"].keys()))
+                "There is no queue {} on {}. Pick one of {}.".format(
+                    queue, system_name, list(system["queue"].keys())
+                )
             )
         # round up when computing the number of nodes needed to run on 'n_cores' cores
         nodes = int(math.ceil(float(n_cores) / ppn))
@@ -1171,7 +1184,9 @@ def make_batch_header(system_name, n_cores, walltime, queue):
             )
 
     system["mpido"] = system["mpido"].format(cores=n_cores)
-    system["header"] = system["header"].format(queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=n_cores)
+    system["header"] = system["header"].format(
+        queue=queue, walltime=walltime, nodes=nodes, ppn=ppn, cores=n_cores
+    )
     system["header"] += version_header()
 
     return system["header"], system
@@ -1181,7 +1196,13 @@ def make_batch_post_header(system):
 
     v = version_header()
 
-    if system in ("electra_broadwell", "pleiades", "pleiades_ivy", "pleiades_broadwell", "pleiades_haswell"):
+    if system in (
+        "electra_broadwell",
+        "pleiades",
+        "pleiades_ivy",
+        "pleiades_broadwell",
+        "pleiades_haswell",
+    ):
         return post_headers["pbs"] + v
     elif system in ("chinook"):
         return post_headers["slurm"] + v
