@@ -61,294 +61,55 @@ def generate_domain(domain):
     return pism_exec
 
 
-def default_spatial_ts_vars():
-    """
-    Returns a list of commonly-used extra vars
-    """
+spatial_ts_vars = {}
 
-    exvars = [
-        "beta",
-        "cell_area",
-        "dbdt",
-        "dHdt",
-        "hardav",
-        "height_above_flotation",
-        "ice_mass",
-        "mask",
-        "mass_fluxes",
-        "lat",
-        "lon",
-        "sftgif",
-        "temppabase",
-        "tempsurf",
-        "thk",
-        "topg",
-        "usurf",
-        "velbase_mag",
-        "velsurf",
-        "velsurf_mag",
-        "vonmises_calving_rate",
-        "vonmises_stress",
-    ]
+spatial_ts_vars["basic"] = [
+    "beta",
+    "cell_area",
+    "dbdt",
+    "dHdt",
+    "hardav",
+    "height_above_flotation",
+    "ice_mass",
+    "mask",
+    "mass_fluxes",
+    "lat",
+    "lon",
+    "sftgif",
+    "temppabase",
+    "tempsurf",
+    "thk",
+    "topg",
+    "usurf",
+    "velbase_mag",
+    "velsurf",
+    "velsurf_mag",
+    "vonmises_calving_rate",
+    "vonmises_stress",
+]
 
-    return exvars
-
-
-def stability_spatial_ts_vars():
-    """
-    Returns a list of commonly-used extra vars
-    """
-
-    exvars = [
-        "beta",
-        "cell_area",
-        "dbdt",
-        "dHdt",
-        "firn_depth",
-        "hardav",
-        "height_above_flotation",
-        "ice_mass",
-        "mask",
-        "mass_fluxes",
-        "lat",
-        "lat_bnds",
-        "lon",
-        "lon_bnds",
-        "pdd_rates",
-        "sftgif",
-        "temppabase",
-        "tempsurf",
-        "thk",
-        "topg",
-        "usurf",
-        "velbase_mag",
-        "velsurf",
-        "velsurf_mag",
-        "vonmises_calving_rate",
-        "vonmises_stress",
-    ]
-
-    return exvars
-
-
-def basic_spatial_ts_vars():
-    """
-    Returns a list of commonly-used extra vars
-    """
-
-    exvars = [
-        "beta",
-        "cell_area",
-        "dHdt",
-        "ice_mass",
-        "mask",
-        "mass_fluxes",
-        "lat",
-        "lat_bnds",
-        "lon",
-        "lon_bnds",
-        "pdd_rates",
-        "sftgif",
-        "temppabase",
-        "thk",
-        "topg",
-        "usurf",
-        "velbase_mag",
-        "velsurf_mag",
-    ]
-
-    return exvars
-
-
-def glacial_spatial_ts_vars():
-    """
-    Returns a list of commonly-used extra vars
-    """
-
-    exvars = [
-        "basal_mass_balance_average",
-        "bmelt",
-        "cell_area",
-        "dHdt",
-        "discharge_mass_flux",
-        "eigen_calving_rate",
-        "height_above_flotation",
-        "ice_mass",
-        "mask",
-        "mass_fluxes",
-        "lat",
-        "lat_bnds",
-        "lon",
-        "lon_bnds",
-        "saccum",
-        "smelt",
-        "srunoff",
-        "sea_level",
-        "surface_mass_balance_average",
-        "temppabase",
-        "tempsurf",
-        "thk",
-        "topg",
-        "topg_sl_adjusted",
-        "usurf",
-        "velbase",
-        "velbase_mag",
-        "velsurf",
-        "velsurf_mag",
-        "vonmises_calving_rate",
-        "vonmises_stress",
-    ]
-
-    return exvars
-
-
-def calibrate_spatial_ts_vars():
-    """
-    Returns a list of essential extra vars
-    """
-
-    exvars = [
-        "amount_fluxes",
-        "flux_divergence",
-        "dHdt",
-        "mask",
-        "lat",
-        "lat_bnds",
-        "lon",
-        "lon_bnds",
-        "thk",
-        "topg",
-        "usurf",
-        "velbase_mag",
-        "velsurf_mag",
-    ]
-
-    return exvars
-
-
-def essential_spatial_ts_vars():
-    """
-    Returns a list of essential extra vars
-    """
-
-    exvars = [
-        "beta",
-        "bmelt",
-        "dHdt",
-        "mask",
-        "lat",
-        "lat_bnds",
-        "lon",
-        "lon_bnds",
-        "taub_mag",
-        "tauc",
-        "taud_mag",
-        "tempsurf",
-        "thk",
-        "tillwat",
-        "topg",
-        "usurf",
-        "velbase",
-        "velbase_mag",
-        "velsurf",
-        "velsurf_mag",
-        "wvelbase",
-        "wvelsurf",
-    ]
-
-    return exvars
-
-
-def ismip6_spatial_ts_vars():
-    """
-    Returns a list of commonly-used extra vars
-    """
-
-    exvars = [
-        "basal_mass_balance_average",
-        "beta",
-        "bmelt",
-        "cell_area",
-        "dbdt",
-        "dHdt",
-        "diffusivity",
-        "discharge_mass_flux",
-        "flux_divergence",
-        "height_above_flotation",
-        "hfgeoubed",
-        "mask",
-        "lat",
-        "lat_bnds",
-        "lon",
-        "lon_bnds",
-        "nuH",
-        "relative_flotation",
-        "sftgrf",
-        "sftflf",
-        "sftgif",
-        "surface_mass_balance_average",
-        "taub_mag",
-        "tauc",
-        "taud_mag",
-        "tempicethk_basal",
-        "tempbase",
-        "temppabase",
-        "tempsurf",
-        "thk",
-        "topg",
-        "usurf",
-        "velbar",
-        "velbase",
-        "velbase_mag",
-        "velsurf",
-        "velsurf_mag",
-        "wvelbase",
-        "wvelsurf",
-    ]
-
-    return exvars
-
-
-def init_spatial_ts_vars():
-    """
-    Returns a list of commonly-used extra vars for initialization
-    """
-
-    exvars = [
-        "beta",
-        "bmelt",
-        "cell_area",
-        "dbdt",
-        "dHdt",
-        "diffusivity",
-        "discharge_mass_flux",
-        "eigen_calving_rate",
-        "ice_mass",
-        "mask",
-        "lat",
-        "lon",
-        "nuH",
-        "sea_level",
-        "strain_rates",
-        "taub_mag",
-        "tauc",
-        "taud_mag",
-        "tempicethk_basal",
-        "temppabase",
-        "tempsurf",
-        "thk",
-        "topg",
-        "topg_sl_adjusted",
-        "usurf",
-        "velbase",
-        "velbase_mag",
-        "velsurf",
-        "velsurf_mag",
-        "vonmises_calving_rate",
-        "vonmises_stress",
-    ]
-
-    return exvars
+spatial_ts_vars["hydro"] = [
+    "bwat",
+    "bwp",
+    "bwatvel",
+    "beta",
+    "cell_area",
+    "dHdt",
+    "ice_mass",
+    "mask",
+    "mass_fluxes",
+    "lat",
+    "lat_bnds",
+    "lon",
+    "lon_bnds",
+    "sftgif",
+    "temppabase",
+    "thk",
+    "topg",
+    "usurf",
+    "velbase_mag",
+    "velsurf_mag",
+]
 
 
 def generate_spatial_ts(
@@ -677,8 +438,10 @@ def generate_hydrology(hydro, **kwargs):
         params_dict["hydrology_null_diffuse_till_water"] = ""
     elif hydro in ("routing"):
         params_dict["hydrology"] = "routing"
+        params_dict["basal_yield_stress.add_transportable_water"] = "true"
     elif hydro in ("distributed"):
         params_dict["hydrology"] = "distributed"
+        params_dict["basal_yield_stress.add_transportable_water"] = "true"
     else:
         print(("hydrology {} not recognized, exiting".format(hydro)))
         import sys

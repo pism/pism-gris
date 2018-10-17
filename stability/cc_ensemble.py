@@ -102,7 +102,7 @@ parser.add_argument(
     "--exstep",
     dest="exstep",
     help="Writing interval for spatial time series",
-    default=10,
+    default=1,
 )
 parser.add_argument(
     "-f",
@@ -156,7 +156,7 @@ parser.add_argument(
 parser.add_argument(
     "--spatial_ts",
     dest="spatial_ts",
-    choices=["basic", "standard", "none"],
+    choices=["basic", "standard", "none", "hydro"],
     help="output size type",
     default="basic",
 )
@@ -170,7 +170,7 @@ parser.add_argument(
 parser.add_argument(
     "--hydrology",
     dest="hydrology",
-    choices=["null", "diffuse", "routing"],
+    choices=["null", "diffuse", "routing", "distributed"],
     help="Basal hydrology model.",
     default="diffuse",
 )
@@ -391,7 +391,6 @@ tsstep = "yearly"
 
 scripts = []
 scripts_combinded = []
-scripts_post = []
 
 simulation_start_year = options.start_year
 simulation_end_year = options.start_year + options.duration
@@ -412,7 +411,6 @@ if restart_step > (simulation_end_year - simulation_start_year):
     sys.exit(0)
 
 batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
-post_header = make_batch_post_header(system)
 
 for n, combination in enumerate(combinations):
 
@@ -708,10 +706,7 @@ for n, combination in enumerate(combinations):
                     )
 
                     if not spatial_ts == "none":
-                        if spatial_ts == "basic":
-                            exvars = basic_spatial_ts_vars()
-                        else:
-                            exvars = stability_spatial_ts_vars()
+                        exvars = spatial_ts_vars[spatial_ts]
                         spatial_ts_dict = generate_spatial_ts(
                             outfile,
                             exvars,
@@ -757,131 +752,10 @@ for n, combination in enumerate(combinations):
 
         scripts_combinded.append(script_combined)
 
-        script_post = join(
-            scripts_dir, "post_lhs_g{}m_{}.sh".format(grid, full_exp_name)
-        )
-        scripts_post.append(script_post)
-
-        with open(script_post, "w") as f:
-
-            f.write(post_header)
-            f.write(run_header)
-
-            if exstep == "monthly":
-                mexstep = 1.0 / 12
-            elif exstep == "daily":
-                mexstep = 1.0 / 365
-            else:
-                mexstep = int(exstep)
-
-            real_start_year = 2008
-            for start in range(
-                simulation_start_year, simulation_end_year, restart_step
-            ):
-                end = start + restart_step
-                ts_file = join(
-                    dirs["scalar"],
-                    "ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc".format(
-                        domain=domain.lower(),
-                        grid=grid,
-                        experiment=full_exp_name,
-                        start=start,
-                        end=end,
-                    ),
-                )
-                cmd = " ".join(
-                    [
-                        "adjust_timeline.py -i start -p yearly -a {}-1-1 -u seconds -d 2008-1-1".format(
-                            real_start_year
-                        ),
-                        "{}".format(ts_file),
-                        "\n",
-                    ]
-                )
-                f.write(cmd)
-                outfile = "{domain}_g{grid}m_{experiment}_{start}_{end}.nc".format(
-                    domain=domain.lower(),
-                    grid=grid,
-                    experiment=full_exp_name,
-                    start=start,
-                    end=end,
-                )
-                state_file = join(dirs["state"], outfile)
-                cmd = " ".join(["ncks -O -4 -L 9", state_file, state_file, "\n\n"])
-                f.write(cmd)
-                real_start_year += restart_step
-            ts_files = join(
-                dirs["scalar"],
-                "ts_{domain}_g{grid}m_{experiment}_*.nc".format(
-                    domain=domain.lower(), grid=grid, experiment=full_exp_name
-                ),
-            )
-            ts_file = join(
-                dirs["scalar"],
-                "ts_{domain}_g{grid}m_{experiment}_{start}_{end}.nc".format(
-                    domain=domain.lower(),
-                    grid=grid,
-                    experiment=full_exp_name,
-                    start=simulation_start_year,
-                    end=simulation_end_year,
-                ),
-            )
-            cmd = "#cdo -f nc4 -z zip_9 mergetime {} {}\n\n".format(ts_files, ts_file)
-            f.write(cmd)
-            if not spatial_ts == "none":
-                for start in range(
-                    simulation_start_year, simulation_end_year, restart_step
-                ):
-                    end = start + restart_step
-                    extra_file_tmp = spatial_ts_dict["extra_file"]
-                    extra_file = "{}.nc".format(
-                        os.path.split(extra_file_tmp)[-1].split(".nc")[0]
-                    )
-                    extra_file_wd = join(dirs["spatial"], extra_file)
-                    cmd = " ".join(
-                        ["ncks -O -4 -L 9 ", extra_file_tmp, extra_file_tmp, "\n"]
-                    )
-                    f.write(cmd)
-                    cmd = " ".join(["nccopy ", extra_file_tmp, extra_file_wd, "\n"])
-                    f.write(cmd)
-                    cmd = " ".join(
-                        [
-                            "adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1",
-                            extra_file_wd,
-                            "\n",
-                        ]
-                    )
-                    f.write(cmd)
-                    cmd = " ".join(
-                        [
-                            "~/base/gris-analysis/scripts/nc_add_hillshade.py -z 1 ",
-                            extra_file_wd,
-                            "\n\n",
-                        ]
-                    )
-                    f.write(cmd)
-                    basin_dir = "basins"
-                    cmd = " ".join(["cd", dirs["spatial"], "\n"])
-                    f.write(cmd)
-                    for basin in ("CW", "NE", "NO", "NW", "SE", "SW"):
-                        cmd = " ".join(
-                            [
-                                "~/base/gris-analysis/basins/extract_basins.py --basins ",
-                                basin,
-                                "--o_dir ../{}".format(basin_dir),
-                                extra_file,
-                                "\n",
-                            ]
-                        )
-                        f.write(cmd)
-                    f.write("cd ../../ \n")
 
 scripts = uniquify_list(scripts)
 scripts_combinded = uniquify_list(scripts_combinded)
-scripts_post = uniquify_list(scripts_post)
 print("\n".join([script for script in scripts]))
 print("\nwritten\n")
 print("\n".join([script for script in scripts_combinded]))
-print("\nwritten\n")
-print("\n".join([script for script in scripts_post]))
 print("\nwritten\n")
