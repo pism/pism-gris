@@ -84,13 +84,6 @@ parser.add_argument(
     default="long",
 )
 parser.add_argument(
-    "--calving",
-    dest="calving",
-    choices=["float_kill", "vonmises_calving"],
-    help="calving",
-    default="vonmises_calving",
-)
-parser.add_argument(
     "-d",
     "--domain",
     dest="domain",
@@ -241,7 +234,6 @@ system = options.system
 spatial_ts = options.spatial_ts
 
 bed_type = options.bed_type
-calving = options.calving
 climate = "flux"
 exstep = options.exstep
 float_kill_calve_near_grounding_line = options.float_kill_calve_near_grounding_line
@@ -343,15 +335,18 @@ phi_max = 40.0
 topg_min = -700
 topg_max = 700
 
-sia_e_values = [1.25, 3]
-ssa_n_values = [3.0, 3.25]
+sia_e_values = [3]
+ssa_n_values = [3.25]
 ppq_values = [0.3, 0.4, 0.5]
 tefo_values = [0.020, 0.015]
+tlftw_values = [0.05, 0.15]
 
-phi_min_values = [5.0]
+phi_min_values = [5.0, 15.0]
 phi_max_values = [40.0]
 topg_min_values = [-700]
 topg_max_values = [700]
+omega_frac_values = [0.02]
+
 combinations = list(
     itertools.product(
         sia_e_values,
@@ -362,6 +357,8 @@ combinations = list(
         phi_max_values,
         topg_min_values,
         topg_max_values,
+        tlftw_values,
+        omega_frac_values,
     )
 )
 
@@ -395,8 +392,23 @@ batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
 
 for n, combination in enumerate(combinations):
 
-    sia_e, ssa_n, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    sia_e, ssa_n, ppq, tefo, phi_min, phi_max, topg_min, topg_max, tlftw, omega_frac = (
+        combination
+    )
 
+    print(
+        n,
+        sia_e,
+        ssa_n,
+        ppq,
+        tefo,
+        phi_min,
+        phi_max,
+        topg_min,
+        topg_max,
+        tlftw,
+        omega_frac,
+    )
     ttphi = "{},{},{},{}".format(phi_min, phi_max, topg_min, topg_max)
 
     vversion = "v" + str(version)
@@ -505,6 +517,8 @@ for n, combination in enumerate(combinations):
                     "pseudo_plastic_q": ppq,
                     "till_effective_fraction_overburden": tefo,
                     "vertical_velocity_approximation": vertical_velocity_approximation,
+                    "flow_law.gpbld.water_frac_observed_limit": omega_frac,
+                    "energy.drainage_target_water_fraction": omega_frac,
                 }
 
                 if start == simulation_start_year:
@@ -523,11 +537,14 @@ for n, combination in enumerate(combinations):
                 )
                 ocean_params_dict = generate_ocean(ocean)
 
-                hydro_params_dict = generate_hydrology(hydrology)
+                hydro_params = {
+                    "basal_yield_stress.mohr_coulomb.till_log_factor_transportable_water": tlftw
+                }
+                hydro_params_dict = generate_hydrology(hydrology, **hydro_params)
 
-                calving_parameters = {"calving.vonmises.sigma_max": 1e6}
-
-                calving_params_dict = generate_calving(calving, **calving_parameters)
+                calving_params_dict = generate_calving(
+                    "ocean_kill", ocean_kill_file=pism_dataname
+                )
 
                 scalar_ts_dict = generate_scalar_ts(
                     outfile,
