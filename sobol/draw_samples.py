@@ -8,7 +8,7 @@ from SALib.sample import saltelli
 from SALib.analyze import sobol
 
 # The number of allowable model runs
-n_samples = 10
+n_samples = 13
 
 distributions = {
     "GCM": randint(0, 4),
