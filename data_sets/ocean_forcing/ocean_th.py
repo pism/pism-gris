@@ -6,10 +6,7 @@ parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.description = "Generating scripts for warming experiments."
 parser.add_argument("FILE", nargs=1, help="Bootstrap file", default=None)
 parser.add_argument(
-    "--ocean_file",
-    dest="ocean_file",
-    help="File containing theta_ocean and salinity_ocean",
-    default=None,
+    "--ocean_file", dest="ocean_file", help="File containing theta_ocean and salinity_ocean", default=None
 )
 
 options = parser.parse_args()
