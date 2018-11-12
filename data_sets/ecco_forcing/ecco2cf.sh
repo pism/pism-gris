@@ -1,15 +1,24 @@
 #!/bin/bash
 
-options="-O -f nc4 -z zip_3"
-start_year=1992
-end_year=2015
-for year in {1992..2015}; do 
+options="-O"
+
+for year in {1992..1993}; do 
     echo "set grid to regular lat lon grid, fix time and vertical axis"
     ifile=THETA.${year}.nc
     ofile=THETA.${year}.cf.nc
     tmpfile=tmp_$ifile
-    cdo $options -r setgrid,r720x360 -setzaxis,zaxis.txt -settaxis,${year}-1-1,0:00:00,1mon $ifile $ofile
+    # This is a regular lat/lon grid, so we can use setgrid to ajdust the grid specifications
+    # Next we set the z-axis with the information given in the file
+    # Finally we adjust the time axis to make it relative and CF-conforming
+    cdo $options -r sellonlatbox,-180,180,-90,90 -setgrid,r720x360 -setzaxis,zaxis.txt -settaxis,${year}-1-1,0:00:00,1mon $ifile $ofile
 done
+
+exit
+
+
+start_year=1992
+end_year=2015
+
 cdo $options mergetime THETA.*.cf.nc THETA.${start_year}-${end_year}.nc
 
 
