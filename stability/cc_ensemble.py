@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2016-17 Andy Aschwanden
+# Copyright (C) 2016-18 Andy Aschwanden
 
 import itertools
 from collections import OrderedDict

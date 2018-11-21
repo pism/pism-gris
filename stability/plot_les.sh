@@ -25,3 +25,8 @@
 # Random ice discharge
 ~/base/gris-analysis/plotting/plotting.py -n 4 -o test  --time_bounds 2008 3000 --plot random_flux 2018_09_les/scalar_clean/ts_gris_g1800m_v3a_rcp_85_*.nc
 
+
+
+~/base/gris-analysis/plotting/plotting.py -o ctrl_2300 --time_bounds 2008 3000 --bounds 0 2  --plot ens_mass 2018_09_les/scalar_ensstat/ens*_0_1000.nc
+~
+~/base/gris-analysis/plotting/plotting.py -o les18 --no_legend --time_bounds 2008 3000 --ctrl_file 2018_08_ctrl/scalar_clean/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc  --plot forcing_mass 2018_09_les/scalar_ensstat/ens*_0_1000.nc ../data_sets/climate_forcing/tas_cmip5_rcp*ensstd**anom*.nc ../data_sets/climate_forcing/tas_Amon_*_rcp*_r1i1p1_ym_anom_GRIS_0-5000.nc
