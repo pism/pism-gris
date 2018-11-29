@@ -292,8 +292,8 @@ except:
 
 firn_dict = {-1.0: "low", 0.0: "off", 1.0: "ctrl"}
 ocs_dict = {-2.0: "off", -1.0: "low", 0.0: "mid", 1.0: "high"}
-ocm_dict = {-2.0: "vlow", -1.0: "low", 0.0: "mid", 1.0: "high", 2.0: "m10", 3.0: "m15"}
-tct_dict = {-3.0: "ulow", -2.0: "vlow", -1.0: "low", 0.0: "mid", 1.0: "high"}
+ocm_dict = {-4.0: "cclow", -2.0: "vlow", -1.0: "low", 0.0: "mid", 1.0: "high", 2.0: "m10", 3.0: "m15"}
+tct_dict = {-4.0: "cclow", -3.0: "ulow", -2.0: "vlow", -1.0: "low", 0.0: "mid", 1.0: "high"}
 bd_dict = {-1.0: "off", 0.0: "i0", 1.0: "ip"}
 sb_dict = {0.0: "ssa+sia", 1.0: "sia"}
 gcm_dict = {-1.0: "ENSMEAN", 0.0: "GISS-E2-H", 1.0: "GISS-E2-R", 2.0: "IPSL-CM5A-LR", 3.0: "MPI-ESM-LR"}
@@ -505,6 +505,7 @@ for n, combination in enumerate(combinations):
                         setattr(climate_params_dict, "pdd_aschwanden", "")
 
                     ocean_files = {
+                        "cclow": "$input_dir/data_sets/ocean_forcing/ocean_forcing_100myr_71n_10myr_80n.nc",
                         "vlow": "$input_dir/data_sets/ocean_forcing/ocean_forcing_200myr_71n_10myr_80n.nc",
                         "low": "$input_dir/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc",
                         "mid": "$input_dir/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc",
@@ -516,6 +517,7 @@ for n, combination in enumerate(combinations):
                     ocean_file = ocean_files[ocm]
 
                     calving_thresholds = {
+                        "cclow": "$input_dir/data_sets/ocean_forcing/tct_forcing_100myr_74n_50myr_76n.nc",
                         "ulow": "$input_dir/data_sets/ocean_forcing/tct_forcing_200myr_74n_50myr_76n.nc",
                         "vlow": "$input_dir/data_sets/ocean_forcing/tct_forcing_300myr_74n_50myr_76n.nc",
                         "low": "$input_dir/data_sets/ocean_forcing/tct_forcing_400myr_74n_50myr_76n.nc",

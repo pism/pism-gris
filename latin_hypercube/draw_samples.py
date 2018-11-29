@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from pyDOE import lhs
 from scipy.stats.distributions import truncnorm, gamma, uniform, randint
+import pylab as plt
 
 # The number of allowable model runs
 n_samples = 500
@@ -41,15 +42,10 @@ for i, key in enumerate(keys):
 df = pd.DataFrame(dist_sample)
 df.to_csv("lhs_samples.csv", header=keys, index=True)
 
-# Plot a histogram of each variable
-plot = True
-if plot:
-    import matplotlib.pyplot as plt
-
-    fig, axs = plt.subplots(len(keys[1:6]), 1)
-    fig.set_size_inches(6, 6)
-    fig.subplots_adjust(hspace=0.45)
-    for i, key in enumerate(keys[1:6]):
-        axs[i].hist(dist_sample[:, i], 20, normed=True, histtype="step")
-        axs[i].set_ylabel(key)
-    fig.savefig("parameter_histograms.pdf", bbox_inches="tight")
+fig, axs = plt.subplots(len(keys[1:6]), 1)
+fig.set_size_inches(6, 6)
+fig.subplots_adjust(hspace=0.45)
+for i, key in enumerate(keys[1:6]):
+    axs[i].hist(dist_sample[:, i], 20, normed=True, histtype="step")
+    axs[i].set_ylabel(key)
+fig.savefig("parameter_histograms.pdf", bbox_inches="tight")
