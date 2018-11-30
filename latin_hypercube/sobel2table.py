@@ -14,8 +14,6 @@ def read_sobel_file(filename):
 
 
 def sobel_table(ifiles):
-    years = [2100, 2200, 2300, 3000]
-    rcps = [26, 45, 85]
 
     result = []
 
@@ -74,9 +72,32 @@ if __name__ == "__main__":
         "$q$",
         "$E$",
     ]
+
+    years = [2100, 2200, 2300, 3000]
+    rcps = [26, 45, 85]
+
     for k, row in enumerate(sobel_table(prefix)):
         table_row = labels[k]
         for x in row:
             table_row += " & " + "{:.0f}".format(x)
         table_row += " \\\\"
         print(table_row)
+
+    result = sobel_table(prefix)
+    climate = result[0] + result[3]
+    surface = result[1] + result[2] + result[4]
+    ocean = result[5] + result[6] + result[7] + result[8]
+    ice = result[9] + result[10]
+
+    import pylab as plt
+    for m, rcp in enumerate(rcps):
+        for n, year in enumerate(years):
+            k = m + n
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.bar(np.array([0, 1, 2, 3]) * 4, np.array([climate[k], surface[k], ocean[k], ice[k]]), width=3.8, color=["#81c77f", "#886c62", "#beaed4", "#dcd588"], edgecolor='k')
+            plt.axis('off')
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+            ax.set_aspect('equal', 'datalim')
+            fig.savefig("bar_rcp{}_{}.pdf".format(rcp, year), bbox_inches='tight')

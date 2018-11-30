@@ -18,12 +18,13 @@ parser.add_argument(
 )
 parser.add_argument("OUTFILE", nargs=1, help="Ouput file (CSV)", default=None)
 parser.add_argument("INFILES", nargs="*", help="Input file (netCDF)", default=None)
+parser.add_argument("-y", "--year", type=inthelp="Year to extract", default=3000)
 
 options = parser.parse_args()
 variable = options.variable
 outfile = options.OUTFILE[0]
 infiles = options.INFILES
-
+idx = options.year - 2008
 
 ne = len(infiles)
 data = np.zeros((2, ne))
@@ -34,7 +35,7 @@ for k, infile in enumerate(infiles):
     else:
         id = re.search("id_(.+?)_", infile).group(1)
         data[0, k] = id
-        val = nc.variables[variable][-1]
+        val = nc.variables[variable][idx]
         data[1, k] = val
         nc.close()
 
