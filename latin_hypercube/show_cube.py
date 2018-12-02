@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 from pyDOE import lhs
 
 
-def plot_cube(cube_definition):
+def plot_cube(cube_definition, unif_sample):
     cube_definition_array = [
         np.array(list(item))
         for item in cube_definition
@@ -46,18 +46,26 @@ def plot_cube(cube_definition):
     ax.add_collection3d(faces)
 
     # Plot the points themselves to force the scaling of the axes
-    ax.scatter(points[:,0], points[:,1], points[:,2], s=0)
-
+    ax.scatter(unif_sample[:,0], unif_sample[:,1], unif_sample[:,2], s=unif_sample[:, 3] * 20)
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+    ax.set_xticks([0, 1])
+    ax.set_yticks([0, 1])
     ax.set_aspect('equal')
-
-
-cube_definition = [
-    (0,0,0), (0,1,0), (1,0,0), (0,0,1)
-]
-plot_cube(cube_definition)
+    ax.grid(False)
+    ax._axis3don = False
+    plt.tight_layout()
+    return fig, ax
 
 
 # The number of allowable model runs
 n_samples = 500
 # Draw samples
-unif_sample = lhs(2, n_samples)
+unif_sample = lhs(4, n_samples)
+
+cube_definition = [
+    (0,0,0), (0,1,0), (1,0,0), (0,0,1)
+]
+
+fig, ax = plot_cube(cube_definition, unif_sample)
+fig.savefig("lhs.pdf", bbox_inches="tight")
