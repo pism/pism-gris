@@ -156,7 +156,7 @@ done
 
 odir=2018_09_les
 grid=1800
-for rcp in 26 45 85; do
+for rcp in 85; do
     for year in {2015..3000}; do
         echo "Processing RCP ${rcp} at year ${year}"
         python ../latin_hypercube/dgmsl2csv.py -y ${year} ${odir}/les/les_gcm_rcp${rcp}_${year}.csv $odir/dgmsl/dgmsl_ts_gris_g1800m_v3a_rcp_${rcp}_id_*_0_1000.nc
