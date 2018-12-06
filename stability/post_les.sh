@@ -96,9 +96,29 @@ for rcp in 26 45 85; do
             ofile=../dgmsl/dgmsl_${pfile}_${year}.nc
             if [ ! -f "$ofile" ]; then
             echo "Extracting DGMSL at year $year from $file and saving it to $ofile"
-            cdo -L setattribute,limnsw@units="cm" -setattribute,limnsw@long_mame="contribution to global mean sea level" -divc,365 -divc,-1e13 -selvar,limnsw -sub -selyear,$year $file -selyear,2008 $file $ofile
+            cdo -L setattribute,limnsw@units="cm" -setattribute,limnsw@long_mame="contribution to global mean sea level" -divc,365 -divc,-1e13 -selvar,limnsw -sub -selyear,$year $file -seltimestep,1 $file $ofile
             fi
         done
+    done
+done
+cd ../../
+
+odir=2018_09_les
+grid=1800
+mkdir -p $odir/dgmsl
+rprefix=ts_
+postfix=_0_1000.nc
+cd $odir/scalar_clean
+for rcp in 26 45 85; do
+    for file in ts_gris_g${grid}m_v3a_rcp_${rcp}_id_*_0_1000.nc; do
+        nfile=${file##*/}
+        sfile=${nfile#"$prefix"}
+        pfile=${sfile%"$postfix"}
+        ofile=../dgmsl/dgmsl_${pfile}_0_1000.nc
+        if [ ! -f "$ofile" ]; then
+            echo "Extracting DGMSL from $file and saving it to $ofile"
+            cdo -O -L setattribute,limnsw@units="cm" -setattribute,limnsw@long_mame="contribution to global mean sea level" -divc,365 -divc,-1e13 -selvar,limnsw -sub $file -seltimestep,1 $file $ofile
+        fi
     done
 done
 cd ../../
@@ -136,10 +156,10 @@ done
 
 odir=2018_09_les
 grid=1800
-for rcp in 26 45 85; do
-    for year in 2100 2200 2300 3000; do
+for rcp in 85; do
+    for year in {2015..3000}; do
         echo "Processing RCP ${rcp} at year ${year}"
-        python ../latin_hypercube/dgmsl2csv.py ../latin_hypercube/les_gcm_rcp${rcp}_${year}.csv $odir/dgmsl/dgmsl_gris_g1800m_v3a_rcp_${rcp}_id_*_${year}.nc
+        python ../latin_hypercube/dgmsl2csv.py -y ${year} ${odir}/les/les_gcm_rcp${rcp}_${year}.csv $odir/dgmsl/dgmsl_ts_gris_g1800m_v3a_rcp_${rcp}_id_*_0_1000.nc
     done
 done
 

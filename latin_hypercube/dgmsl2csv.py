@@ -18,7 +18,7 @@ parser.add_argument(
 )
 parser.add_argument("OUTFILE", nargs=1, help="Ouput file (CSV)", default=None)
 parser.add_argument("INFILES", nargs="*", help="Input file (netCDF)", default=None)
-parser.add_argument("-y", "--year", type=inthelp="Year to extract", default=3000)
+parser.add_argument("-y", "--year", type=int, help="Year to extract", default=3000)
 
 options = parser.parse_args()
 variable = options.variable
