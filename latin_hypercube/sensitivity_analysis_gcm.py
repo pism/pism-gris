@@ -15,25 +15,28 @@ def analyze(filename):
     # Load the response file
     response = pandas.read_table(filename, delimiter = ',', index_col=0, squeeze=True)
 
-    # Optional mask for weird values that showed up in some early versions of the response files
-    id = [True for k in response.values]
-
+    try:
+        id = [True for k in response.values if k < 800 and k is not str]
+    except:
+        print(filename)
+        pass
+    
     # Convert data frame into numpy array
     response_matrix = response.as_matrix()[id].astype(float).ravel()
-
+    
     # Convert parameter values into numpy array
     params_matrix = params.as_matrix()[response.index[id]].astype(float)
-
+    
     # Define a salib "problem"
     problem = {
-      'num_vars': params.shape[1],                 # Number of parameters
-      'names': params.columns.values,              # Parameter names
-      'bounds': zip(params.min(),params.max())     # Parameter bounds
+        'num_vars': params.shape[1],                 # Number of parameters
+        'names': params.columns.values,              # Parameter names
+        'bounds': zip(params.min(),params.max())     # Parameter bounds
     }
 
     # Compute S1 sobol indices using the method of Plischke (2013, doi: https://doi.org/10.1016/j.ejor.2012.11.047) 
     # as implemented in SALib
-    Si = delta.analyze(problem,params_matrix,response_matrix,num_resamples=100,print_to_console=False)
+    Si = delta.analyze(problem, params_matrix, response_matrix, num_resamples=100, print_to_console=False)
 
     # Save responses as text files
     outfile = join(output_dir, os.path.split(filename)[-1][:-4] + "_sobel.txt")
