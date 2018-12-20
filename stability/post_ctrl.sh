@@ -223,6 +223,13 @@ for rcp in 45; do
 done
 
 odir=2018_08_ctrl
+grid=600
+mkdir -p ${odir}/profiles
+for rcp in 85 45; do
+    extract_profiles.py -v velsurf_mag,velbase_mag,thk,usurf,topg ../../gris-outlet-glacier-profiles/gris-outlet-glacier-profiles-epsg3413-filtered-100m.shp $odir/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc $odir/profiles/profiles_100m_ex_gris_g${grid}m_v3a_rcp_${rcp}_id_CTRL_0_1000.nc
+done
+
+odir=2018_08_ctrl
 grid=450
 mkdir -p ${odir}/profiles
 for rcp in 45; do

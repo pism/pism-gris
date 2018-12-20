@@ -65,7 +65,6 @@ spatial_ts_vars = {}
 
 spatial_ts_vars["basic"] = [
     "beta",
-    "cell_area",
     "dbdt",
     "dHdt",
     "hardav",
@@ -93,7 +92,6 @@ spatial_ts_vars["hydro"] = [
     "bwp",
     "bwatvel",
     "beta",
-    "cell_area",
     "dHdt",
     "ice_mass",
     "mask",

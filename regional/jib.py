@@ -705,10 +705,7 @@ for n, combination in enumerate(combinations):
                     )
 
                     if not spatial_ts == "none":
-                        if spatial_ts == "basic":
-                            exvars = basic_spatial_ts_vars()
-                        else:
-                            exvars = stability_spatial_ts_vars()
+                        exvars = spatial_ts_vars[spatial_ts]
                         spatial_ts_dict = generate_spatial_ts(
                             outfile,
                             exvars,
@@ -716,13 +713,8 @@ for n, combination in enumerate(combinations):
                             odir=dirs["spatial_tmp"],
                             split=False,
                         )
-                        snap_dict = generate_snap_shots(
-                            outfile, save_times, odir=dirs["snap"]
-                        )
 
-                        all_params_dict = merge_dicts(
-                            all_params_dict, spatial_ts_dict, snap_dict
-                        )
+                        all_params_dict = merge_dicts(all_params_dict, spatial_ts_dict)
 
                     all_params = " \\\n  ".join(
                         [
