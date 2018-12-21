@@ -9,13 +9,7 @@ import re
 # set up the option parser
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.description = "Generating scripts for warming experiments."
-parser.add_argument(
-    "-v",
-    "--variable",
-    dest="variable",
-    help="Variable to read in. Default=limnsw",
-    default="limnsw",
-)
+parser.add_argument("-v", "--variable", dest="variable", help="Variable to read in. Default=limnsw", default="limnsw")
 parser.add_argument("OUTFILE", nargs=1, help="Ouput file (CSV)", default=None)
 parser.add_argument("INFILES", nargs="*", help="Input file (netCDF)", default=None)
 parser.add_argument("-y", "--year", type=int, help="Year to extract", default=3000)
@@ -37,12 +31,9 @@ for k, infile in enumerate(infiles):
         data[0, k] = id
         val = nc.variables[variable][idx]
         data[1, k] = val
-        nc.close()
+        if val > 800:
+            print(id)
 
-np.savetxt(
-    outfile,
-    np.transpose(data),
-    fmt=["%i", "%4.0f"],
-    delimiter=",",
-    header="run,dgmsl(cm)",
-)
+    nc.close()
+
+np.savetxt(outfile, np.transpose(data), fmt=["%i", "%4.0f"], delimiter=",", header="run,dgmsl(cm)")
