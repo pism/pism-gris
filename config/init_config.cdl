@@ -2,6 +2,11 @@ netcdf pism_overrides {
     variables:
     byte pism_overrides;
 
+    pism_overrides:stress_balance.sia.max_diffusivity = 100000.0;
+    pism_overrides:stress_balance.sia.max_diffusivity_doc = "Maximum allowed diffusivity of the SIA flow. PISM stops with an error message if the SIA diffusivity exceeds this limit.";
+    pism_overrides:stress_balance.sia.max_diffusivity_type = "scalar";
+    pism_overrides:stress_balance.sia.max_diffusivity_units = "m2 s-1";
+
     pism_overrides:surface.pdd.air_temp_all_precip_as_snow = 272.15;
     pism_overrides:surface.pdd.air_temp_all_precip_as_snow_doc = "Kelvin; threshold temperature below which all precipitation is snow";
 

@@ -161,24 +161,35 @@ profile_name = "greenland"
 profile_spacing = 250
 profile_type = "29"
 profile_basename = "{}-flux-gates-{}-{}m".format(profile_name, profile_type, profile_spacing)
-profile_basedir = "../data_sets/flux-gates"
+profile_basedir = "~/base/gris-analysis/flux-gates"
 profile_file = ".".join([profile_basename, "shp"])
 profile_file_wd = os.path.join(profile_basedir, profile_file)
 
 
 # Process observations
-obs_dir = "observations"
+obs_dir = "../data_sets/velocities/"
 profile_dir = "profiles"
 velocity_file = "greenland_vel_mosaic250_v1.nc"
-velocity_file_wd = os.path.join(obs_dir, "velocity", velocity_file)
+velocity_file_wd = os.path.join(obs_dir, "measures", velocity_file)
 velocity_profile_file_wd = os.path.join(
     obs_dir, profile_dir, "profile_{}_{}m_{}_{}".format(profile_name, profile_spacing, profile_type, velocity_file)
 )
 
-cmd = ["extract_profiles.py", "-a", "--special_vars", profile_file_wd, velocity_file_wd, velocity_profile_file_wd]
+# Preparing Observations
+logger.info("Preparing observations")
+cmd = [
+    "extract_profiles.py",
+    "--srs",
+    "3413",
+    "--special_vars",
+    profile_file_wd,
+    velocity_file_wd,
+    velocity_profile_file_wd,
+]
+print(" ".join(cmd))
 sub.call(cmd)
-logger.info("calculating profile-normal speed")
-compute_normal_speed(velocity_profile_file_wd)
+# logger.info("calculating profile-normal speed")
+# compute_normal_speed(velocity_profile_file_wd)
 
 # Process experiments
 if not os.path.isdir(os.path.join(idir, "profiles")):
