@@ -65,6 +65,7 @@ spatial_ts_vars = {}
 
 spatial_ts_vars["basic"] = [
     "beta",
+    "bmelt",
     "dbdt",
     "dHdt",
     "hardav",

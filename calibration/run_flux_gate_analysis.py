@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2017 Andy Aschwanden
+# Copyright (C) 2017-18 Andy Aschwanden
 
 import os
 
@@ -7,13 +7,9 @@ try:
     import subprocess32 as sub
 except:
     import subprocess as sub
+import shlex
 from glob import glob
 import numpy as np
-import gdal
-from nco import Nco
-
-nco = Nco()
-from nco import custom as c
 import logging
 import logging.handlers
 from argparse import ArgumentParser
@@ -105,17 +101,6 @@ def compute_normal_speed(ifile):
     nc.close()
 
 
-def add_run_stats(ifile, ds=1500):
-    """
-    Add missing run_stats
-    """
-    nc = NC(ifile, "a")
-    if "run_stats" not in nc.variables:
-        nc.createVariable("run_stats", "b", dimensions=())
-    nc.variables["run_stats"].grid_dx_meters = ds
-    nc.close()
-
-
 # set up the option parser
 parser = ArgumentParser()
 parser.description = "Generating scripts for model calibration."
@@ -187,7 +172,7 @@ cmd = [
     velocity_profile_file_wd,
 ]
 print(" ".join(cmd))
-sub.call(cmd)
+# sub.call(cmd)
 # logger.info("calculating profile-normal speed")
 # compute_normal_speed(velocity_profile_file_wd)
 
@@ -203,9 +188,11 @@ for exp_file in exp_files:
     exp_profile_file_wd = os.path.join(idir, "profiles", exp_profile_file)
     if (not append) or (not append and not os.path.isfile(exp_profile_file)):
         logger.info("processing {}".format(exp_file))
-        cmd = ["extract_profiles.py", "--special_vars", profile_file_wd, exp_file, exp_profile_file_wd]
-        sub.call(cmd)
+        cmd = "extract_profiles.py --special_vars {shpfile} {infile} {outfile}".format(
+            shpfile=profile_file_wd, infile=exp_file, outfile=exp_profile_file_wd
+        )
+        sub.call(shlex.split(cmd))
         logger.info("calculating profile-normal speed")
-        compute_normal_speed(exp_profile_file_wd)
+        # compute_normal_speed(exp_profile_file_wd)
         # ds = int(os.path.split(exp_file)[-1].split('gris_g')[1].split('m_')[0])
         # add_run_stats(exp_profile_file_wd, ds=ds)
