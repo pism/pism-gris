@@ -31,7 +31,7 @@ for var in vx vy ex ey; do
         ncatted -a units,${mvar},o,c,"m year-1"  ${dataset_dir}/${prefix}_${version}.nc
     fi
 done
-ncap2 -O -s "velsurf_mag=(uvelsurf^2+vvelsurf^2)^0.5; velsurf_mag_error=uvelsurf_error;" ${dataset_dir}/${prefix}_${version}.nc ${dataset_dir}/${prefix}_${version}.nc
+ncap2 -O -s "velsurf_mag=(uvelsurf^2+vvelsurf^2)^0.5; velsurf_mag_error=(uvelsurf_error^2+vvelsurf_error^2)^(0.5);" ${dataset_dir}/${prefix}_${version}.nc ${dataset_dir}/${prefix}_${version}.nc
 rm -f ${profile_dir}/profiles_${prefix}_${version}.nc
 
 flux_gate_file=$2
