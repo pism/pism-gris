@@ -74,12 +74,12 @@ NEWBHEATFLX="bheatflx=hotmask*${GHFSPOT}+!hotmask*bheatflxSR"
 ncap2 -O -s $NEWBHEATFLX $OUTFILE $OUTFILE
 
 # ncap2 leaves hosed attributes; start over
-ncatted -a units,bheatflx,c,c,"W m-2" $OUTFILE
+ncatted -a units,bheatflx,o,c,"W m-2" $OUTFILE
 ncatted -a long_name,bheatflx,c,c,"basal geothermal flux" $OUTFILE
-ncatted -a propose_standard_name,bheatflx,c,c,"lithosphere_upward_heat_flux" $OUTFILE
+ncatted -a _CoordinateAxisType,bheatflx,d,, -a standard_name,bheatflx,d,, -a bounds,bheatflx,d,, -a propose_standard_name,bheatflx,c,c,"lithosphere_upward_heat_flux" $OUTFILE
 
 # clear out the temporary variables and only leave additional 'bheatflxSR'
-ncks -O -x -v xx,yy,xi,eta,eleft,eright,hotmask,zero,bheatflxSR $OUTFILE $OUTFILE
+ncks -O -x -v r2,xx,yy,xi,eta,eleft,eright,hotmask,zero,bheatflxSR $OUTFILE $OUTFILE
 
 echo "PISM-readable file '$OUTFILE' created from '$INFILE':"
 echo "  * variable 'bheatflxSR' is copy of 'bheatflx' from '$INFILE'"
