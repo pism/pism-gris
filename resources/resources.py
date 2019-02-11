@@ -85,6 +85,7 @@ spatial_ts_vars["basic"] = [
 ]
 
 spatial_ts_vars["hydro"] = [
+    "bmelt",
     "bwat",
     "bwp",
     "bwatvel",
