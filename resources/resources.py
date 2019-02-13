@@ -64,8 +64,8 @@ def generate_domain(domain):
 spatial_ts_vars = {}
 
 spatial_ts_vars["basic"] = [
+    "basal_melt_rate_grounded",
     "beta",
-    "bmelt",
     "dbdt",
     "dHdt",
     "hardav",
@@ -85,19 +85,18 @@ spatial_ts_vars["basic"] = [
 ]
 
 spatial_ts_vars["hydro"] = [
-    "bmelt",
+    "basal_melt_rate_grounded",
     "bwat",
     "bwp",
     "bwatvel",
     "beta",
     "dHdt",
+    "hydraulic_potential",
     "ice_mass",
     "mask",
     "mass_fluxes",
     "lat",
-    "lat_bnds",
     "lon",
-    "lon_bnds",
     "sftgif",
     "temppabase",
     "tillwat",

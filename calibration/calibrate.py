@@ -262,18 +262,18 @@ phi_max = 40.0
 topg_min = -700
 topg_max = 700
 
-sia_e_values = [2.0, 3.0]
+sia_e_values = [2.0]
 ssa_n_values = [3.25]
-ppq_values = [0.5, 0.6]
-tefo_values = [0.020]
+ppq_values = [0.5]
+tefo_values = [0.020, 0.010]
 tlftw_values = [0]
 if hydrology not in ("null", "diffuse"):
-    tlftw_values = [0.05, 0.5, 1.0, 10]
+    tlftw_values = [0.1, 1000]
 
-phi_min_values = [5.0, 15.0]
+phi_min_values = [5.0]
 phi_max_values = [40.0]
-topg_min_values = [-700, -500, -200]
-topg_max_values = [0, 200, 700]
+topg_min_values = [-700]
+topg_max_values = [200]
 omega_frac_values = [0.01]
 
 combinations = list(
@@ -406,7 +406,7 @@ with open(exp_file, "wb") as f_csv:
                     if osize != "custom":
                         general_params_dict["o_size"] = osize
                     else:
-                        general_params_dict["output.sizes.medium"] = "sftgif,velsurf_mag"
+                        general_params_dict["output.sizes.medium"] = "sftgif,velsurf_mag,tempicethk_basal"
 
                     if start == simulation_start_year:
                         grid_params_dict = generate_grid_description(grid, domain)

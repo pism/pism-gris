@@ -422,7 +422,6 @@ for n, combination in enumerate(combinations):
                         general_params_dict["i"] = pism_dataname
                         general_params_dict["regrid_file"] = input_file
                         general_params_dict["regrid_vars"] = regridvars
-                        general_params_dict["regrid_special"] = ""
                     else:
                         general_params_dict["i"] = regridfile
 
