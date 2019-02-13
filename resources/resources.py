@@ -612,7 +612,7 @@ def list_bed_types():
     Return a list of supported bed types.
     """
 
-    list = ["ctrl", "cresis", "cresisp", "minus", "plus", "ba01_bed", "970mW_hs", "jak_1985", "no_bath"]
+    list = ["ctrl", "cresis", "cresisp", "minus", "plus", "ba01_bed", "970mW_hs", "jak_1985", "no_bath", "wc"]
 
     return list
 

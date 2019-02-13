@@ -92,7 +92,7 @@ parser.add_argument(
     default="pleiades_broadwell",
 )
 parser.add_argument(
-    "-b", "--bed_type", dest="bed_type", choices=list_bed_types(), help="output size type", default="no_bath"
+    "-b", "--bed_type", dest="bed_type", choices=list_bed_types(), help="output size type", default="wc"
 )
 parser.add_argument(
     "--spatial_ts",
@@ -129,7 +129,7 @@ parser.add_argument(
     "--topg_delta", dest="topg_delta_file", help="end of initialization detla=(topg-topg_initial) file", default=None
 )
 parser.add_argument(
-    "--dataset_version", dest="version", choices=["2", "3", "3a"], help="input data set version", default="3a"
+    "--dataset_version", dest="version", choices=["2", "3", "3a", "4"], help="input data set version", default="4"
 )
 parser.add_argument(
     "--vertical_velocity_approximation",
@@ -251,7 +251,7 @@ done
 )
 
 # ########################################################
-# set up model initialization
+# set up parameters
 # ########################################################
 
 ssa_n = 3.25
@@ -262,18 +262,19 @@ phi_max = 40.0
 topg_min = -700
 topg_max = 700
 
-sia_e_values = [2.0]
+sia_e_values = [1.25, 1.5, 2.0, 3.0]
 ssa_n_values = [3.25]
-ppq_values = [0.5]
-tefo_values = [0.020, 0.010]
+ppq_values = [0.6]
+tefo_values = [0.020]
 tlftw_values = [0]
 if hydrology not in ("null", "diffuse"):
-    tlftw_values = [0.1, 1000]
+    tlftw_values = [0.1,
+                    1000]
 
 phi_min_values = [5.0]
 phi_max_values = [40.0]
 topg_min_values = [-700]
-topg_max_values = [200]
+topg_max_values = [700]
 omega_frac_values = [0.01]
 
 combinations = list(
@@ -406,7 +407,7 @@ with open(exp_file, "wb") as f_csv:
                     if osize != "custom":
                         general_params_dict["o_size"] = osize
                     else:
-                        general_params_dict["output.sizes.medium"] = "sftgif,velsurf_mag,tempicethk_basal"
+                        general_params_dict["output.sizes.medium"] = "sftgif,velsurf_mag,tempicethk_basal,velsurf"
 
                     if start == simulation_start_year:
                         grid_params_dict = generate_grid_description(grid, domain)
