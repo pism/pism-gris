@@ -8,7 +8,7 @@ profile_dir=profiles
 mkdir -p ${profile_dir}
 prefix=greenland_vel_mosaic250
 for var in vx vy ex ey; do
-    gdal_translate -a_srs epsg:3413 -a_nodata -2e9 "${indir}/${prefix}_${var}_${version}.tif" ${dataset_dir}/${prefix}_${var}_${version}.nc
+    gdal_translate -co "FORMAT=NC4" -co "ZLEVEL=3" -a_srs epsg:3413 -a_nodata -2e9 "${indir}/${prefix}_${var}_${version}.tif" ${dataset_dir}/${prefix}_${var}_${version}.nc
     if [[ "${var}" == "vx" ]]; then
         mvar=uvelsurf
         ncrename -v Band1,${mvar} ${dataset_dir}/${prefix}_${var}_${version}.nc
