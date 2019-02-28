@@ -63,26 +63,7 @@ def generate_domain(domain):
 
 spatial_ts_vars = {}
 
-spatial_ts_vars["basic"] = [
-    "basal_melt_rate_grounded",
-    "beta",
-    "dbdt",
-    "dHdt",
-    "hardav",
-    "height_above_flotation",
-    "ice_mass",
-    "mask",
-    "mass_fluxes",
-    "sftgif",
-    "temppabase",
-    "tempsurf",
-    "thk",
-    "topg",
-    "usurf",
-    "velbase_mag",
-    "velsurf",
-    "velsurf_mag",
-]
+spatial_ts_vars["basic"] = ["ice_mass", "mass_fluxes", "sftgif", "velsurf_mag"]
 
 spatial_ts_vars["hydro"] = [
     "basal_melt_rate_grounded",
@@ -627,7 +608,7 @@ systems["chinook"] = {
     "submit": "sbatch",
     "work_dir": "SLURM_SUBMIT_DIR",
     "job_id": "SLURM_JOBID",
-    "queue": {"t1standard": 24, "t1small": 24, "t2standard": 24, "t2small": 24, "debug": 24},
+    "queue": {"t1standard": 24, "t1small": 24, "t2standard": 24, "t2small": 24, "debug": 24, "analysis": 24},
 }
 
 systems["pleiades"] = {

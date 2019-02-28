@@ -213,7 +213,7 @@ if not os.path.isdir(exp_dir):
     os.makedirs(exp_dir)
 
 # generate the config file *after* creating the output directory
-pism_config = "init_config"
+pism_config = "calibrate_config"
 pism_config_nc = join(output_dir, pism_config + ".nc")
 
 cmd = "ncgen -o {output} {input_dir}/config/{config}.cdl".format(
@@ -262,14 +262,13 @@ phi_max = 40.0
 topg_min = -700
 topg_max = 700
 
-sia_e_values = [1.25, 1.5, 2.0, 3.0]
+sia_e_values = [1.25]
 ssa_n_values = [3.25]
 ppq_values = [0.6]
 tefo_values = [0.020]
 tlftw_values = [0]
 if hydrology not in ("null", "diffuse"):
-    tlftw_values = [0.1,
-                    1000]
+    tlftw_values = [0.1, 1000]
 
 phi_min_values = [5.0]
 phi_max_values = [40.0]
@@ -407,7 +406,9 @@ with open(exp_file, "wb") as f_csv:
                     if osize != "custom":
                         general_params_dict["o_size"] = osize
                     else:
-                        general_params_dict["output.sizes.medium"] = "sftgif,velsurf_mag,tempicethk_basal,velsurf"
+                        general_params_dict[
+                            "output.sizes.medium"
+                        ] = "sftgif,velsurf_mag,tempicethk_basal,velsurf,velbase_mag"
 
                     if start == simulation_start_year:
                         grid_params_dict = generate_grid_description(grid, domain)
@@ -443,7 +444,9 @@ with open(exp_file, "wb") as f_csv:
                     }
 
                     ocean_file = ocean_files[ocm]
-                    ocean_params_dict = generate_ocean("given", **{"ocean_given_file": ocean_file})
+
+                    ocean_parameters = {"ocean_given_file": ocean_file, "ocean.always_grounded": True}
+                    ocean_params_dict = generate_ocean("given", **ocean_parameters)
 
                     hydro_params = {"basal_yield_stress.mohr_coulomb.till_log_factor_transportable_water": tlftw}
                     hydro_params_dict = generate_hydrology(hydrology, **hydro_params)

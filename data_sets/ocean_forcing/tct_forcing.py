@@ -202,7 +202,7 @@ def def_var(nc, name, units):
     return var
 
 
-var = "calving_threshold"
+var = "thickness_calving_threshold"
 if var not in list(nc.variables.keys()):
     tct_var = def_var(nc, var, "m")
 else:
