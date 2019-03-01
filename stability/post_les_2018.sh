@@ -9,10 +9,10 @@
 cd $SLURM_SUBMIT_DIR
 
 ## PLEIADES
-odir=2019_02_salt
+odir=2018_09_les
 grid=1800
 MAXSIZE=2500000000
-for file in ${odir}/state/*_0_100.nc  ${odir}/state/*_0_100_max*.nc; do
+for file in ${odir}/state/*_0_1000.nc  ${odir}/state/*_0_1000_max*.nc; do
     FILESIZE=$(stat -c%s "$file")
     if (( $FILESIZE > $MAXSIZE)); then
         echo "compressing $file"
@@ -32,8 +32,38 @@ for file in ${odir}/scalar/ts_*.nc; do
 done
 
 
+## CHINOOK
+odir=2018_09_les
+grid=1800
+MAXSIZE=2500000000
+for file in ${odir}_chi/state/*_0_1000.nc  ${odir}_chi/state/*_0_1000_max*.nc; do
+    FILESIZE=$(stat -c%s "$file")
+    if (( $FILESIZE > $MAXSIZE)); then
+        echo "compressing $file"
+        ncks -O -4 -L 3 $file $file
+    fi
+    nfile=${file##*/}
+    ofile=${odir}/state/${nfile}
+    if [ ! -f "$ofile" ]; then
+        echo "copying ${file} to ${ofile}"
+        nccopy $file ${ofile}
+    fi
+done
+prefix=ts_
+mkdir -p $odir/scalar_pruned
+for file in ${odir}_chi/scalar/ts_*.nc; do
+    nfile=${file##*/}
+    sfile=${nfile#"$prefix"}
+    ofile=${odir}/scalar_pruned/${nfile}
+    if [ -f "${odir}/state/$sfile" ] && [ ! -f "$ofile" ]; then
+        echo "copying ${file} to ${ofile}"
+        nccopy $file ${ofile}
+    fi
+done
+
+
 ## CHINOOK ONLY
-odir=2019_02_salt
+odir=2018_09_les
 grid=1800
 mkdir -p $odir/scalar_clean
 for file in $odir/scalar_pruned/ts_*.nc; do
@@ -41,25 +71,25 @@ for file in $odir/scalar_pruned/ts_*.nc; do
     ofile=${odir}/scalar_clean/$nfile
     if [ ! -f "$ofile" ]; then
         echo "copying ${file} to ${ofile}"
-        cdo -O seltimestep,1/100 -selvar,tendency*,surface*,li*,ice_*,dt,basal* $file $ofile
+        cdo -O seltimestep,1/1000 -selvar,tendency*,surface*,li*,ice_*,dt,basal* $file $ofile
         adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 $ofile
      fi
     # echo "copying ${file} to ${ofile}"
-    # cdo -O seltimestep,1/100 -selvar,tendency*,surface*,li*,ice_*,dt,basal* $file $ofile
+    # cdo -O seltimestep,1/1000 -selvar,tendency*,surface*,li*,ice_*,dt,basal* $file $ofile
     #adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 $ofile
 done
 
 
 # Extract DGMSL
-odir=2019_02_salt
+odir=2018_09_les
 grid=1800
 mkdir -p $odir/dgmsl
 rprefix=ts_
 postfix=_0_1000.nc
 cd $odir/scalar_clean
-for rcp in 45; do
-    for year in 2100; do
-        for file in ts_gris_g${grid}m_v3a_rcp_${rcp}_id_*_0_100.nc; do
+for rcp in 26 45 85; do
+    for year in 2100 2200 2300 3000; do
+        for file in ts_gris_g${grid}m_v3a_rcp_${rcp}_id_*_0_1000.nc; do
             nfile=${file##*/}
             sfile=${nfile#"$prefix"}
             pfile=${sfile%"$postfix"}
@@ -73,14 +103,14 @@ for rcp in 45; do
 done
 cd ../../
 
-odir=2019_02_salt
+odir=2018_09_les
 grid=1800
 mkdir -p $odir/dgmsl
 rprefix=ts_
 postfix=_0_1000.nc
 cd $odir/scalar_clean
-for rcp in 45; do
-    for file in ts_gris_g${grid}m_v3a_rcp_${rcp}_id_*_0_100.nc; do
+for rcp in 26 45 85; do
+    for file in ts_gris_g${grid}m_v3a_rcp_${rcp}_id_*_0_1000.nc; do
         nfile=${file##*/}
         sfile=${nfile#"$prefix"}
         pfile=${sfile%"$postfix"}
@@ -94,7 +124,7 @@ done
 cd ../../
 
 
-odir=2019_02_salt
+odir=2018_09_les
 grid=1800
 mkdir -p $odir/contrib_absolute
 mkdir -p $odir/contrib_percent
@@ -124,7 +154,7 @@ done
 
 
 
-odir=2019_02_salt
+odir=2018_09_les
 grid=1800
 for rcp in 26 45 85; do
     for year in {2015..3000}; do
@@ -139,7 +169,7 @@ done
 
 cd $PBS_O_WORKDIR
 
-odir=2019_02_salt
+odir=2018_09_les
 grid=1800
 
 for file in ${odir}_*/state/*_0_1000.nc; do
@@ -150,7 +180,7 @@ for file in ${odir}_*/state/*_0_1000.nc; do
     fi
 done
 
-odir=2019_02_salt
+odir=2018_09_les
 grid=1800
 mkdir -p $odir/sftgif
 mkdir -p $odir/sftgif_pctl
@@ -163,7 +193,7 @@ for file in gris_g${grid}m*id_*0_1000.nc; do
 done
 cd ../../
 
-odir=2019_02_salt
+odir=2018_09_les
 grid=1800
 
 rcp=26

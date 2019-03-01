@@ -20,5 +20,5 @@ PISM_PREFIX=~/pism-as19/bin/ ./lhs_ensemble.py -e ../sobol/saltelli_samples_20.c
 
 exit
 
-for id in {000..129}; do sbatch /import/c1/ICESHEET/aaschwanden/pism-gris/stability/2018_10_sobol/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_${id}_j.sh; done
-for id in {130..168}; do sbatch /import/c1/ICESHEET/aaschwanden/pism-gris/stability/2018_10_sobol/run_scripts/lhs_g3600m_v3a_rcp_${rcp}_id_${id}_j.sh; done
+rcp=45
+for id in {000..100}; do sbatch /nobackupp8/aaschwan/pism-gris/stability/2019_02_salt/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done

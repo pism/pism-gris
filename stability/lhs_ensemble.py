@@ -288,7 +288,22 @@ ocm_dict = {-1.0: "low", 0.0: "mid", 1.0: "high", 2.0: "m10", 3.0: "m15"}
 tct_dict = {-1.0: "low", 0.0: "mid", 1.0: "high"}
 bd_dict = {-1.0: "off", 0.0: "i0", 1.0: "ip"}
 sb_dict = {0.0: "ssa+sia", 1.0: "sia"}
-gcm_dict = {-1.0: "ENSMEAN", 0.0: "GISS-E2-H", 1.0: "GISS-E2-R", 2.0: "IPSL-CM5A-LR", 3.0: "MPI-ESM-LR"}
+gcm_dict = {
+    -2.0: "ENSMEAN",
+    -1.0: "ENSMEAN",
+    0.0: "GISS-E2-H",
+    1.0: "GISS-E2-R",
+    2.0: "IPSL-CM5A-LR",
+    3.0: "MPI-ESM-LR",
+}
+pgcm_dict = {
+    -2.0: "ENSMEANCAP6",
+    -1.0: "ENSMEAN",
+    0.0: "GISS-E2-H",
+    1.0: "GISS-E2-R",
+    2.0: "IPSL-CM5A-LR",
+    3.0: "MPI-ESM-LR",
+}
 
 tsstep = "yearly"
 
@@ -353,6 +368,9 @@ for n, combination in enumerate(combinations):
 
         climate_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
             mgcm=gcm_dict[gcm], rcp=rcp
+        )
+        precip_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
+            mgcm=pgcm_dict[gcm], rcp=rcp
         )
 
         if m_ohc == 0:
@@ -485,12 +503,13 @@ for n, combination in enumerate(combinations):
                         "atmosphere_given_period": 1,
                         "atmosphere_lapse_rate_file": climate_file,
                         "atmosphere.precip_exponential_factor_for_temperature": prs / 100,
-                        "atmosphere_paleo_precip_file": climate_modifier_file,
+                        "atmosphere_paleo_precip_file": precip_modifier_file,
                         "atmosphere_delta_T_file": climate_modifier_file,
                         "temp_lapse_rate": lapse_rate,
                     }
 
                     if start == simulation_start_year:
+                        firn_file = "$input_dir/data_sets/climate_forcing/hirham_firn_depth_4500m_ctrl.nc"
                         climate_parameters["pdd_firn_depth_file"] = firn_file
 
                     climate_params_dict = generate_climate(climate, **climate_parameters)
