@@ -297,12 +297,12 @@ gcm_dict = {
     3.0: "MPI-ESM-LR",
 }
 pgcm_dict = {
-    -2.0: "ENSMEANCAP6",
-    -1.0: "ENSMEAN",
-    0.0: "GISS-E2-H",
-    1.0: "GISS-E2-R",
-    2.0: "IPSL-CM5A-LR",
-    3.0: "MPI-ESM-LR",
+    -2.0: "ENSMEAN-CAP6",
+    -1.0: "ENSMEAN-CAP6",
+    0.0: "GISS-E2-H-CAP6",
+    1.0: "GISS-E2-R-CAP6",
+    2.0: "IPSL-CM5A-LR-CAP6",
+    3.0: "MPI-ESM-LR-CAP6",
 }
 
 tsstep = "yearly"

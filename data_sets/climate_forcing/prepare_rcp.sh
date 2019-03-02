@@ -19,8 +19,10 @@ for rcp in 26 45 85; do
         ncrename -O -v tas,delta_T ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_ym_anom_GRIS_2008-7008.nc
         ncwa -a lat,lon -O ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_ym_anom_GRIS_2008-7008.nc ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_ym_anom_GRIS_2008-7008.nc
         ncatted -O -a units,time,o,c,"years since 1-1-1 12:00" ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_ym_anom_GRIS_2008-7008.nc ${var}_Amon_${gcm}_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc
+        ncap2 -O -s "where(delta_T > 6) delta_T = 6;" ${var}_Amon_${gcm}_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc  ${var}_Amon_${gcm}_rcp${rcp}-CAP6_${ens}_ym_anom_GRIS_0-5000.nc
     done
-    cdo -O -P 4 ensmin ${var}_Amon_GISS-E2-H_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_GISS-E2-R_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_IPSL-CM5A-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_MPI-ESM-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_ENSMIN_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc
     cdo -O -P 4 ensmean ${var}_Amon_GISS-E2-H_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_GISS-E2-R_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_IPSL-CM5A-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_MPI-ESM-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_ENSMEAN_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc
+    ncap2 -O -s "where(delta_T > 6) delta_T = 6;" ${var}_Amon_ENSMEAN_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_ENSMEAN-CAP6_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc
+    cdo -O -P 4 ensmin ${var}_Amon_GISS-E2-H_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_GISS-E2-R_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_IPSL-CM5A-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_MPI-ESM-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_ENSMIN_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc
     cdo -O -P 4 ensmax ${var}_Amon_GISS-E2-H_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_GISS-E2-R_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_IPSL-CM5A-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_MPI-ESM-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_ENSMAX_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc
 done
