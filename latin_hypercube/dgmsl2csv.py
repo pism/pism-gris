@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2018 Andy Aschwanden
+# Copyright (C) 2019 Andy Aschwanden
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import numpy as np

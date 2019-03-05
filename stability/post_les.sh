@@ -55,7 +55,7 @@ odir=2019_02_salt
 grid=1800
 mkdir -p $odir/dgmsl
 rprefix=ts_
-postfix=_0_1000.nc
+postfix=_0_100.nc
 cd $odir/scalar_clean
 for rcp in 45; do
     for year in 2100; do
@@ -77,14 +77,14 @@ odir=2019_02_salt
 grid=1800
 mkdir -p $odir/dgmsl
 rprefix=ts_
-postfix=_0_1000.nc
+postfix=_0_100.nc
 cd $odir/scalar_clean
 for rcp in 45; do
     for file in ts_gris_g${grid}m_v3a_rcp_${rcp}_id_*_0_100.nc; do
         nfile=${file##*/}
         sfile=${nfile#"$prefix"}
         pfile=${sfile%"$postfix"}
-        ofile=../dgmsl/dgmsl_${pfile}_0_1000.nc
+        ofile=../dgmsl/dgmsl_${pfile}_0_100.nc
         if [ ! -f "$ofile" ]; then
             echo "Extracting DGMSL from $file and saving it to $ofile"
             cdo -O -L setattribute,limnsw@units="cm" -setattribute,limnsw@long_mame="contribution to global mean sea level" -divc,365 -divc,-1e13 -selvar,limnsw -sub $file -seltimestep,1 $file $ofile
@@ -102,7 +102,7 @@ mkdir -p $odir/contrib_flux_absolute
 mkdir -p $odir/contrib_flux_percent
 mkdir -p $odir/scalar_ensstat
 
-for pctl in 16 84; do
+for pctl in 5 16 50 64 95; do
     for rcp in 26 45 85; do
         cdo -O -P 16 --sortname enspctl,$pctl $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}*0_1000.nc  $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
         cdo mulc,-100 -selvar,limnsw -div -sub -selyear,3000 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc -selyear,2008 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc  -selyear,2008 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/scalar_ensstat/percent_enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
@@ -122,6 +122,15 @@ done
 
 
 
+odir=2019_02_salt
+mkdir -p $odir/les
+grid=1800
+for rcp in 45; do
+    for year in 2100; do
+        echo "Processing RCP ${rcp} at year ${year}"
+        python ../latin_hypercube/dgmsl2csv.py -y ${year} ${odir}/les/les_gcm_rcp${rcp}_${year}.csv $odir/dgmsl/dgmsl_ts_gris_g1800m_v3a_rcp_${rcp}_id_*_0_100.nc
+    done
+done
 
 
 odir=2019_02_salt
@@ -132,6 +141,8 @@ for rcp in 26 45 85; do
         python ../latin_hypercube/dgmsl2csv.py -y ${year} ${odir}/les/les_gcm_rcp${rcp}_${year}.csv $odir/dgmsl/dgmsl_ts_gris_g1800m_v3a_rcp_${rcp}_id_*_0_1000.nc
     done
 done
+
+
 
 #PBS -l select=1:mem=250GB
 #PBS -l walltime=24:00:00

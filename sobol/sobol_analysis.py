@@ -2,7 +2,7 @@
 # (c) 2018 Doug Brinkerhoff, adapted by Andy Aschwanden
 
 from argparse import ArgumentParser
-from SALib.analyze import delta
+from SALib.analyze import sobol
 import numpy as np
 import pandas
 import os
@@ -25,6 +25,8 @@ def analyze(filename):
     # Convert data frame into numpy array
     response_matrix = response.as_matrix()[id].astype(float).ravel()
 
+    print(response_matrix.shape)
+    print(params.shape)
     # Convert parameter values into numpy array
     params_matrix = params.as_matrix()[response.index[id]].astype(float)
 
@@ -37,7 +39,7 @@ def analyze(filename):
 
     # Compute S1 sobol indices using the method of Plischke (2013, doi: https://doi.org/10.1016/j.ejor.2012.11.047)
     # as implemented in SALib
-    Si = delta.analyze(problem, params_matrix, response_matrix, num_resamples=100, print_to_console=False)
+    Si = sobol.analyze(problem, response_matrix, calc_second_order=False, num_resamples=100, print_to_console=False)
 
     # Save responses as text files
     outfile = join(output_dir, os.path.split(filename)[-1][:-4] + "_sobel.txt")

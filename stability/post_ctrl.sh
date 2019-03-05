@@ -76,10 +76,16 @@ cd ../../
 
 odir=2018_08_ctrl
 grid=900
-mkdir $odir/scalar_clean
+mkdir -p $odir/scalar_clean
 cd $odir/scalar
 for rcp in 26 45 85; do
     for run in CTRL NTRL NISO; do
+        ncks -O ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc ../scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ../scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+    done
+done
+for rcp in 85; do
+    for run in CAP6 CAP6NTRL CAP6NISO NTRL NISO; do
         ncks -O ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc ../scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
         adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 ../scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
     done
@@ -108,6 +114,17 @@ grid=900
 mkdir -p $odir/fldsum
 for rcp in 26 45 85; do
     for run in CTRL NTRL; do
+        # so PISM reports fluxes even in ice free cells, we need to correct for this
+        cdo -L -O -f nc4 -z zip_3 fldsum -aexpr,"surface_runoff_rate=surface_runoff_rate*sftgif,surface_accumulation_rate=surface_accumulation_rate*sftgif,dMdt=dMdt*sftgif;tendency_of_ice_mass_due_to_conservation_error=tendency_of_ice_mass_due_to_conservation_error*sftgif;tendency_of_ice_mass_due_to_basal_mass_flux=tendency_of_ice_mass_due_to_basal_mass_flux*sftgif;tendency_of_ice_mass_due_to_surface_mass_flux=tendency_of_ice_mass_due_to_surface_mass_flux*sftgif;tendency_of_ice_mass_due_to_discharge=tendency_of_ice_mass_due_to_discharge*sftgif;" -setattribute,dMdt@units="Gt year-1" -aexpr,"dMdt=tendency_of_ice_mass-tendency_of_ice_mass_due_to_flow" -selvar,ice_mass,tendency_of_ice_mass,tendency_of_ice_mass_due_to_flow,tendency_of_ice_mass_due_to_conservation_error,tendency_of_ice_mass_due_to_basal_mass_flux,tendency_of_ice_mass_due_to_surface_mass_flux,tendency_of_ice_mass_due_to_discharge,surface_runoff_rate,surface_accumulation_rate,sftgif $odir/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        ncks -A -v limnsw,ice_area_glacierized $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        cdo timmean -selyear,2095/2105 $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2100.nc
+        cdo timmean -selyear,2195/2205 $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2200.nc
+        cdo timmean -selyear,2295/2305 $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2300.nc
+        cdo timmean -selyear,2995/3005 $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_3000.nc
+    done
+done
+for rcp in 85; do
+    for run in CAP6; do
         # so PISM reports fluxes even in ice free cells, we need to correct for this
         cdo -L -O -f nc4 -z zip_3 fldsum -aexpr,"surface_runoff_rate=surface_runoff_rate*sftgif,surface_accumulation_rate=surface_accumulation_rate*sftgif,dMdt=dMdt*sftgif;tendency_of_ice_mass_due_to_conservation_error=tendency_of_ice_mass_due_to_conservation_error*sftgif;tendency_of_ice_mass_due_to_basal_mass_flux=tendency_of_ice_mass_due_to_basal_mass_flux*sftgif;tendency_of_ice_mass_due_to_surface_mass_flux=tendency_of_ice_mass_due_to_surface_mass_flux*sftgif;tendency_of_ice_mass_due_to_discharge=tendency_of_ice_mass_due_to_discharge*sftgif;" -setattribute,dMdt@units="Gt year-1" -aexpr,"dMdt=tendency_of_ice_mass-tendency_of_ice_mass_due_to_flow" -selvar,ice_mass,tendency_of_ice_mass,tendency_of_ice_mass_due_to_flow,tendency_of_ice_mass_due_to_conservation_error,tendency_of_ice_mass_due_to_basal_mass_flux,tendency_of_ice_mass_due_to_surface_mass_flux,tendency_of_ice_mass_due_to_discharge,surface_runoff_rate,surface_accumulation_rate,sftgif $odir/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
         ncks -A -v limnsw,ice_area_glacierized $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
