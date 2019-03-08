@@ -39,10 +39,11 @@ n=160
 grid=1800
 
 PISM_PREFIX=~/pism-as19/bin ./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 80:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
-S
+
 
 rcp=85
-for id in {000..299} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
+for id in {000..298} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
+
 
 rcp=26
 for id in 113 235 258 301 315 345 366 368; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
@@ -122,7 +123,7 @@ grid=900
 
 
 odir=2018_08_ctrl
-s=pleiades_broadwell
+s=electra_broadwell
 q=long
 n=420
 grid=900

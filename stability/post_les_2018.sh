@@ -132,7 +132,7 @@ mkdir -p $odir/contrib_flux_absolute
 mkdir -p $odir/contrib_flux_percent
 mkdir -p $odir/scalar_ensstat
 
-for pctl in 16 84; do
+for pctl in 5 16 50 84 95; do
     for rcp in 26 45 85; do
         cdo -O -P 16 --sortname enspctl,$pctl $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}*0_1000.nc  $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
         cdo mulc,-100 -selvar,limnsw -div -sub -selyear,3000 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc -selyear,2008 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc  -selyear,2008 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/scalar_ensstat/percent_enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
