@@ -59,7 +59,7 @@ parser.add_argument(
 parser.add_argument(
     "-d", "--domain", dest="domain", choices=["gris", "gris_ext"], help="sets the modeling domain", default="gris"
 )
-parser.add_argument("--exstep", dest="exstep", help="Writing interval for spatial time series", default=10)
+parser.add_argument("--exstep", dest="exstep", help="Writing interval for spatial time series", default=1)
 parser.add_argument(
     "-f",
     "--o_format",
@@ -92,7 +92,11 @@ parser.add_argument(
     "-b", "--bed_type", dest="bed_type", choices=list_bed_types(), help="output size type", default="no_bath"
 )
 parser.add_argument(
-    "--spatial_ts", dest="spatial_ts", choices=["basic", "standard", "none"], help="output size type", default="basic"
+    "--spatial_ts",
+    dest="spatial_ts",
+    choices=["basic", "standard", "none", "svs"],
+    help="output size type",
+    default="basic",
 )
 parser.add_argument(
     "--forcing_type", dest="forcing_type", choices=["ctrl", "e_age"], help="output size type", default="ctrl"
@@ -583,7 +587,6 @@ for n, combination in enumerate(combinations):
                         spatial_ts_dict = generate_spatial_ts(
                             outfile, exvars, exstep, odir=dirs["spatial_tmp"], split=False
                         )
-                        spatial_ts_dict["extra_times"] = exstep
                         all_params_dict = merge_dicts(all_params_dict, spatial_ts_dict)
 
                     all_params = " \\\n  ".join(["-{} {}".format(k, v) for k, v in list(all_params_dict.items())])
