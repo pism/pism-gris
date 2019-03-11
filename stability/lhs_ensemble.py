@@ -583,7 +583,7 @@ for n, combination in enumerate(combinations):
                         spatial_ts_dict = generate_spatial_ts(
                             outfile, exvars, exstep, odir=dirs["spatial_tmp"], split=False
                         )
-                        spatial_ts_dict["extra_times"] = "8:10:1000"
+                        spatial_ts_dict["extra_times"] = exstep
                         all_params_dict = merge_dicts(all_params_dict, spatial_ts_dict)
 
                     all_params = " \\\n  ".join(["-{} {}".format(k, v) for k, v in list(all_params_dict.items())])

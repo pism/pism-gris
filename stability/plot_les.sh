@@ -14,7 +14,7 @@
 # Flux Partitioning
 ~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --time_bounds 2008 3000 --no_legend --plot flux_partitioning 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_CTRL_0_1000.nc 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_NTRL_0_1000.nc
 # Flux Partitioning CAP6
-~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --time_bounds 2008 3000 --no_legend --plot flux_partitioning 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_CTRL_0_1000.nc 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_NTRL_0_1000.nc 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_CAP6_0_1000.nc 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_CAP6NTRL_0_1000.nc
+~/base/gris-analysis/plotting/plotting.py -n 4 -o ctrl --time_bounds 2008 3000 --no_legend --plot flux_partitioning 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_CTRL_0_1000.nc 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_NTRL_0_1000.nc 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_CTRL-CAP6_0_1000.nc 2018_08_ctrl/fldsum/ts_gris_g900m_v3a_rcp_*id_NTRL-CAP6_0_1000.nc
 
 
 # Basin Flux Partitioning
