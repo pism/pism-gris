@@ -15,20 +15,14 @@ def analyze(filename):
     print("Processing {}".format(filename))
     # Load the response file
     response = pandas.read_table(filename, delimiter=",", index_col=0, squeeze=True)
-    print(response)
-    try:
-        id = [True for k in response.values if k < 800 and k is not str]
-    except:
-        print(filename)
-        pass
 
     # Convert data frame into numpy array
-    response_matrix = response.as_matrix()[id].astype(float).ravel()
+    #    response_matrix = response.as_matrix()[id].astype(float).ravel()
+    response_matrix = response.as_matrix()
 
-    print(response_matrix.shape)
-    print(params.shape)
     # Convert parameter values into numpy array
-    params_matrix = params.as_matrix()[response.index[id]].astype(float)
+    params_matrix = params.as_matrix()
+    print(response)
 
     # Define a salib "problem"
     problem = {
@@ -76,7 +70,7 @@ if not os.path.isdir(output_dir):
     os.makedirs(output_dir)
 
 # Use pandas to import parameter sample files
-params = pandas.read_table(samples_file, delimiter=",", index_col=0)
+params = pandas.read_table(samples_file)
 
 if len(files) > 1:
     p = Pool(n)
