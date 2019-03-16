@@ -32,7 +32,7 @@
 ~/base/gris-analysis/plotting/plotting.py -f png -r 1200 -c ~/base/gris-analysis/plotting/bath_112.cpt --bounds 0 8000 --time_bounds 2015 2415  -o rcp45 --plot profile_anim 2018_08_ctrl/profiles/profiles_100m_ex_gris_g600m_v3a_rcp_45_id_CTRL_0_1000.nc
 
 # grid resolution
-~/base/gris-analysis/plotting/plotting.py  -n 8 -o ctrl --time_bounds 2020 2200 --bounds -750 0 --plot grid_res 2018_08_ctrl/scalar_clean/ts_gris_g450m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g600m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g3600m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g4500m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g9000m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g18000m_v3a_rcp_*_id_CTRL_0_1000.nc
+~/base/gris-analysis/plotting/plotting.py  -n 8 -o ctrl --time_bounds 2020 2200 --bounds -650 0 --plot grid_res 2018_08_ctrl/scalar_clean/ts_gris_g450m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g600m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g1800m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g3600m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g4500m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g9000m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/scalar_clean/ts_gris_g18000m_v3a_rcp_*_id_CTRL_0_1000.nc
 
 # Random ice discharge
 ~/base/gris-analysis/plotting/plotting.py -n 4 -o test  --time_bounds 2008 3000 --plot random_flux 2018_09_les/scalar_clean/ts_gris_g1800m_v3a_rcp_85_*.nc

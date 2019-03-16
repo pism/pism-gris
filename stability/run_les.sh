@@ -128,7 +128,7 @@ q=long
 n=600
 grid=600
 
-PISM_PREFIX=~/pism-as19/bin ./lhs_ensemble.py --spatial_ts svs  -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep monthly -n ${n} -w 60:00:00 -g ${grid} -s ${s} -q ${q} --step 300 --duration 300 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+PISM_PREFIX=~/pism-as19/bin ./lhs_ensemble.py --spatial_ts svs  -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep monthly -n ${n} -w 80:00:00 -g ${grid} -s ${s} -q ${q} --step 300 --duration 300 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 odir=2018_08_ctrl
 s=electra_broadwell

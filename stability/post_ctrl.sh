@@ -115,7 +115,7 @@ mkdir -p $odir/fldsum
 for rcp in 26 45 85; do
     for run in CTRL NTRL; do
         # so PISM reports fluxes even in ice free cells, we need to correct for this
-        cdo -L -O -f nc4 -z zip_3 fldsum -aexpr,"tendency_of_ice_mass_due_to_surface_mass_flux=tendency_of_ice_mass_due_to_surface_mass_flux*sftgif;surface_runoff_rate=surface_runoff_rate*sftgif;surface_accumulation_rate=surface_accumulation_rate*sftgif;surface_melt_rate=surface_melt_rate*sftgif;" -setattribute,dMdt@units="Gt year-1" -aexpr,"dMdt=(tendency_of_ice_mass-tendency_of_ice_mass_due_to_flow)*sftgif" -selvar,ice_mass,tendency_of_ice_mass,tendency_of_ice_mass_due_to_flow,tendency_of_ice_mass_due_to_conservation_error,tendency_of_ice_mass_due_to_basal_mass_flux,tendency_of_ice_mass_due_to_surface_mass_flux,tendency_of_ice_mass_due_to_discharge,surface_runoff_rate,surface_accumulation_rate,surface_melt_rate,sftgif $odir/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
+        cdo -L -O -f nc4 -z zip_3 fldsum -aexpr,"tendency_of_ice_mass_due_to_surface_mass_flux=tendency_of_ice_mass_due_to_surface_mass_flux*sftgif;surface_runoff_rate=surface_runoff_rate*sftgif;surface_accumulation_rate=surface_accumulation_rate*sftgif;surface_melt_rate=surface_melt_rate*sftgif;" -setattribute,dMdt@units="Gt year-1" -aexpr,"dMdt=tendency_of_ice_mass*sftgif-tendency_of_ice_mass_due_to_flow*sftgif" -selvar,ice_mass,tendency_of_ice_mass,tendency_of_ice_mass_due_to_flow,tendency_of_ice_mass_due_to_conservation_error,tendency_of_ice_mass_due_to_basal_mass_flux,tendency_of_ice_mass_due_to_surface_mass_flux,tendency_of_ice_mass_due_to_discharge,surface_runoff_rate,surface_accumulation_rate,surface_melt_rate,sftgif $odir/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
         ncks -A -v limnsw,ice_area_glacierized $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc
         cdo timmean -selyear,2095/2105 $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2100.nc
         cdo timmean -selyear,2195/2205 $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/fldsum/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_2200.nc
@@ -158,7 +158,9 @@ for rcp in 26 45 85; do
     done
 done
 
-# Extract DGMSL
+# Contributions
+
+
 odir=2018_08_ctrl
 grid=900
 mkdir -p $odir/contrib_absolute
@@ -167,16 +169,16 @@ mkdir -p $odir/contrib_flux_absolute
 mkdir -p $odir/contrib_flux_percent
 for rcp in 26 45 85; do
     for run in CTRL NISO NTRL; do
-        # cdo -L  setattribute,discharge_contrib@units="cm" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_accumulation_rate)*tendency_of_ice_mass" -divc,365 -divc,-1e13 -timcumsum  $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_absolute/dgmsl_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
-        # cdo -L  setattribute,discharge_contrib@units="" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_accumulation_rate)*100" -divc,365 -divc,-1e13 -timcumsum  $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_percent/dgmsl_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+        cdo -L  setattribute,discharge_contrib@units="cm" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_runoff_rate)*tendency_of_ice_mass" -divc,365 -divc,-1e13 -timcumsum  $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_absolute/dgmsl_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+        cdo -L  setattribute,discharge_contrib@units="" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_runoff_rate)*100" -divc,365 -divc,-1e13 -timcumsum  $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_percent/dgmsl_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
 
-        cdo -L  setattribute,discharge_contrib@units="kg year-1" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_accumulation_rate)*tendency_of_ice_mass"  $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_flux_absolute/dgmsl_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
-        # cdo -L  setattribute,discharge_contrib@units="" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_accumulation_rate)*100" -divc,365 -divc,-1e13  $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_flux_percent/dgmsl_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+        cdo -L  setattribute,discharge_contrib@units="kg year-1" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_runoff_rate)*tendency_of_ice_mass"  $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_flux_absolute/dgmsl_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+        cdo -L  setattribute,discharge_contrib@units="" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_runoff_rate)*100" -divc,365 -divc,-1e13  $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_flux_percent/dgmsl_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
 
-        # for year in 2100 2200 2300 3000; do
-        #     cdo -L  setattribute,discharge_contrib@units="cm" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_accumulation_rate)*tendency_of_ice_mass" -divc,365 -divc,-1e13 -selyear,${year} -timcumsum $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib/dgmsl_g${grid}m_rcp_${rcp}_${run}_${year}.nc
-        #     cdo -L  setattribute,discharge_contrib@units="" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_accumulation_rate)*100" -divc,365 -divc,-1e13 -selyear,${year} -timcumsum $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_percent/dgmsl_g${grid}m_rcp_${rcp}_${run}_${year}.nc
-        # done
+        for year in 2100 2200 2300 3000; do
+            cdo -L  setattribute,discharge_contrib@units="cm" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_runoff_rate)*tendency_of_ice_mass" -divc,365 -divc,-1e13 -selyear,${year} -timcumsum $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib/dgmsl_g${grid}m_rcp_${rcp}_${run}_${year}.nc
+            cdo -L  setattribute,discharge_contrib@units="" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_runoff_rate)*100" -divc,365 -divc,-1e13 -selyear,${year} -timcumsum $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/contrib_percent/dgmsl_g${grid}m_rcp_${rcp}_${run}_${year}.nc
+        done
     done
 done
 
