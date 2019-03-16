@@ -1,14 +1,19 @@
 #!/usr/bin/env python
 
+from argparse import ArgumentParser
 import numpy as np
 import pandas as pd
 from scipy.stats.distributions import truncnorm, gamma, uniform, randint
 
 from SALib.sample import saltelli
-from SALib.analyze import sobol
 
-# The number of allowable model runs
-n_samples = 20
+parser = ArgumentParser()
+parser.description = "Draw samples using the Saltelli methods"
+parser.add_argument(
+    "-s", "--n_samples", dest="n_samples", type=int, help="""number of samples to draw. default=40.""", default=40
+)
+options = parser.parse_args()
+n_samples = options.n_samples
 
 distributions = {
     "GCM": randint(0, 4),
@@ -25,7 +30,7 @@ distributions = {
 }
 
 # Names of all the variables
-keys = ["GCM", "FICE", "FSNOW", "PRS", "RFR", "OCM", "OCS", "TCT", "VCM", "PPQ", "SIAE"]
+keys = [x for x in distributions.keys()]
 
 
 # Generate the Sobol sequence samples with uniform distributions
@@ -34,7 +39,6 @@ problem = {"num_vars": len(keys), "names": keys, "bounds": [[0, 1]] * len(keys)}
 
 # Generate samples
 unif_sample = saltelli.sample(problem, n_samples, calc_second_order=False)
-
 
 # To hold the transformed variables
 dist_sample = np.zeros_like(unif_sample)
@@ -48,16 +52,3 @@ for i, key in enumerate(keys):
 # Convert to Pandas dataframe, append column headers, output as csv
 df = pd.DataFrame(dist_sample)
 df.to_csv("saltelli_samples.csv", header=keys, index=True)
-
-# Plot a histogram of each variable
-plot = True
-if plot:
-    import matplotlib.pyplot as plt
-
-    fig, axs = plt.subplots(len(keys), 1)
-    fig.set_size_inches(6, 15)
-    fig.subplots_adjust(hspace=0.45)
-    for i, key in enumerate(keys):
-        axs[i].hist(dist_sample[:, i], 20, normed=True, histtype="step")
-        axs[i].set_ylabel(key)
-    fig.savefig("parameter_histograms.pdf")

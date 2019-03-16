@@ -41,4 +41,5 @@ np.savetxt(
     fmt=["%i", "%4.0f"],
     delimiter=",",
     header="id,{variable}({units})".format(variable=variable, units=units),
+    comments="",
 )
