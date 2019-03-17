@@ -32,7 +32,6 @@ distributions = {
 # Names of all the variables
 keys = [x for x in distributions.keys()]
 
-
 # Generate the Sobol sequence samples with uniform distributions
 
 problem = {"num_vars": len(keys), "names": keys, "bounds": [[0, 1]] * len(keys)}
