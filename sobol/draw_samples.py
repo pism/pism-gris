@@ -12,8 +12,10 @@ parser.description = "Draw samples using the Saltelli methods"
 parser.add_argument(
     "-s", "--n_samples", dest="n_samples", type=int, help="""number of samples to draw. default=40.""", default=40
 )
+parser.add_argument("OUTFILE", nargs=1, help="Ouput file (CSV)", default="saltelli_samples.csv")
 options = parser.parse_args()
 n_samples = options.n_samples
+outfile = options.OUTFILE[-1]
 
 distributions = {
     "GCM": randint(0, 4),
@@ -47,7 +49,7 @@ dist_sample = np.zeros_like(unif_sample)
 for i, key in enumerate(keys):
     dist_sample[:, i] = distributions[key].ppf(unif_sample[:, i])
 
-
+header = keys
 # Convert to Pandas dataframe, append column headers, output as csv
-df = pd.DataFrame(dist_sample)
-df.to_csv("saltelli_samples.csv", header=keys, index=True)
+df = pd.DataFrame(data=dist_sample, columns=header)
+df.to_csv(outfile, index=True, index_label="id")
