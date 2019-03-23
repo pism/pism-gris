@@ -2,8 +2,10 @@
 # Copyright (C) 2019 Andy Aschwanden
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from braceexpand import braceexpand
 import numpy as np
 from netCDF4 import Dataset as NC
+import os
 import re
 
 # set up the option parser
@@ -17,29 +19,36 @@ parser.add_argument("-t", "--time_step", type=int, help="Time step to extract", 
 options = parser.parse_args()
 variable = options.variable
 outfile = options.OUTFILE[0]
-infiles = options.INFILES
+infiles = list(braceexpand(options.INFILES[-1]))
 idx = options.time_step
 
 ne = len(infiles)
-data = np.zeros((2, ne))
-for k, infile in enumerate(infiles):
-    nc = NC(infile)
-    if not variable in nc.variables:
-        print("Variable {} not found, skipping".format(variable))
-    else:
-        id = re.search("id_(.+?)_", infile).group(1)
-        data[0, k] = id
-        val = nc.variables[variable][idx]
-        units = nc.variables[variable].units
-        data[1, k] = val
+data = np.zeros((2, 1))
+k = 0
+for infile in infiles:
+    if os.path.isfile(infile):
+        print(infile)
+        nc = NC(infile)
+        if not variable in nc.variables:
+            print("Variable {} not found, skipping".format(variable))
+        else:
+            id = int(re.search("id_(.+?)_", infile).group(1))
+            print(id)
+            val = float(nc.variables[variable][idx])
+            units = nc.variables[variable].units
+            if k == 0:
+                data[:] = [[id], [val]]
+            else:
+                data = np.append(data, [[id], [val]], axis=1)
+            k += 1
 
-    nc.close()
+        nc.close()
 
-np.savetxt(
-    outfile,
-    np.transpose(data),
-    fmt=["%i", "%4.0f"],
-    delimiter=",",
-    header="id,{variable}({units})".format(variable=variable, units=units),
-    comments="",
-)
+# np.savetxt(
+#     outfile,
+#     np.transpose(data),
+#     fmt=["%i", "%4.0f"],
+#     delimiter=",",
+#     header="id,{variable}({units})".format(variable=variable, units=units),
+#     comments="",
+# )

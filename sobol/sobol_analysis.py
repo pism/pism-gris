@@ -7,30 +7,13 @@ import numpy as np
 import pandas
 import os
 from os.path import join, abspath, realpath, dirname
-from scipy.interpolate import NearestNDInterpolator
+from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 from multiprocessing import Pool
+import pylab as plt
 
 
 def analyze(filename):
     print("Processing {}".format(filename))
-    # Load the response file
-    response = pandas.read_csv(filename, delimiter=",", squeeze=True)
-
-    missing_ids = list(set(params["id"]).difference(response["id"]))
-    print("The following simulation ids are missing:\n   {}".format(["{}\n".format(x) for x in missing_ids]))
-
-    params_missing_removed = params[~params["id"].isin(missing_ids)]
-    params_missing = params[params["id"].isin(missing_ids)]
-
-    # Note that the "1::" is needed because our first columns is the experiment id, which
-    # is discarded because it is not a parameter
-
-    f = NearestNDInterpolator(params_missing_removed.values[:, 1::], response.values[:, 1], rescale=True)
-    data = f(*np.transpose(params_missing.values[:, 1::]))
-
-    filled = pandas.DataFrame(data=np.transpose([missing_ids, data]), columns=response.columns)
-    response_filled = response.append(filled)
-    response_filled = response_filled.sort_values(by="id")
 
     # Define a salib "problem"
     problem = {
@@ -38,22 +21,51 @@ def analyze(filename):
         "names": params.columns.values[1::],  # Parameter names
         "bounds": zip(params.min()[1::], params.max()[1::]),  # Parameter bounds
     }
-    response_matrix = response_filled[response_filled.columns[-1]].values
+
+    # Load the response file
+    response = pandas.read_csv(filename, delimiter=",", squeeze=True)
+
+    missing_ids = list(set(params["id"]).difference(response["id"]))
+
+    if missing_ids:
+        print("The following simulation ids are missing:\n   {}".format(missing_ids))
+
+        params_missing_removed = params[~params["id"].isin(missing_ids)]
+        params_missing = params[params["id"].isin(missing_ids)]
+
+        # Note that the "1::" is needed because our first columns is the experiment id, which
+        # is discarded because it is not a parameter
+
+        f = NearestNDInterpolator(params_missing_removed.values[:, 1::], response.values[:, 1], rescale=True)
+        data = f(*np.transpose(params_missing.values[:, 1::]))
+        filled = pandas.DataFrame(data=np.transpose([missing_ids, data]), columns=response.columns)
+        response_filled = response.append(filled)
+        response_filled = response_filled.sort_values(by="id")
+
+        response_matrix = response_filled[response_filled.columns[-1]].values
+
+    else:
+        response_matrix = response[response.columns[-1]].values
+
+    plt.hist(response_matrix, bins=105, range=[response_matrix.min(), response_matrix.max()])
+    plt.savefig(join(output_dir, os.path.split(filename)[-1][:-4] + "_pdf.pdf"))
 
     # Compute S1 sobol indices using the method of Plischke (2013, doi: https://doi.org/10.1016/j.ejor.2012.11.047)
     # as implemented in SALib
     Si = sobol.analyze(problem, response_matrix, calc_second_order=False, num_resamples=100, print_to_console=False)
 
-    print(Si)
-
     # Save responses as text files
-    outfile = join(output_dir, os.path.split(filename)[-1][:-4] + "_sobol.txt")
+    outfile = join(
+        output_dir, os.path.split(filename)[-1][:-4] + "_" + os.path.split(samples_file)[-1][:-4] + "_sobol.csv"
+    )
+    print(outfile)
     np.savetxt(
         outfile,
         np.c_[params.columns.values[1::], Si["S1"], Si["S1_conf"]],
         delimiter=" ",
         header="Parameter S1 S1_conf",
         fmt=["%s", "%.03f", "%.03f"],
+        comments="",
     )
 
 

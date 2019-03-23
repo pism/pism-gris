@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2016-18 Andy Aschwanden
+# Copyright (C) 2016-19 Andy Aschwanden
 
 import itertools
 from collections import OrderedDict
@@ -362,7 +362,7 @@ for n, combination in enumerate(combinations):
 
         name_options = {"rcp": rcp}
         try:
-            name_options["id"] = "{:03d}".format(int(run_id))
+            name_options["id"] = "{:05d}".format(int(run_id))
         except:
             name_options["id"] = "{}".format(run_id)
 
