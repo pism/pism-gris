@@ -58,7 +58,6 @@ def analyze(filename):
     outfile = join(
         output_dir, os.path.split(filename)[-1][:-4] + "_" + os.path.split(samples_file)[-1][:-4] + "_sobol.csv"
     )
-    print(outfile)
     np.savetxt(
         outfile,
         np.c_[params.columns.values[1::], Si["S1"], Si["S1_conf"]],

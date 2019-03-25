@@ -27,13 +27,11 @@ data = np.zeros((2, 1))
 k = 0
 for infile in infiles:
     if os.path.isfile(infile):
-        print(infile)
         nc = NC(infile)
         if not variable in nc.variables:
             print("Variable {} not found, skipping".format(variable))
         else:
             id = int(re.search("id_(.+?)_", infile).group(1))
-            print(id)
             val = float(nc.variables[variable][idx])
             units = nc.variables[variable].units
             if k == 0:
@@ -44,11 +42,11 @@ for infile in infiles:
 
         nc.close()
 
-# np.savetxt(
-#     outfile,
-#     np.transpose(data),
-#     fmt=["%i", "%4.0f"],
-#     delimiter=",",
-#     header="id,{variable}({units})".format(variable=variable, units=units),
-#     comments="",
-# )
+np.savetxt(
+    outfile,
+    np.transpose(data),
+    fmt=["%i", "%4.0f"],
+    delimiter=",",
+    header="id,{variable}({units})".format(variable=variable, units=units),
+    comments="",
+)
