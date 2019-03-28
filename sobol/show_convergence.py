@@ -31,8 +31,10 @@ colors = [
     "#ffff99",
 ]
 
+ns = []
 for m_file in files:
     n = int(m_file.split("_")[-2])
+    ns.append(n)
     m_df = pd.read_csv(m_file, delimiter=" ", squeeze=True)
     handles = []
     for k in range(len(m_df["S1"].values)):

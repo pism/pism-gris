@@ -9,7 +9,7 @@ mkdir -p ${odir}/sobol
 mkdir -p ${odir}/${var}
 
 echo "Running Sobol Analysis using $D parameters"
-for N in 110 100 90 80 70 60 50 40 30 20 10; do
+for N in 170 160 150 140 130 120 110 100 90 80 70 60 50 40 30 20 10; do
     echo "  Processing N=$N samples"
     # Number of Samples
     (( M = N * (D + 2)))
@@ -22,6 +22,5 @@ for N in 110 100 90 80 70 60 50 40 30 20 10; do
     python ~/base/pism-gris/sobol/sobol_analysis.py --o_dir ${odir}/sobol -s ${odir}/saltelli/saltelli_samples_${N}.csv ${odir}/${var}/${var}_rcp_45_2100_${N}.csv
 
 done
-
 
 python ~/base/pism-gris/sobol/show_convergence.py ${odir}/sobol/sobol-convergence.pdf ${odir}/sobol/limnsw_rcp_45_2100_*sobol.csv
