@@ -139,7 +139,8 @@ for pctl in 5 16 50 84 95; do
     for rcp in 26 45 85; do
         # cdo -O -P 16 --sortname enspctl,$pctl $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}*0_1000.nc  $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
 
-        for year in 2100 2200 2300 3000; do    
+        for year in 2050; do    
+        # for year in 2100 2200 2300 3000; do    
             cdo -L setattribute,limnsw@units="cm" -setattribute,limnsw@long_mame="contribution to global mean sea level" -divc,365 -divc,-1e13 -selvar,limnsw -sub -selyear,$year $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc -seltimestep,1 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc  $odir/dgmsl_ensstat/dgmsl_enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_${year}.nc
         done
         
