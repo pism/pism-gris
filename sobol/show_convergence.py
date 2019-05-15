@@ -8,8 +8,10 @@ import pylab as plt
 
 parser = ArgumentParser()
 parser.description = "Calculate sobel indices"
+parser.add_argument("OUTFILE", nargs=1)
 parser.add_argument("FILE", nargs="*")
 options = parser.parse_args()
+outfile = options.OUTFILE[-1]
 files = options.FILE
 
 fig = plt.figure()
@@ -29,8 +31,10 @@ colors = [
     "#ffff99",
 ]
 
+ns = []
 for m_file in files:
     n = int(m_file.split("_")[-2])
+    ns.append(n)
     m_df = pd.read_csv(m_file, delimiter=" ", squeeze=True)
     handles = []
     for k in range(len(m_df["S1"].values)):
@@ -39,7 +43,11 @@ for m_file in files:
             float(m_df["S1"].values[k]),
             yerr=float(m_df["S1_conf"].values[k]),
             fmt="o",
+            capsize=2,
+            capthick=0.4,
             color=colors[k],
+            linewidth=0.4,
+            markersize=2,
             label=m_df["Parameter"][k],
         )
         handles.append(l)
@@ -60,4 +68,4 @@ D = len(m_df["Parameter"])
 
 ax.set_xlabel("Number of Samples (1)")
 ax.set_ylabel("Variance (1)")
-fig.savefig("sobol-convergence.pdf")
+fig.savefig(outfile)
