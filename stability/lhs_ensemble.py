@@ -308,8 +308,10 @@ pgcm_dict = {
     1.0: "GISS-E2-R-CAP6",
     2.0: "IPSL-CM5A-LR-CAP6",
     3.0: "MPI-ESM-LR-CAP6",
-    4.0: "W1.5K",
-    5.0: "W2.0K",
+    10.0: "W0.7K",
+    11.0: "W1.2K",
+    12.0: "W1.5K",
+    13.0: "W2.0K",
 }
 
 tsstep = "yearly"
