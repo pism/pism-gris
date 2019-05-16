@@ -298,8 +298,11 @@ gcm_dict = {
     0.0: "GISS-E2-H",
     1.0: "GISS-E2-R",
     2.0: "IPSL-CM5A-LR",
-    4.0: "W1.5K",
-    5.0: "W2.0K",
+    3.0: "MPI-ESM-LR",
+    10.0: "W0.7K",
+    11.0: "W1.2K",
+    12.0: "W1.5K",
+    13.0: "W2.0K",
 }
 pgcm_dict = {
     -2.0: "ENSMEAN-CAP6",
