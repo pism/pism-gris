@@ -370,7 +370,7 @@ for n, combination in enumerate(combinations):
 
         name_options = {"rcp": rcp}
         try:
-            name_options["id"] = "{:05d}".format(int(run_id))
+            name_options["id"] = "{:d}".format(int(run_id))
         except:
             name_options["id"] = "{}".format(run_id)
 
