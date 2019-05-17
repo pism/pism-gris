@@ -34,7 +34,7 @@ distributions = {
     "OCM": randint(-1, 2),
     "OCS": randint(-1, 2),
     "TCT": randint(-1, 2),
-    "VCM": truncnorm(-0.35 / 0.2, 0.35 / 0.2, loc=1, scale=0.2),
+    "VCM": truncnorm(-0.35 / 0.2, 0.35 / 0.2, loc=0.4, scale=0.2),
     "PPQ": truncnorm(-0.35 / 0.2, 0.35 / 0.2, loc=0.6, scale=0.2),
     "SIAE": gamma(1.5, scale=0.8, loc=1),
 }
@@ -64,3 +64,13 @@ header = keys
 # Convert to Pandas dataframe, append column headers, output as csv
 df = pd.DataFrame(data=dist_sample, columns=header)
 df.to_csv(outfile, index=True, index_label="id")
+
+# import pylab as plt
+
+# fig, axs = plt.subplots(len(keys[:]), 1)
+# fig.set_size_inches(6, 12)
+# fig.subplots_adjust(hspace=0.45)
+# for i, key in enumerate(keys[:]):
+#     axs[i].hist(dist_sample[:, i], 20, normed=True, histtype="step")
+#     axs[i].set_ylabel(key)
+# fig.savefig("parameter_histograms.pdf", bbox_inches="tight")

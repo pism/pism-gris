@@ -32,7 +32,7 @@ for infile in infiles:
             print("Variable {} not found, skipping".format(variable))
         else:
             id = int(re.search("id_(.+?)_", infile).group(1))
-            val = float(nc.variables[variable][idx])
+            val = float(nc.variables[variable][0] - nc.variables[variable][idx])
             units = nc.variables[variable].units
             if k == 0:
                 data[:] = [[id], [val]]

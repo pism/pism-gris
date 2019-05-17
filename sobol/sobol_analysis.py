@@ -10,10 +10,31 @@ from os.path import join, abspath, realpath, dirname
 from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 from multiprocessing import Pool
 import pylab as plt
+import re
+
+rcp_col_dict = {"CTRL": "k", "85": "#990002", "45": "#5492CD", "26": "#003466"}
+rcp_shade_col_dict = {"CTRL": "k", "85": "#F4A582", "45": "#92C5DE", "26": "#4393C3"}
+rcp_dict = {"26": "RCP 2.6", "45": "RCP 4.5", "85": "RCP 8.5", "CTRL": "CTRL"}
+
+
+def set_size(w, h, ax=None):
+    """ w, h: width, height in inches """
+
+    if not ax:
+        ax = plt.gca()
+    l = ax.figure.subplotpars.left
+    r = ax.figure.subplotpars.right
+    t = ax.figure.subplotpars.top
+    b = ax.figure.subplotpars.bottom
+    figw = float(w) / (r - l)
+    figh = float(h) / (t - b)
+    ax.figure.set_size_inches(figw, figh)
 
 
 def analyze(filename):
     print("Processing {}".format(filename))
+
+    rcp = re.search("rcp_(.+?)_", filename).group(1)
 
     # Define a salib "problem"
     problem = {
@@ -47,14 +68,55 @@ def analyze(filename):
     else:
         response_matrix = response[response.columns[-1]].values
 
-    plt.hist(response_matrix, bins=105, range=[response_matrix.min(), response_matrix.max()])
-    plt.savefig(join(output_dir, os.path.split(filename)[-1][:-4] + "_pdf.pdf"))
+    make_sle = True
+    if make_sle:
+        kg2cmSLE = 1.0e-12 / 365 / 10.0
+
+        response_matrix = response_matrix * kg2cmSLE
+
+    outfile = join(
+        output_dir, os.path.split(filename)[-1][:-4] + "_" + os.path.split(samples_file)[-1][:-4] + "_filled.csv"
+    )
+    np.savetxt(
+        outfile,
+        np.c_[params["id"].values, response_matrix],
+        delimiter=",",
+        comments="",
+        header="id, sle(cm)",
+        fmt=["%i", "%.03f"],
+    )
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.hist(
+        response_matrix,
+        bins=105,
+        range=[response_matrix.min(), response_matrix.max()],
+        density=True,
+        color=rcp_col_dict[rcp],
+    )
+    p16, p50, p84 = np.percentile(response_matrix, [16, 50, 84])
+    ax.errorbar(
+        p50,
+        0.06,
+        xerr=[[p50 - p16], [p84 - p50]],
+        fmt="o",
+        capsize=3,
+        capthick=0.5,
+        color=rcp_col_dict[rcp],
+        linewidth=0.75,
+        markersize=3,
+    )
+    ax.set_xlabel("Sea-level equivalent (cm)")
+    ax.set_ylabel("Density")
+    set_size(4.5, 3)
+    fig.savefig(join(output_dir, os.path.split(filename)[-1][:-4] + "_pdf.pdf"))
 
     # Compute S1 sobol indices using the method of Plischke (2013, doi: https://doi.org/10.1016/j.ejor.2012.11.047)
     # as implemented in SALib
     Si = sobol.analyze(problem, response_matrix, calc_second_order=False, num_resamples=100, print_to_console=False)
 
-    # Save responses as text files
+    # Save Sobol indices as text files
     outfile = join(
         output_dir, os.path.split(filename)[-1][:-4] + "_" + os.path.split(samples_file)[-1][:-4] + "_sobol.csv"
     )
