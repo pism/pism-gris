@@ -94,7 +94,7 @@ parser.add_argument(
 parser.add_argument(
     "--spatial_ts",
     dest="spatial_ts",
-    choices=["basic", "standard", "none", "svs"],
+    choices=["basic", "standard", "none", "svs", "divq"],
     help="output size type",
     default="basic",
 )
@@ -275,7 +275,7 @@ phi_max = 40.0
 topg_min = -700
 topg_max = 700
 
-rcps = ["26", "45", "85"]
+rcps = ["paris", "26", "45", "85"]
 std_dev = 4.23
 firn = "ctrl"
 lapse_rate = 6
@@ -299,6 +299,10 @@ gcm_dict = {
     1.0: "GISS-E2-R",
     2.0: "IPSL-CM5A-LR",
     3.0: "MPI-ESM-LR",
+    10.0: "W0.7K",
+    11.0: "W1.2K",
+    12.0: "W1.5K",
+    13.0: "W2.0K",
 }
 pgcm_dict = {
     -2.0: "ENSMEAN-CAP6",
@@ -307,6 +311,10 @@ pgcm_dict = {
     1.0: "GISS-E2-R-CAP6",
     2.0: "IPSL-CM5A-LR-CAP6",
     3.0: "MPI-ESM-LR-CAP6",
+    10.0: "W0.7K",
+    11.0: "W1.2K",
+    12.0: "W1.5K",
+    13.0: "W2.0K",
 }
 
 tsstep = "yearly"

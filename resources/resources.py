@@ -65,7 +65,21 @@ spatial_ts_vars = {}
 
 spatial_ts_vars["basic"] = ["ice_mass", "mass_fluxes", "sftgif", "velsurf_mag", "mask", "usurf", "pdd_rates"]
 
-spatial_ts_vars["svs"] = ["topg", "sftgif", "velsurf_mag", "mask", "usurf", "dHdt", "velsurf"]
+spatial_ts_vars["svs"] = ["topg", "sftgif", "velsurf_mag", "mask", "usurf", "dHdt", "velsurf", "thk"]
+
+spatial_ts_vars["divq"] = [
+    "topg",
+    "sftgif",
+    "velsurf_mag",
+    "mask",
+    "usurf",
+    "dHdt",
+    "velsurf",
+    "ice_mass",
+    "flux_divergence",
+    "mass_fluxes",
+    "pdd_rates",
+]
 
 
 spatial_ts_vars["hydro"] = [

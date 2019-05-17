@@ -30,6 +30,14 @@ for file in ${odir}/scalar/ts_*.nc; do
         nccopy $file ${ofile}
     fi
 done
+MAXSIZE=6000000000
+for file in ${odir}_tmp/*_0_100.nc; do
+    FILESIZE=$(stat -c%s "$file")
+    if (( $FILESIZE > $MAXSIZE)); then
+        echo "compressing $file"
+        ncks -O -4 -L 3 $file $file
+    fi
+done
 
 
 ## CHINOOK ONLY
