@@ -9,7 +9,7 @@
 cd $SLURM_SUBMIT_DIR
 
 ## PLEIADES
-odir=2019_02_salt
+odir=2019_05_salt
 grid=1800
 MAXSIZE=2500000000
 for file in ${odir}/state/*_0_100.nc  ${odir}/state/*_0_100_max*.nc; do
