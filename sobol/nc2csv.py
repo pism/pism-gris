@@ -19,7 +19,9 @@ parser.add_argument("-t", "--time_step", type=int, help="Time step to extract", 
 options = parser.parse_args()
 variable = options.variable
 outfile = options.OUTFILE[0]
+# need to switch between the two solutions
 infiles = list(braceexpand(options.INFILES[-1]))
+infiles = options.INFILES
 idx = options.time_step
 
 ne = len(infiles)
@@ -45,7 +47,7 @@ for infile in infiles:
 np.savetxt(
     outfile,
     np.transpose(data),
-    fmt=["%i", "%4.0f"],
+    fmt=["%i", "%4.1f"],
     delimiter=",",
     header="id,{variable}({units})".format(variable=variable, units=units),
     comments="",

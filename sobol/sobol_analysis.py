@@ -86,6 +86,17 @@ def analyze(filename):
         fmt=["%i", "%.03f"],
     )
 
+    for k in range(1, len(params.columns)):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(
+            params[params.columns[k]].values, response_filled[response_filled.columns[-1]].values, ".", color="0.5"
+        )
+        ax.set_ylabel("Sea-level equivalent (cm)")
+        ax.set_xlabel("{}".format(params.columns[k]))
+        set_size(4.5, 3)
+        fig.savefig(join(output_dir, os.path.split(filename)[-1][:-4] + "_{}.png".format(params.columns[k])))
+
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.hist(
@@ -110,7 +121,7 @@ def analyze(filename):
     ax.set_xlabel("Sea-level equivalent (cm)")
     ax.set_ylabel("Density")
     set_size(4.5, 3)
-    fig.savefig(join(output_dir, os.path.split(filename)[-1][:-4] + "_pdf.pdf"))
+    fig.savefig(join(output_dir, os.path.split(filename)[-1][:-4] + "_pdf.png"))
 
     # Compute S1 sobol indices using the method of Plischke (2013, doi: https://doi.org/10.1016/j.ejor.2012.11.047)
     # as implemented in SALib
