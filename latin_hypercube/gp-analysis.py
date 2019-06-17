@@ -69,7 +69,7 @@ def draw_samples(n_samples=1000):
     return pd.DataFrame(data=dist_sample, columns=header)
 
 
-def gp_emulate(year):
+def gp_emulate(year, rcp):
 
     # Load respone file as Pandas DataFrame
     response_file = "2018_09_les/dgmsl_csv/dgmsl_rcp_{}_{}.csv".format(rcp, year)
@@ -106,7 +106,7 @@ def gp_emulate(year):
     pctls_df.to_csv("gp_pctl_rcp_{}_{}.csv".format(rcp, year), index_label="percentile")
 
 
-def gp_loo(kern, year):
+def gp_loo(kern, rcp, year):
 
     # Load respone file as Pandas DataFrame
     response_file = "2018_09_les/dgmsl_csv/dgmsl_rcp_{}_{}.csv".format(rcp, year)
@@ -128,26 +128,28 @@ def gp_loo(kern, year):
     pool = Pool(4)
 
     n = X.shape[1]
-    kern = gp.kern.Exponential(input_dim=n - 1, ARD=True)
-    pool.map(partial(gp_loo_mp, X=X, Y=Y, kern=kern), range(2))
+    kern = gp.kern.Exponential(input_dim=n, ARD=True)
+    pool.map(partial(gp_loo_mp, X=X, Y=Y, kern=kern, rcp=rcp, year=year), range(2))
 
 
-def gp_loo_mp(loo_idx, X, Y, kern):
+def gp_loo_mp(loo_idx, X, Y, kern, rcp, year):
 
     X_loo = np.delete(X, loo_idx, axis=0)
     Y_loo = np.delete(Y, loo_idx, axis=0)
 
     X_predict = X[loo_idx, :].reshape(1, -1)
 
-    # Dimension n of kernel
-    n = X_loo.shape[1]
-
-    # We choose a kernel
-    print(loo_idx)
-    # k = kern(input_dim=n, ARD=True)
-
     m = gp.models.GPRegression(X_loo, Y_loo, kern)
     m.optimize(messages=True)
+
+    p = m.predict(X_predict)
+
+    df = pd.DataFrame(data=np.asarray(p).reshape(1, -1), index=[loo_idx], columns=["prediction", "variance"])
+    df.to_csv("gp_rcp_{}_{}_loo_{}.csv".format(rcp, year, loo_idx), index_label="LOO")
+
+
+# pctls_df = pd.DataFrame(data=np.vstack([pctls, pctls_gp]).T, index=[5, 16, 50, 84, 95], columns=["lhs", "gp"])
+# pctls_df.to_csv("gp_pctl_rcp_{}_{}.csv".format(rcp, year), index_label="percentile")
 
 
 rcp_col_dict = {"CTRL": "k", "85": "#990002", "45": "#5492CD", "26": "#003466"}
@@ -161,9 +163,9 @@ rcp = "85"
 m_percentiles = [5, 16, 50, 84, 95]
 
 # pool = Pool(4)
-# pool.map(gp_emulate, range(292))
+# pool.map(partial(gp_emulate, rcp=rcp), range(292))
 
-gp_loo(gp.models.GPRegression, 92)
+gp_loo(gp.models.GPRegression, rcp, 92)
 
 date = np.arange(0, 292) + 2009
 fig = plt.figure()
