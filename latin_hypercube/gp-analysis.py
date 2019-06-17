@@ -8,6 +8,7 @@ import pandas as pd
 import pylab as plt
 
 from multiprocessing import Pool
+from functools import partial
 
 from SALib.sample import saltelli
 import pandas as pd
@@ -113,6 +114,7 @@ def gp_loo(kern, year):
     # It is possible that not all ensemble simulations succeeded and returned a value
     # so we much search for missing response values
     missing_ids = list(set(samples["id"]).difference(response["id"]))
+
     Y = -response[response.columns[-1]].values.reshape(1, -1).T
     if missing_ids:
         print("The following simulation ids are missing:\n   {}".format(missing_ids))
@@ -126,11 +128,11 @@ def gp_loo(kern, year):
     pool = Pool(4)
 
     n = X.shape[1]
-    k = gp.kern.Exponential(input_dim=n - 1, ARD=True)
-    pool.map(gp_loo_mp, range(10))
+    kern = gp.kern.Exponential(input_dim=n - 1, ARD=True)
+    pool.map(partial(gp_loo_mp, X=X, Y=Y, kern=kern), range(2))
 
 
-def gp_loo_mp(loo_idx):
+def gp_loo_mp(loo_idx, X, Y, kern):
 
     X_loo = np.delete(X, loo_idx, axis=0)
     Y_loo = np.delete(Y, loo_idx, axis=0)
@@ -141,10 +143,10 @@ def gp_loo_mp(loo_idx):
     n = X_loo.shape[1]
 
     # We choose a kernel
-    print(kern)
+    print(loo_idx)
     # k = kern(input_dim=n, ARD=True)
 
-    m = gp.models.GPRegression(X_loo, Y_loo, k)
+    m = gp.models.GPRegression(X_loo, Y_loo, kern)
     m.optimize(messages=True)
 
 
@@ -161,7 +163,7 @@ m_percentiles = [5, 16, 50, 84, 95]
 # pool = Pool(4)
 # pool.map(gp_emulate, range(292))
 
-# gp_loo(gp.models.GPRegression, 92)
+gp_loo(gp.models.GPRegression, 92)
 
 date = np.arange(0, 292) + 2009
 fig = plt.figure()
