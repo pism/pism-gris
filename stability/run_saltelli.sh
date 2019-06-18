@@ -31,4 +31,4 @@ PISM_PREFIX=~/pism-as19/bin/ ./lhs_ensemble.py -e ../sobol/saltelli_samples_20.c
 exit
 
 rcp=45
-for id in {000..100}; do qsub /nobackupp8/aaschwan/pism-gris/stability/2019_02_salt/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
+for id in {0..294}; do qsub /nobackupp8/aaschwan/pism-gris/stability/2019_05_salt/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
