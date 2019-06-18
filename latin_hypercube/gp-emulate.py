@@ -123,6 +123,8 @@ rcp_shade_col_dict = {"CTRL": "k", "85": "#F4A582", "45": "#92C5DE", "26": "#439
 
 if __name__ == "__main__":
 
+    __spec__ = None
+
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
     parser.description = "Gaussian Process Emulators."
     parser.add_argument(
@@ -167,10 +169,11 @@ if __name__ == "__main__":
 
         print(results)
 
-    # years = np.asarray([int(re.search("year_(.+?).csv", x[0]).group(1)) for x in results])
-    # print(years)
-    # gp_dict = dict()
-    # lhs_dict = dict()
-    # for idx, pctl in enumerate(results[0][1].index):
-    #     gp_dict[pctl] = [x[1].values[idx][1] for x in results]
-    #     lhs_dict[pctl] = [x[1].values[idx][0] for x in results]
+    gp = dict()
+    gp["years"] = np.asarray([item["year"] for item in results])
+    lhs = dict()
+    lhs["years"] = np.asarray([item["year"] for item in results])
+
+    for idx, pctl in enumerate(m_percentiles):
+        gp[pctl] = np.squeeze(np.asarray([item["gp"].values[idx, :] for item in results]).reshape(1, -1))
+        lhs[pctl] = np.squeeze(np.asarray([item["lhs"].values[idx, :] for item in results]).reshape(1, -1))
