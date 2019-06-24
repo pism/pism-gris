@@ -275,7 +275,7 @@ phi_max = 40.0
 topg_min = -700
 topg_max = 700
 
-rcps = ["paris", "26", "45", "85"]
+rcps = ["cc", "26", "45", "85"]
 std_dev = 4.23
 firn = "ctrl"
 lapse_rate = 6
@@ -304,6 +304,8 @@ gcm_dict = {
     12.0: "W1.5K",
     13.0: "W2.0K",
     20.0: "C0.2K",
+    21.0: "C0.7K",
+    22.0: "C1.2K",
 }
 pgcm_dict = {
     -2.0: "ENSMEAN-CAP6",
@@ -316,7 +318,8 @@ pgcm_dict = {
     11.0: "W1.2K",
     12.0: "W1.5K",
     13.0: "W2.0K",
-    20.0: "C0.2K",
+    21.0: "C0.7K",
+    22.0: "C1.2K",
 }
 
 tsstep = "yearly"
@@ -380,10 +383,10 @@ for n, combination in enumerate(combinations):
         full_exp_name = "_".join([vversion, "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())])])
         full_outfile = "g{grid}m_{experiment}.nc".format(grid=grid, experiment=full_exp_name)
 
-        climate_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
+        climate_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-500000.nc".format(
             mgcm=gcm_dict[gcm], rcp=rcp
         )
-        precip_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
+        precip_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-500000.nc".format(
             mgcm=pgcm_dict[gcm], rcp=rcp
         )
 

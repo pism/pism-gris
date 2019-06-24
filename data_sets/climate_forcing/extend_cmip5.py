@@ -38,7 +38,7 @@ b = np.squeeze(nc_b.variables["tas"][0])
 nc_b.close()
 
 nt = len(time_var[:])
-for t in range(0, 5001):
+for t in range(0, 500001):
     time_var[t] = t
     time_bnds_var[t, 0] = t
     time_bnds_var[t, 1] = t + 1

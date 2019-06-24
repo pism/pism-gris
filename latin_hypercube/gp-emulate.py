@@ -112,7 +112,7 @@ def create_netcdf(
     nc.close()
 
 
-def save_to_netcdf(filename, data):
+def save_to_netcdf(filename, data, ens):
     """ Save results to a netcdf file"""
 
     time = np.asarray([item["year"] for item in data])
@@ -123,11 +123,10 @@ def save_to_netcdf(filename, data):
     ne = len(data[0]["Y_gp"][0])
 
     nc = NC(filename, "a")
-    nc.createDimension("ne", size=ne)
     for idx, varname in enumerate(("limnsw", "limnsw_variance")):
-        var = nc.createVariable(varname, "d", dimensions=("time", "ne"), zlib=True, complevel=3)
+        var = nc.createVariable(varname, "d", dimensions=("time"), zlib=True, complevel=3)
         var.units = "kg"
-        var[:] = np.squeeze(np.asarray([x["Y_gp"][idx] for x in data]))
+        var[:] = np.squeeze(np.asarray([x["Y_gp"][idx][ens] for x in data]))
 
     nc.close()
 
@@ -247,7 +246,7 @@ if __name__ == "__main__":
     __spec__ = None
 
     parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.description = "Gaussian Process Emulators."
+    parser.description = "Gaussian Process Emulator."
     parser.add_argument(
         "-n", "--n_procs", dest="n_procs", type=int, help="""number of cores/processors. default=4.""", default=4
     )
@@ -277,6 +276,10 @@ if __name__ == "__main__":
 
     samples_file = options.samples_file
     basedir = options.INDIR[0]
+    odir = os.path.join(basedir, "gp")
+
+    if not os.path.isdir(odir):
+        os.makedirs(odir)
 
     X_new = draw_samples(n_samples)
 
@@ -288,8 +291,9 @@ if __name__ == "__main__":
         )
         pool.close()
 
-    filename = "test.nc"
-    save_to_netcdf(filename, results)
+    for ens in range(n_samples):
+        filename = os.path.join(odir, "gp_{}_{}.nc".format(ens, n_samples))
+        save_to_netcdf(filename, results, ens)
 
     # gp = dict()
     # gp["years"] = np.asarray([item["year"] for item in results])
