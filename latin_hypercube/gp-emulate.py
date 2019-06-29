@@ -291,55 +291,93 @@ if __name__ == "__main__":
         )
         pool.close()
 
-    for ens in range(n_samples):
-        filename = os.path.join(odir, "gp_{}_{}.nc".format(ens, n_samples))
-        save_to_netcdf(filename, results, ens)
+    # for ens in range(n_samples):
+    #     filename = os.path.join(odir, "gp_{}_{}.nc".format(ens, n_samples))
+    #     save_to_netcdf(filename, results, ens)
 
-    # gp = dict()
-    # gp["years"] = np.asarray([item["year"] for item in results])
-    # lhs = dict()
-    # lhs["years"] = np.asarray([item["year"] for item in results])
+    gp = dict()
+    gp["years"] = np.asarray([item["year"] for item in results])
+    lhs = dict()
+    lhs["years"] = np.asarray([item["year"] for item in results])
 
-    # for idx, pctl in enumerate(m_percentiles):
-    #     gp[pctl] = np.squeeze(np.asarray([item["gp"].values[idx, :] for item in results]).reshape(1, -1))
-    #     lhs[pctl] = np.squeeze(np.asarray([item["lhs"].values[idx, :] for item in results]).reshape(1, -1))
+    for idx, pctl in enumerate(m_percentiles):
+        gp[pctl] = np.squeeze(np.asarray([item["gp"].values[idx, :] for item in results]).reshape(1, -1))
+        lhs[pctl] = np.squeeze(np.asarray([item["lhs"].values[idx, :] for item in results]).reshape(1, -1))
 
-    # # Because the above analysis can take some time,
-    # # here we want to take the results and save it in a file instead of making a plot right now.
+    # Because the above analysis can take some time,
+    # here we want to take the results and save it in a file instead of making a plot right now.
 
-    # lw = 0.3
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # ax.fill_between(gp["years"], gp[5], gp[95], color=rcp_col_dict[rcp], linewidth=lw, alpha=0.2)
-    # ax.fill_between(gp["years"], gp[16], gp[84], color=rcp_col_dict[rcp], linewidth=lw, alpha=0.2)
+    fontsize = 6
+    lw = 0.65
+
+    params = {
+        "backend": "ps",
+        "axes.linewidth": 0.25,
+        "lines.linewidth": lw,
+        "axes.labelsize": fontsize,
+        "font.size": fontsize,
+        "xtick.direction": "in",
+        "xtick.labelsize": fontsize,
+        "xtick.major.size": 2.5,
+        "xtick.major.width": 0.25,
+        "ytick.direction": "in",
+        "ytick.labelsize": fontsize,
+        "ytick.major.size": 2.5,
+        "ytick.major.width": 0.25,
+        "legend.fontsize": fontsize,
+        "font.size": fontsize,
+    }
+
+    plt.rcParams.update(params)
+
+    lw = 0.3
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.fill_between(gp["years"], gp[5], gp[95], color=rcp_col_dict[rcp], linewidth=lw, alpha=0.2)
+    ax.fill_between(gp["years"], gp[16], gp[84], color=rcp_col_dict[rcp], linewidth=lw, alpha=0.2)
+    for pctl in m_percentiles:
+        if pctl != 5:
+            ax.plot(lhs["years"], lhs[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle=":")
+        else:
+            ax.plot(lhs["years"], lhs[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle=":", label="AS19")
+    for pctl in m_percentiles:
+        ax.annotate("{}".format(pctl), (2300, gp[pctl][-1]), size=5)
+        if pctl != 5:
+            ax.plot(gp["years"], gp[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle="-")
+        else:
+            ax.plot(gp["years"], gp[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle="-", label="GP")
+    ax.annotate("50", (2320, gp[50][-1]))
+    legend = plt.legend()
+    legend.get_frame().set_linewidth(0.0)
+    legend.get_frame().set_alpha(0.0)
+    ax.set_ylabel("Sea-level equivalent\n(cm)")
+    ax.set_xlabel("Year")
+    ax.set_xlim(lhs["years"].min(), lhs["years"].max())
+    set_size(3.2, 1.2)
+    fig.savefig("gp_rcp_{}.pdf".format(rcp), bbox_inches="tight", dpi=600)
+
+    m_year = 2100
+    Y_gp = results[91]["Y_gp"][0]
+    Y_lhs = results[91]["Y_lhs"]
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    plt.title("Probability Density Year 2100")
+    ax.hist(
+        Y_lhs, bins=np.arange(int(Y_gp.min()), int(Y_gp.max()), 1), density=True, color=rcp_col_dict[rcp], alpha=0.4
+    )
+    ax.hist(
+        Y_gp,
+        bins=np.arange(int(Y_gp.min()), int(Y_gp.max()), 1),
+        histtype="step",
+        linewidth=0.6,
+        density=True,
+        color=rcp_col_dict[rcp],
+        alpha=1.0,
+    )
     # for pctl in m_percentiles:
-    #     ax.plot(lhs["years"], lhs[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle=":")
-    # for pctl in m_percentiles:
-    #     ax.plot(gp["years"], gp[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle="-")
-    # ax.set_ylabel("Sea-level equivalent\n(cm)")
-    # ax.set_xlabel("Year")
-    # ax.set_xlim(lhs["years"].min(), lhs["years"].max())
-    # set_size(3.2, 1)
-    # fig.savefig("gp_rcp_{}.pdf".format(rcp), bbox_inches="tight", dpi=600)
-
-    # m_year = 2100
-    # Y_gp = results[-1]["Y_gp"][0]
-    # Y_lhs = results[-1]["Y_lhs"]
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # ax.hist(
-    #     Y_lhs, bins=np.arange(int(Y_gp.min()), int(Y_gp.max()), 0.25), density=True, color=rcp_col_dict[rcp], alpha=0.4
-    # )
-    # ax.hist(
-    #     Y_gp,
-    #     bins=np.arange(int(Y_gp.min()), int(Y_gp.max()), 0.25),
-    #     histtype="step",
-    #     linewidth=0.6,
-    #     density=True,
-    #     color=rcp_col_dict[rcp],
-    #     alpha=1.0,
-    # )
-    # ax.set_xlabel("Sea-level equivalent (cm)")
-    # ax.set_ylabel("Density")
-    # set_size(3.2, 1.2)
-    # fig.savefig("gp_rcp_{}_hist_{}.png".format(rcp, m_year), bbox_inches="tight", dpi=600)
+    #     ax.axvline(gp[pctl][91], linewidth=0.3, linestyle="-")
+    #     ax.axvline(lhs[pctl][91], linewidth=0.3, linestyle=":")
+    ax.set_xlabel("Sea-level equivalent (cm)")
+    ax.set_ylabel("Density")
+    set_size(3.2, 1.2)
+    fig.savefig("gp_rcp_{}_hist_{}.pdf".format(rcp, m_year), bbox_inches="tight", dpi=600)
