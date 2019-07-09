@@ -209,7 +209,7 @@ if __name__ == "__main__":
     pool.close()
 
     # gp_loo(gp.models.GPRegression, rcp, 92)
-
+    
     date = np.arange(0, duration) + start_year
     fig = plt.figure()
     ax = fig.add_subplot(111)
