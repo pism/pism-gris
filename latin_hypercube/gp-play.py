@@ -31,20 +31,6 @@ from scipy.stats.distributions import truncnorm, gamma, uniform, randint
 import re
 import os
 
-params_dict = {
-    "GCM": 0,
-    "FICE": 1,
-    "FSNOW": 2,
-    "PRS": 3,
-    "RFR": 4,
-    "OCM": 5,
-    "OCS": 6,
-    "TCT": 7,
-    "VCM": 8,
-    "PPQ": 9,
-    "SIAE": 10,
-}
-
 
 def create_netcdf(
     filename,
@@ -196,9 +182,83 @@ def emulate(year, X_new, samples_file, metadata):
     ## lm(formula = limnsw ~ GCM + FICE + FSNOW + RFR + TCT + PPQ +
     ##     SIAE + FSNOW:TCT + PPQ:SIAE + TCT:PPQ, data = data)
 
-    kern = gp.kern.Exponential(input_dim=7, active_dims=[0, 1, 2], ARD=True) + gp.kern.Exponential(
-        input_dim=1, active_dims=[1], ARD=True
-    ) * gp.kern.Exponential(input_dim=1, active_dims=[2], ARD=True)
+    kern = gp.kern.Exponential(input_dim=n, ARD=True)
+    m = gp.models.GPRegression(X, Y, kern)
+    m.optimize(messages=True)
+
+    p = m.predict(X_new.values)
+
+    # kern = gp.kernels.Exponential(input_dim=n, ARD=True)
+    # m = gp.models.GPR(X, Y, kern)
+    # opt = gp.train.ScipyOptimizer()
+    # opt.minimize(m)
+
+    # p = m.predict_f(X_new.values)
+
+    pctls_gp = np.percentile(p[0], m_percentiles)
+    pctls_lhs = np.percentile(Y, m_percentiles)
+    gp_df = pd.DataFrame(data=pctls_gp, index=[5, 16, 50, 84, 95], columns=["gp"])
+    lhs_df = pd.DataFrame(data=pctls_lhs, index=[5, 16, 50, 84, 95], columns=["lhs"])
+
+    return {"year": year, "gp": gp_df, "lhs": lhs_df, "Y_gp": p, "Y_lhs": Y, "m": m}
+
+
+def emulate_stepAIC(year, X_new, samples_file, metadata):
+
+    rcp = metadata["rcp"]
+    basedir = metadata["basedir"]
+
+    response_file = os.path.join(basedir, "dgmsl_rcp_{}_year_{}.csv").format(rcp, year)
+
+    print("\nProcessing {}".format(response_file))
+
+    # Load Samples file as Pandas DataFrame
+    samples = pd.read_csv(samples_file, delimiter=",", squeeze=True, skipinitialspace=True)
+
+    # Load Respone file as Pandas DataFrame
+    response = pd.read_csv(response_file, delimiter=",", squeeze=True, skipinitialspace=True)
+    # It is possible that not all ensemble simulations succeeded and returned a value
+    # so we much search for missing response values
+    missing_ids = list(set(samples["id"]).difference(response["id"]))
+    Y = response[response.columns[-1]].values.reshape(1, -1).T
+    if missing_ids:
+        print("The following simulation ids are missing:\n   {}".format(missing_ids))
+        # and remove the missing samples
+        samples_missing_removed = samples[~samples["id"].isin(missing_ids)]
+        X = samples_missing_removed.values[:, 1::]
+
+    else:
+        X = samples.values[:, 1::]
+
+    # Dimension n of kernel
+    n = X.shape[1]
+
+    # We choose an exponential kernel
+
+    ## lm(formula = limnsw ~ GCM + FICE + FSNOW + RFR + TCT + PPQ +
+    ##     SIAE + FSNOW:TCT + PPQ:SIAE + TCT:PPQ, data = data)
+
+    kern = (
+        gp.kern.Exponential(
+            input_dim=7,
+            active_dims=[
+                params_dict["GCM"],
+                params_dict["FICE"],
+                params_dict["FSNOW"],
+                params_dict["RFR"],
+                params_dict["GCM"],
+                params_dict["PPQ"],
+                params_dict["SIAE"],
+            ],
+            ARD=True,
+        )
+        + gp.kern.Exponential(input_dim=1, active_dims=[params_dict["FSNOW"]], ARD=True)
+        * gp.kern.Exponential(input_dim=1, active_dims=[params_dict["TCT"]], ARD=True)
+        + gp.kern.Exponential(input_dim=1, active_dims=[params_dict["PPQ"]], ARD=True)
+        * gp.kern.Exponential(input_dim=1, active_dims=[params_dict["SIAE"]], ARD=True)
+        + gp.kern.Exponential(input_dim=1, active_dims=[params_dict["TCT"]], ARD=True)
+        * gp.kern.Exponential(input_dim=1, active_dims=[params_dict["PPQ"]], ARD=True)
+    )
     m = gp.models.GPRegression(X, Y, kern)
     m.optimize(messages=True)
 
@@ -267,6 +327,19 @@ def draw_samples(n_samples=1000):
 m_percentiles = [5, 16, 50, 84, 95]
 rcp_col_dict = {"CTRL": "k", "85": "#990002", "45": "#5492CD", "26": "#003466"}
 rcp_shade_col_dict = {"CTRL": "k", "85": "#F4A582", "45": "#92C5DE", "26": "#4393C3"}
+params_dict = {
+    "GCM": 0,
+    "FICE": 1,
+    "FSNOW": 2,
+    "PRS": 3,
+    "RFR": 4,
+    "OCM": 5,
+    "OCS": 6,
+    "TCT": 7,
+    "VCM": 8,
+    "PPQ": 9,
+    "SIAE": 10,
+}
 
 
 if __name__ == "__main__":
@@ -315,6 +388,7 @@ if __name__ == "__main__":
     metadata = {"rcp": rcp, "basedir": basedir}
     if options.test:
         results = emulate(2100, X_new, samples_file=samples_file, metadata=metadata)
+        results_stepAIC = emulate_stepAIC(2100, X_new, samples_file=samples_file, metadata=metadata)
     else:
         with Pool(n_procs) as pool:
             results = pool.map(
@@ -342,74 +416,74 @@ if __name__ == "__main__":
     fontsize = 6
     lw = 0.65
 
-    # params = {
-    #     "backend": "ps",
-    #     "axes.linewidth": 0.25,
-    #     "lines.linewidth": lw,
-    #     "axes.labelsize": fontsize,
-    #     "font.size": fontsize,
-    #     "xtick.direction": "in",
-    #     "xtick.labelsize": fontsize,
-    #     "xtick.major.size": 2.5,
-    #     "xtick.major.width": 0.25,
-    #     "ytick.direction": "in",
-    #     "ytick.labelsize": fontsize,
-    #     "ytick.major.size": 2.5,
-    #     "ytick.major.width": 0.25,
-    #     "legend.fontsize": fontsize,
-    #     "font.size": fontsize,
-    # }
+    params = {
+        "backend": "ps",
+        "axes.linewidth": 0.25,
+        "lines.linewidth": lw,
+        "axes.labelsize": fontsize,
+        "font.size": fontsize,
+        "xtick.direction": "in",
+        "xtick.labelsize": fontsize,
+        "xtick.major.size": 2.5,
+        "xtick.major.width": 0.25,
+        "ytick.direction": "in",
+        "ytick.labelsize": fontsize,
+        "ytick.major.size": 2.5,
+        "ytick.major.width": 0.25,
+        "legend.fontsize": fontsize,
+        "font.size": fontsize,
+    }
 
-    # plt.rcParams.update(params)
+    plt.rcParams.update(params)
 
-    # lw = 0.3
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # ax.fill_between(gp["years"], gp[5], gp[95], color=rcp_col_dict[rcp], linewidth=lw, alpha=0.2)
-    # ax.fill_between(gp["years"], gp[16], gp[84], color=rcp_col_dict[rcp], linewidth=lw, alpha=0.2)
+    lw = 0.3
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.fill_between(m_gp["years"], m_gp[5], m_gp[95], color=rcp_col_dict[rcp], linewidth=lw, alpha=0.2)
+    ax.fill_between(m_gp["years"], m_gp[16], m_gp[84], color=rcp_col_dict[rcp], linewidth=lw, alpha=0.2)
+    for pctl in m_percentiles:
+        if pctl != 5:
+            ax.plot(m_lhs["years"], m_lhs[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle=":")
+        else:
+            ax.plot(m_lhs["years"], m_lhs[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle=":", label="AS19")
+    for pctl in m_percentiles:
+        ax.annotate("{}".format(pctl), (2300, m_gp[pctl][-1]), size=5)
+        if pctl != 5:
+            ax.plot(m_gp["years"], m_gp[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle="-")
+        else:
+            ax.plot(m_gp["years"], m_gp[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle="-", label="GP")
+    ax.annotate("50", (2320, m_gp[50][-1]))
+    legend = plt.legend()
+    legend.get_frame().set_linewidth(0.0)
+    legend.get_frame().set_alpha(0.0)
+    ax.set_ylabel("Sea-level equivalent\n(cm)")
+    ax.set_xlabel("Year")
+    ax.set_xlim(m_lhs["years"].min(), m_lhs["years"].max())
+    set_size(3.2, 1.2)
+    fig.savefig("gp_rcp_{}.pdf".format(rcp), bbox_inches="tight", dpi=600)
+
+    m_year = 2100
+    Y_gp = results[-1]["Y_gp"][0]
+    Y_lhs = results[-1]["Y_lhs"]
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    plt.title("Probability Density Year 2100")
+    ax.hist(
+        Y_lhs, bins=np.arange(int(Y_gp.min()), int(Y_gp.max()), 1), density=True, color=rcp_col_dict[rcp], alpha=0.4
+    )
+    ax.hist(
+        Y_gp,
+        bins=np.arange(int(Y_gp.min()), int(Y_gp.max()), 1),
+        histtype="step",
+        linewidth=0.6,
+        density=True,
+        color=rcp_col_dict[rcp],
+        alpha=1.0,
+    )
     # for pctl in m_percentiles:
-    #     if pctl != 5:
-    #         ax.plot(lhs["years"], lhs[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle=":")
-    #     else:
-    #         ax.plot(lhs["years"], lhs[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle=":", label="AS19")
-    # for pctl in m_percentiles:
-    #     ax.annotate("{}".format(pctl), (2300, gp[pctl][-1]), size=5)
-    #     if pctl != 5:
-    #         ax.plot(gp["years"], gp[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle="-")
-    #     else:
-    #         ax.plot(gp["years"], gp[pctl], color=rcp_col_dict[rcp], linewidth=0.3, linestyle="-", label="GP")
-    # ax.annotate("50", (2320, gp[50][-1]))
-    # legend = plt.legend()
-    # legend.get_frame().set_linewidth(0.0)
-    # legend.get_frame().set_alpha(0.0)
-    # ax.set_ylabel("Sea-level equivalent\n(cm)")
-    # ax.set_xlabel("Year")
-    # ax.set_xlim(lhs["years"].min(), lhs["years"].max())
-    # set_size(3.2, 1.2)
-    # fig.savefig("gp_rcp_{}.pdf".format(rcp), bbox_inches="tight", dpi=600)
-
-    # m_year = 2100
-    # Y_gp = results[91]["Y_gp"][0]
-    # Y_lhs = results[91]["Y_lhs"]
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    # plt.title("Probability Density Year 2100")
-    # ax.hist(
-    #     Y_lhs, bins=np.arange(int(Y_gp.min()), int(Y_gp.max()), 1), density=True, color=rcp_col_dict[rcp], alpha=0.4
-    # )
-    # ax.hist(
-    #     Y_gp,
-    #     bins=np.arange(int(Y_gp.min()), int(Y_gp.max()), 1),
-    #     histtype="step",
-    #     linewidth=0.6,
-    #     density=True,
-    #     color=rcp_col_dict[rcp],
-    #     alpha=1.0,
-    # )
-    # # for pctl in m_percentiles:
-    # #     ax.axvline(gp[pctl][91], linewidth=0.3, linestyle="-")
-    # #     ax.axvline(lhs[pctl][91], linewidth=0.3, linestyle=":")
-    # ax.set_xlabel("Sea-level equivalent (cm)")
-    # ax.set_ylabel("Density")
-    # set_size(3.2, 1.2)
-    # fig.savefig("gp_rcp_{}_hist_{}.pdf".format(rcp, m_year), bbox_inches="tight", dpi=600)
+    #     ax.axvline(gp[pctl][91], linewidth=0.3, linestyle="-")
+    #     ax.axvline(lhs[pctl][91], linewidth=0.3, linestyle=":")
+    ax.set_xlabel("Sea-level equivalent (cm)")
+    ax.set_ylabel("Density")
+    set_size(3.2, 1.2)
+    fig.savefig("gp_rcp_{}_hist_{}.pdf".format(rcp, m_year), bbox_inches="tight", dpi=600)
