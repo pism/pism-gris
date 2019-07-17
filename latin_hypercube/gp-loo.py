@@ -1,4 +1,7 @@
 #!/env/bin python
+#
+# This script tests different Gaussian Process kernels using a
+# Leave-One-Out methods as described in Edwards et al. (2019)
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
@@ -34,7 +37,7 @@ def set_size(w, h, ax=None):
     ax.figure.set_size_inches(figw, figh)
 
 
-def gp_loo(kernel, rcp, year):
+def gp_loo(kernel, rcp, year, odir):
 
     """
     Leave One Out (LOO)
@@ -57,16 +60,16 @@ def gp_loo(kernel, rcp, year):
     else:
         X = samples.values[:, 1::]
 
-    n = X.shape[1]
+    m, n = X.shape[:]
 
     kern = kernel(input_dim=n, ARD=True)
 
     with Pool(n_procs) as pool:
-        pool.map(partial(gp_loo_mp, X=X, Y=Y, kern=kern, rcp=rcp, year=year), range(2))
+        pool.map(partial(gp_loo_mp, X=X, Y=Y, kern=kern, rcp=rcp, year=year, odir=odir), range(m))
         pool.close()
 
 
-def gp_loo_mp(loo_idx, X, Y, kern, rcp, year):
+def gp_loo_mp(loo_idx, X, Y, kern, rcp, year, odir):
 
     X_loo = np.delete(X, loo_idx, axis=0)
     Y_loo = np.delete(Y, loo_idx, axis=0)
@@ -79,12 +82,17 @@ def gp_loo_mp(loo_idx, X, Y, kern, rcp, year):
     p = m.predict(X_predict)
 
     df = pd.DataFrame(data=np.asarray(p).reshape(1, -1), index=[loo_idx], columns=["prediction", "variance"])
-    df.to_csv("gp_rcp_{}_{}_loo_{}.csv".format(rcp, year, loo_idx), index_label="LOO")
+    filename = os.path.join(odir, "gp_rcp_{}_{}_loo_{}.csv".format(rcp, year, loo_idx))
+    df.to_csv(filename, index_label="LOO")
 
 
-m_percentiles = [5, 16, 50, 84, 95]
-rcp_col_dict = {"CTRL": "k", "85": "#990002", "45": "#5492CD", "26": "#003466"}
-rcp_shade_col_dict = {"CTRL": "k", "85": "#F4A582", "45": "#92C5DE", "26": "#4393C3"}
+# A dictionary with the available kernels
+kernel_dict = {
+    "exponential": gp.kern.Exponential,
+    "expquad": gp.kern.ExpQuad,
+    "matern32": gp.kern.Matern32,
+    "matern52": gp.kern.Matern52,
+}
 
 
 if __name__ == "__main__":
@@ -96,6 +104,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-n", "--n_procs", dest="n_procs", type=int, help="""number of cores/processors. default=4.""", default=4
     )
+    parser.add_argument("--kernel", help="Kernel", choices=kernel_dict.keys(), default="exponential")
     parser.add_argument("--year", help="Simulation start year", type=int, default=2100)
     parser.add_argument("--rcp", help="RCP scenario. Default=85", default="85")
     parser.add_argument(
@@ -109,12 +118,20 @@ if __name__ == "__main__":
 
     options = parser.parse_args()
     basedir = options.INDIR[0]
+    kernel = options.kernel
     n_procs = options.n_procs
     rcp = options.rcp
     year = options.year
 
+    odir = os.path.join(basedir, "gp-loo")
+
+    if not os.path.isdir(odir):
+        os.makedirs(odir)
+
+    print(odir)
     # Load Samples file as Pandas DataFrame
     samples_file = options.samples_file
     samples = pd.read_csv(samples_file, delimiter=",", squeeze=True, skipinitialspace=True)
 
-    gp_loo(gp.kern.Exponential, rcp, 2100)
+    # Run the LOO
+    gp_loo(kernel_dict[kernel], rcp, year, odir)
