@@ -81,8 +81,13 @@ def gp_loo_mp(loo_idx, X, Y, kern, rcp, year, odir):
 
     p = m.predict(X_predict)
 
-    df = pd.DataFrame(data=np.asarray(p).reshape(1, -1), index=[loo_idx], columns=["prediction", "variance"])
-    filename = os.path.join(odir, "gp_rcp_{}_{}_loo_{}.csv".format(rcp, year, loo_idx))
+    df = pd.DataFrame(
+        data=np.asarray([Y[loo_idx], p[0], p[1]]).reshape(1, -1),
+        index=[loo_idx],
+        columns=["true", "prediction", "variance"],
+    )
+    kernel_name = kern.hierarchy_name().lower().split(".")[-1]
+    filename = os.path.join(odir, "gp_kernel_{}_rcp_{}_{}_loo_{}.csv".format(kernel_name, rcp, year, loo_idx))
     df.to_csv(filename, index_label="LOO")
 
 
@@ -123,12 +128,11 @@ if __name__ == "__main__":
     rcp = options.rcp
     year = options.year
 
-    odir = os.path.join(basedir, "gp-loo")
+    odir = os.path.join(basedir, "gp-loo", kernel)
 
     if not os.path.isdir(odir):
         os.makedirs(odir)
 
-    print(odir)
     # Load Samples file as Pandas DataFrame
     samples_file = options.samples_file
     samples = pd.read_csv(samples_file, delimiter=",", squeeze=True, skipinitialspace=True)
