@@ -50,4 +50,5 @@
 # Sobel Analysis
 ~/base/gris-analysis/plotting/plotting.py  -o sobel --time_bounds 2015 2500  --plot sobel 2018_09_les/scalar_ensstat/ens*_0_1000.nc
 
+~/base/gris-analysis/plotting/plotting.py  -o glacier_discharge --time_bounds 2010 2100  --plot glacier_dgmsl 2019_08_les/glaciers_pctls/pctls_dgmsl_rcp_85_*.csv
 

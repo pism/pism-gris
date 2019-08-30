@@ -1,5 +1,16 @@
 #!/bin/bash
 
+odir=2019_08_les
+s=pleiades_ivy
+q=long
+n=160
+grid=1800
+
+PISM_PREFIX=~/pism-as19/bin ./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --o_dir ${odir} --exstep 1 -n ${n} -w 10:00:00 -g ${grid} -s ${s} -q ${q} --step 100 --duration 100 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+rcp=85
+for id in {0..499} ; do qsub /nobackupp8/aaschwan/pism-gris/stability/${odir}/run_scripts/lhs_g1800m_v3a_rcp_${rcp}_id_${id}_j.sh; done
+
 
 ./cc_ensemble.py --hydrology null --o_dir 2018_11_regional --ensemble_file ../latin_hypercube/cc_control.csv -g 600 -d jib -n 120 -s chinook -q t2standard ../calibration/2017_06_vc/state/gris_g600m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 

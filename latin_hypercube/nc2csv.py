@@ -27,7 +27,10 @@ idx = options.time_step
 ne = len(infiles)
 data = np.zeros((2, 1))
 k = 0
-for infile in infiles:
+# for infile in infiles:
+for mid in range(0, 1920):
+    infile = "2019_02_salt/dgmsl/dgmsl_ts_gris_g1800m_v3a_rcp_45_id_{}_0_100.nc".format(str(mid).zfill(3))
+    print(infile)
     if os.path.isfile(infile):
         nc = NC(infile)
         if not variable in nc.variables:
@@ -43,7 +46,6 @@ for infile in infiles:
             k += 1
 
         nc.close()
-
 np.savetxt(
     outfile,
     np.transpose(data),
