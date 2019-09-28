@@ -712,6 +712,8 @@ systems["electra_broadwell"][
 
 module list
 
+ulimit -s unlimited
+
 cd $PBS_O_WORKDIR
 
 """
@@ -728,6 +730,8 @@ systems["pleiades"][
 #PBS -j oe
 
 module list
+
+ulimit -s unlimited
 
 cd $PBS_O_WORKDIR
 
@@ -746,6 +750,8 @@ systems["pleiades_broadwell"][
 
 module list
 
+ulimit -s unlimited
+
 cd $PBS_O_WORKDIR
 
 """
@@ -762,6 +768,8 @@ systems["pleiades_sandy"][
 #PBS -j oe
 
 module list
+
+ulimit -s unlimited
 
 cd $PBS_O_WORKDIR
 
@@ -780,6 +788,8 @@ systems["pleiades_haswell"][
 
 module list
 
+ulimit -s unlimited
+
 cd $PBS_O_WORKDIR
 
 """
@@ -796,6 +806,8 @@ systems["pleiades_ivy"][
 #PBS -j oe
 
 module list
+
+ulimit -s unlimited
 
 cd $PBS_O_WORKDIR
 
@@ -815,6 +827,8 @@ systems["electra_skylake"][
 module list
 
 cd $PBS_O_WORKDIR
+
+ulimit -s unlimited
 
 """
 
