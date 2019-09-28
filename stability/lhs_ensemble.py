@@ -383,10 +383,10 @@ for n, combination in enumerate(combinations):
         full_exp_name = "_".join([vversion, "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())])])
         full_outfile = "g{grid}m_{experiment}.nc".format(grid=grid, experiment=full_exp_name)
 
-        climate_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-500000.nc".format(
+        climate_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
             mgcm=gcm_dict[gcm], rcp=rcp
         )
-        precip_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-500000.nc".format(
+        precip_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
             mgcm=pgcm_dict[gcm], rcp=rcp
         )
 
