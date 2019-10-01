@@ -9,7 +9,7 @@
 cd $SLURM_SUBMIT_DIR
 
 ## PLEIADES
-odir=2019_05_salt
+odir=2019_02_salt
 grid=1800
 MAXSIZE=2500000000
 for file in ${odir}/state/*_0_100.nc  ${odir}/state/*_0_100_max*.nc; do
@@ -52,9 +52,6 @@ for file in $odir/scalar_pruned/ts_*.nc; do
         cdo -O seltimestep,1/100 -selvar,tendency*,surface*,li*,ice_*,dt,basal* $file $ofile
         adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 $ofile
      fi
-    # echo "copying ${file} to ${ofile}"
-    # cdo -O seltimestep,1/100 -selvar,tendency*,surface*,li*,ice_*,dt,basal* $file $ofile
-    #adjust_timeline.py -i start -p yearly -a 2008-1-1 -u seconds -d 2008-1-1 $ofile
 done
 
 

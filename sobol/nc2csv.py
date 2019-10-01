@@ -7,6 +7,7 @@ import numpy as np
 from netCDF4 import Dataset as NC
 import os
 import re
+from glob import glob
 
 # set up the option parser
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
@@ -20,11 +21,15 @@ options = parser.parse_args()
 variable = options.variable
 outfile = options.OUTFILE[0]
 # need to switch between the two solutions
-infiles = list(braceexpand(options.INFILES[-1]))
-infiles = options.INFILES
+# infiles = list(braceexpand(options.INFILES[-1]))
+# infiles = options.INFILES
 idx = options.time_step
 
+infiles = glob("2019_02_salt/dgmsl/dgmsl_*.nc")
+# print(infiles)
+
 ne = len(infiles)
+print(ne)
 data = np.zeros((2, 1))
 k = 0
 for infile in infiles:
@@ -34,7 +39,7 @@ for infile in infiles:
             print("Variable {} not found, skipping".format(variable))
         else:
             id = int(re.search("id_(.+?)_", infile).group(1))
-            val = float(nc.variables[variable][0] - nc.variables[variable][idx])
+            val = nc.variables[variable][idx]
             units = nc.variables[variable].units
             if k == 0:
                 data[:] = [[id], [val]]
