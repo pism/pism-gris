@@ -136,14 +136,20 @@ mkdir -p $odir/mass_loss_percent_ensstat
 
 
 
-for pctl in 5 16 50 84 95; do
+for pctl in 2.5 5 16 50 64 95 97.5 ; do
     for rcp in 26 45 85; do
+<<<<<<< Updated upstream
 
         # First, calculate ensemble statistics
         cdo -O -P 16 --sortname enspctl,$pctl $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}*0_1000.nc  $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
 
         # Calculate sea level contribution and percent mass loss for select years
         for year in 2050 2100 2200 2300 3000; do    
+=======
+        cdo -O -P 8 --sortname enspctl,$pctl $odir/scalar_clean/ts_gris_g${grid}m_v3a_rcp_${rcp}*0_1000.nc  $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+
+        for year in 2100 2200 2300 3000; do    
+>>>>>>> Stashed changes
             cdo -L setattribute,limnsw@units="cm" -setattribute,limnsw@long_mame="contribution to global mean sea level" -divc,365 -divc,-1e13 -selvar,limnsw -sub -selyear,$year $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc -seltimestep,1 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc  $odir/dgmsl_ensstat/dgmsl_enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_${year}.nc
             cdo -L  setattribute,limnsw@units="1" -setattribute,limnsw@long_mame="Mass loss in percent since 2008"  -selvar,limnsw -mulc,-100 -div -sub -selyear,$year $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc -seltimestep,1 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc -seltimestep,1 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/mass_loss_percent_ensstat/mass_loss_percent_enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_${year}.nc
         done
@@ -166,6 +172,21 @@ for pctl in 5 16 50 84 95; do
             cdo selyear,${year} $odir/contrib_flux_absolute/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/contrib_flux_absolute/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_${year}.nc
             cdo selyear,${year} $odir/contrib_flux_percent/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/contrib_flux_percent/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_${year}.nc
         done
+<<<<<<< Updated upstream
+=======
+        
+        cdo mulc,-100 -selvar,limnsw -div -sub -selyear,3000 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc -selyear,2008 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc  -selyear,2008 $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/scalar_ensstat/percent_enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+        cdo -L  setattribute,discharge_contrib@units="cm" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_runoff_rate)*tendency_of_ice_mass" -divc,365 -divc,-1e13 -timcumsum $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/contrib_absolute/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+        cdo -L  setattribute,discharge_contrib@units="" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_runoff_rate)*100" -divc,365 -divc,-1e13 -timcumsum $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/contrib_percent/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+        cdo -L  setattribute,discharge_contrib@units="kg year-1" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_runoff_rate)*tendency_of_ice_mass"  $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/contrib_flux_absolute/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+        cdo -L  setattribute,discharge_contrib@units="" -setattribute,discharge_contrib@long_mame="ice discharge contribution to global mean sea level" -expr,"discharge_contrib=tendency_of_ice_mass_due_to_discharge/(tendency_of_ice_mass_due_to_discharge-surface_runoff_rate)*100"  $odir/scalar_ensstat/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/contrib_flux_percent/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc
+        for year in 2100 2200 2300 3000; do
+            cdo selyear,${year} $odir/contrib_absolute/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/contrib_absolute/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_${year}.nc
+            cdo selyear,${year}  $odir/contrib_percent/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc  $odir/contrib_percent/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_${year}.nc
+            cdo selyear,${year} $odir/contrib_flux_absolute/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/contrib_flux_absolute/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_${year}.nc
+            cdo selyear,${year} $odir/contrib_flux_percent/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_0_1000.nc $odir/contrib_flux_percent/enspctl${pctl}_gris_g${grid}m_v3a_rcp_${rcp}_${year}.nc
+        done
+>>>>>>> Stashed changes
     done
 done
 
