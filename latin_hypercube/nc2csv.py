@@ -28,8 +28,8 @@ ne = len(infiles)
 data = np.zeros((2, 1))
 k = 0
 # for infile in infiles:
-for mid in range(0, 1920):
-    infile = "2019_02_salt/dgmsl/dgmsl_ts_gris_g1800m_v3a_rcp_45_id_{}_0_100.nc".format(str(mid).zfill(3))
+for mid in range(0, 4160):
+    infile = "2019_02_salt/dgmsl/dgmsl_ts_gris_g1800m_v3a_rcp_45_id_{}_2100.nc".format(mid)
     print(infile)
     if os.path.isfile(infile):
         nc = NC(infile)
@@ -49,7 +49,7 @@ for mid in range(0, 1920):
 np.savetxt(
     outfile,
     np.transpose(data),
-    fmt=["%i", "%4.4f"],
+    fmt=["%i", "%4.1f"],
     delimiter=",",
     header="id,{variable}({units})".format(variable=variable, units=units),
     comments="",
