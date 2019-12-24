@@ -376,7 +376,6 @@ for n, combination in enumerate(combinations):
                     "ys": start,
                     "ye": end,
                     "calendar": "365_day",
-                    "climate_forcing_buffer_size": 365,
                     "o": join(dirs["state"], outfile),
                     "o_format": oformat,
                     "config_override": "$config",
