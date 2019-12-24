@@ -72,7 +72,7 @@ parser.add_argument(
     default="netcdf4_parallel",
 )
 parser.add_argument(
-    "-g", "--grid", dest="grid", type=int, choices=grid_choices, help="horizontal grid resolution", default=1200
+    "-g", "--grid", dest="grid", type=int, choices=grid_choices, help="horizontal grid resolution", default=1500
 )
 parser.add_argument("--i_dir", dest="input_dir", help="input directory", default=abspath(join(script_directory, "..")))
 parser.add_argument("--o_dir", dest="output_dir", help="output directory", default="test_dir")
@@ -126,9 +126,6 @@ parser.add_argument(
     default="ssa+sia",
 )
 parser.add_argument(
-    "--topg_delta", dest="topg_delta_file", help="end of initialization detla=(topg-topg_initial) file", default=None
-)
-parser.add_argument(
     "--dataset_version", dest="version", choices=["2", "3", "3a", "4"], help="input data set version", default="4"
 )
 parser.add_argument(
@@ -138,6 +135,14 @@ parser.add_argument(
     help="How to approximate vertical velocities",
     default="upstream",
 )
+parser.add_argument(
+    "-e",
+    "--ensemble_file",
+    dest="ensemble_file",
+    help="File that has all combinations for ensemble study",
+    default="../uncertainty_quantification/initialization.csv",
+)
+
 parser.add_argument("--start_year", dest="start_year", type=int, help="Simulation start year", default=0)
 parser.add_argument("--duration", dest="duration", type=int, help="Years to simulate", default=50)
 parser.add_argument("--step", dest="step", type=int, help="Step in years for restarting", default=50)
@@ -155,6 +160,8 @@ queue = options.queue
 walltime = options.walltime
 system = options.system
 
+ensemble_file = options.ensemble_file
+
 spatial_ts = options.spatial_ts
 
 bed_type = options.bed_type
@@ -164,7 +171,6 @@ float_kill_calve_near_grounding_line = options.float_kill_calve_near_grounding_l
 grid = options.grid
 hydrology = options.hydrology
 stress_balance = options.stress_balance
-topg_delta_file = options.topg_delta_file
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 ocean = "const"
@@ -275,21 +281,10 @@ topg_min_values = [-700]
 topg_max_values = [700]
 omega_frac_values = [0.01]
 
-combinations = list(
-    itertools.product(
-        sia_e_values,
-        ssa_n_values,
-        ppq_values,
-        tefo_values,
-        phi_min_values,
-        phi_max_values,
-        topg_min_values,
-        topg_max_values,
-        tlftw_values,
-        omega_frac_values,
-    )
-)
-
+if system == "debug":
+    combinations = np.genfromtxt(ensemble_file, dtype=None, encoding=None, delimiter=",", skip_header=1)
+else:
+    combinations = np.genfromtxt(ensemble_file, dtype=None, delimiter=",", skip_header=1)
 
 sb_dict = {0.0: "ssa+sia", 1.0: "sia"}
 
@@ -318,190 +313,178 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
 
-exp_file = os.path.join(exp_dir, "experiment_table.csv")
-with open(exp_file, "wb") as f_csv:
-    writer = csv.writer(f_csv, delimiter=",")
-    for n, combination in enumerate(combinations):
+for n, combination in enumerate(combinations):
 
-        sia_e, ssa_n, ppq, tefo, phi_min, phi_max, topg_min, topg_max, tlftw, omega_frac = combination
+    m_id, sia_e, ssa_n, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
-        writer.writerow([n, sia_e, ssa_n, ppq, tefo, phi_min, phi_max, topg_min, topg_max, tlftw, omega_frac])
-        ttphi = "{},{},{},{}".format(phi_min, phi_max, topg_min, topg_max)
+    ttphi = "{},{},{},{}".format(phi_min, phi_max, topg_min, topg_max)
 
-        vversion = "v" + str(version)
+    vversion = "v" + str(version)
 
-        name_options = OrderedDict()
-        name_options["id"] = "{:03d}".format(n)
+    name_options = OrderedDict()
+    name_options["id"] = "{:03d}".format(m_id)
 
-        full_exp_name = "_".join([vversion, "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())])])
-        full_outfile = "g{grid}m_{experiment}.nc".format(grid=grid, experiment=full_exp_name)
+    full_exp_name = "_".join([vversion, "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())])])
+    full_outfile = "g{grid}m_{experiment}.nc".format(grid=grid, experiment=full_exp_name)
 
-        # All runs in one script file for coarse grids that fit into max walltime
-        script_combined = join(scripts_dir, "cc_g{}m_{}_j.sh".format(grid, full_exp_name))
-        with open(script_combined, "w") as f_combined:
+    # All runs in one script file for coarse grids that fit into max walltime
+    script_combined = join(scripts_dir, "cc_g{}m_{}_j.sh".format(grid, full_exp_name))
+    with open(script_combined, "w") as f_combined:
 
-            outfiles = []
-            job_no = 0
-            for start in range(simulation_start_year, simulation_end_year, restart_step):
-                job_no += 1
+        outfiles = []
+        job_no = 0
+        for start in range(simulation_start_year, simulation_end_year, restart_step):
+            job_no += 1
 
-                end = start + restart_step
+            end = start + restart_step
 
-                experiment = "_".join(
-                    [
-                        vversion,
-                        "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())]),
-                        "{}".format(start),
-                        "{}".format(end),
-                    ]
+            experiment = "_".join(
+                [
+                    vversion,
+                    "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())]),
+                    "{}".format(start),
+                    "{}".format(end),
+                ]
+            )
+
+            script = join(scripts_dir, "cc_g{}m_{}.sh".format(grid, experiment))
+            scripts.append(script)
+
+            for filename in script:
+                try:
+                    os.remove(filename)
+                except OSError:
+                    pass
+
+            if start == simulation_start_year:
+                f_combined.write(batch_header)
+                f_combined.write(run_header)
+
+            with open(script, "w") as f:
+
+                f.write(batch_header)
+                f.write(run_header)
+
+                outfile = "{domain}_g{grid}m_{experiment}.nc".format(
+                    domain=domain.lower(), grid=grid, experiment=experiment
                 )
 
-                script = join(scripts_dir, "cc_g{}m_{}.sh".format(grid, experiment))
-                scripts.append(script)
+                pism = generate_prefix_str(pism_exec)
 
-                for filename in script:
-                    try:
-                        os.remove(filename)
-                    except OSError:
-                        pass
+                general_params_dict = {
+                    "profile": join(dirs["performance"], "profile_${job_id}.py".format(**batch_system)),
+                    "ys": start,
+                    "ye": end,
+                    "calendar": "365_day",
+                    "climate_forcing_buffer_size": 365,
+                    "o": join(dirs["state"], outfile),
+                    "o_format": oformat,
+                    "config_override": "$config",
+                }
 
                 if start == simulation_start_year:
-                    f_combined.write(batch_header)
-                    f_combined.write(run_header)
+                    general_params_dict["bootstrap"] = ""
+                    general_params_dict["i"] = pism_dataname
+                    general_params_dict["regrid_file"] = input_file
+                    general_params_dict["regrid_vars"] = regridvars
+                else:
+                    general_params_dict["i"] = regridfile
 
-                with open(script, "w") as f:
+                if osize != "custom":
+                    general_params_dict["o_size"] = osize
+                else:
+                    general_params_dict[
+                        "output.sizes.medium"
+                    ] = "sftgif,velsurf_mag,tempicethk_basal,velsurf,velbase_mag"
 
-                    f.write(batch_header)
-                    f.write(run_header)
+                if start == simulation_start_year:
+                    grid_params_dict = generate_grid_description(grid, domain)
+                else:
+                    grid_params_dict = generate_grid_description(grid, domain, restart=True)
 
-                    outfile = "{domain}_g{grid}m_{experiment}.nc".format(
-                        domain=domain.lower(), grid=grid, experiment=experiment
+                sb_params_dict = {
+                    "sia_e": sia_e,
+                    "ssa_e": ssa_e,
+                    "ssa_n": ssa_n,
+                    "pseudo_plastic_q": ppq,
+                    "till_effective_fraction_overburden": tefo,
+                    "vertical_velocity_approximation": vertical_velocity_approximation,
+                }
+
+                if start == simulation_start_year:
+                    sb_params_dict["topg_to_phi"] = ttphi
+
+                # If stress balance choice is made in file, overwrite command line option
+                stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
+
+                climate_params_dict = generate_climate(climate, force_to_thickness_file=pism_dataname)
+
+                ocm = "low"
+                ocean_files = {
+                    "low": "$input_dir/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc",
+                    "mid": "$input_dir/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc",
+                    "high": "$input_dir/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc",
+                    "m10": "$input_dir/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc",
+                    "m15": "$input_dir/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc",
+                }
+
+                ocean_file = ocean_files[ocm]
+
+                ocean_parameters = {"ocean_given_file": ocean_file, "ocean.always_grounded": False}
+                ocean_params_dict = generate_ocean("given", **ocean_parameters)
+
+                hydro_params_dict = generate_hydrology(hydrology)
+
+                calving_params_dict = generate_calving("vonmises_calving,ocean_kill", ocean_kill_file=pism_dataname)
+
+                scalar_ts_dict = generate_scalar_ts(
+                    outfile, tsstep, start=simulation_start_year, end=simulation_end_year, odir=dirs["scalar"]
+                )
+
+                all_params_dict = merge_dicts(
+                    general_params_dict,
+                    grid_params_dict,
+                    stress_balance_params_dict,
+                    climate_params_dict,
+                    ocean_params_dict,
+                    hydro_params_dict,
+                    calving_params_dict,
+                    scalar_ts_dict,
+                )
+
+                if not spatial_ts == "none":
+                    exvars = spatial_ts_vars[spatial_ts]
+                    spatial_ts_dict = generate_spatial_ts(
+                        outfile, exvars, exstep, odir=dirs["spatial_tmp"], split=False
                     )
 
-                    pism = generate_prefix_str(pism_exec)
+                    all_params_dict = merge_dicts(all_params_dict, spatial_ts_dict)
 
-                    general_params_dict = {
-                        "profile": join(dirs["performance"], "profile_${job_id}.py".format(**batch_system)),
-                        "ys": start,
-                        "ye": end,
-                        "calendar": "365_day",
-                        "climate_forcing_buffer_size": 365,
-                        "o": join(dirs["state"], outfile),
-                        "o_format": oformat,
-                        "config_override": "$config",
-                    }
+                all_params = " \\\n  ".join(["-{} {}".format(k, v) for k, v in list(all_params_dict.items())])
 
-                    if start == simulation_start_year:
-                        general_params_dict["bootstrap"] = ""
-                        general_params_dict["i"] = pism_dataname
-                        general_params_dict["regrid_file"] = input_file
-                        general_params_dict["regrid_vars"] = regridvars
-                    else:
-                        general_params_dict["i"] = regridfile
+                if system == "debug":
+                    redirect = " 2>&1 | tee {jobs}/job_{job_no}.${job_id}"
+                else:
+                    redirect = " > {jobs}/job_{job_no}.${job_id} 2>&1"
 
-                    if (start == simulation_start_year) and (topg_delta_file is not None):
-                        general_params_dict["topg_delta_file"] = topg_delta_file
+                template = "{mpido} {pism} {params}" + redirect
 
-                    if osize != "custom":
-                        general_params_dict["o_size"] = osize
-                    else:
-                        general_params_dict[
-                            "output.sizes.medium"
-                        ] = "sftgif,velsurf_mag,tempicethk_basal,velsurf,velbase_mag"
+                context = merge_dicts(batch_system, dirs, {"job_no": job_no, "pism": pism, "params": all_params})
+                cmd = template.format(**context)
 
-                    if start == simulation_start_year:
-                        grid_params_dict = generate_grid_description(grid, domain)
-                    else:
-                        grid_params_dict = generate_grid_description(grid, domain, restart=True)
+                f.write(cmd)
+                f.write("\n")
+                f.write(batch_system.get("footer", ""))
 
-                    sb_params_dict = {
-                        "sia_e": sia_e,
-                        "ssa_e": ssa_e,
-                        "ssa_n": ssa_n,
-                        "pseudo_plastic_q": ppq,
-                        "till_effective_fraction_overburden": tefo,
-                        "vertical_velocity_approximation": vertical_velocity_approximation,
-                        "flow_law.gpbld.water_frac_observed_limit": omega_frac,
-                        "energy.drainage_target_water_fraction": omega_frac,
-                    }
+                f_combined.write(cmd)
+                f_combined.write("\n\n")
 
-                    if start == simulation_start_year:
-                        sb_params_dict["topg_to_phi"] = ttphi
+                regridfile = join(dirs["state"], outfile)
+                outfiles.append(outfile)
 
-                    # If stress balance choice is made in file, overwrite command line option
-                    stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
+            f_combined.write(batch_system.get("footer", ""))
 
-                    climate_params_dict = generate_climate(climate, force_to_thickness_file=pism_dataname)
-
-                    ocm = "low"
-                    ocean_files = {
-                        "low": "$input_dir/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc",
-                        "mid": "$input_dir/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc",
-                        "high": "$input_dir/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc",
-                        "m10": "$input_dir/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc",
-                        "m15": "$input_dir/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc",
-                    }
-
-                    ocean_file = ocean_files[ocm]
-
-                    ocean_parameters = {"ocean_given_file": ocean_file, "ocean.always_grounded": False}
-                    ocean_params_dict = generate_ocean("given", **ocean_parameters)
-
-                    hydro_params = {"basal_yield_stress.mohr_coulomb.till_log_factor_transportable_water": tlftw}
-                    hydro_params_dict = generate_hydrology(hydrology, **hydro_params)
-
-                    calving_params_dict = generate_calving(
-                        "vonmises_calving,ocean_kill", ocean_kill_file=pism_dataname
-                    )
-
-                    scalar_ts_dict = generate_scalar_ts(
-                        outfile, tsstep, start=simulation_start_year, end=simulation_end_year, odir=dirs["scalar"]
-                    )
-
-                    all_params_dict = merge_dicts(
-                        general_params_dict,
-                        grid_params_dict,
-                        stress_balance_params_dict,
-                        climate_params_dict,
-                        ocean_params_dict,
-                        hydro_params_dict,
-                        calving_params_dict,
-                        scalar_ts_dict,
-                    )
-
-                    if not spatial_ts == "none":
-                        exvars = spatial_ts_vars[spatial_ts]
-                        spatial_ts_dict = generate_spatial_ts(
-                            outfile, exvars, exstep, odir=dirs["spatial_tmp"], split=False
-                        )
-
-                        all_params_dict = merge_dicts(all_params_dict, spatial_ts_dict)
-
-                    all_params = " \\\n  ".join(["-{} {}".format(k, v) for k, v in list(all_params_dict.items())])
-
-                    if system == "debug":
-                        redirect = " 2>&1 | tee {jobs}/job_{job_no}.${job_id}"
-                    else:
-                        redirect = " > {jobs}/job_{job_no}.${job_id} 2>&1"
-
-                    template = "{mpido} {pism} {params}" + redirect
-
-                    context = merge_dicts(batch_system, dirs, {"job_no": job_no, "pism": pism, "params": all_params})
-                    cmd = template.format(**context)
-
-                    f.write(cmd)
-                    f.write("\n")
-                    f.write(batch_system.get("footer", ""))
-
-                    f_combined.write(cmd)
-                    f_combined.write("\n\n")
-
-                    regridfile = join(dirs["state"], outfile)
-                    outfiles.append(outfile)
-
-                f_combined.write(batch_system.get("footer", ""))
-
-            scripts_combinded.append(script_combined)
+        scripts_combinded.append(script_combined)
 
 scripts = uniquify_list(scripts)
 scripts_combinded = uniquify_list(scripts_combinded)
