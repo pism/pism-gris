@@ -418,23 +418,9 @@ for n, combination in enumerate(combinations):
 
                 climate_params_dict = generate_climate(climate, force_to_thickness_file=pism_dataname)
 
-                ocm = "low"
-                ocean_files = {
-                    "low": "$input_dir/data_sets/ocean_forcing/ocean_forcing_300myr_71n_10myr_80n.nc",
-                    "mid": "$input_dir/data_sets/ocean_forcing/ocean_forcing_400myr_71n_20myr_80n.nc",
-                    "high": "$input_dir/data_sets/ocean_forcing/ocean_forcing_500myr_71n_30myr_80n.nc",
-                    "m10": "$input_dir/data_sets/ocean_forcing/ocean_forcing_1000myr_71n_60myr_80n.nc",
-                    "m15": "$input_dir/data_sets/ocean_forcing/ocean_forcing_1500myr_71n_90myr_80n.nc",
-                }
-
-                ocean_file = ocean_files[ocm]
-
-                ocean_parameters = {"ocean_given_file": ocean_file, "ocean.always_grounded": False}
-                ocean_params_dict = generate_ocean("given", **ocean_parameters)
-
                 hydro_params_dict = generate_hydrology(hydrology)
 
-                calving_params_dict = generate_calving("vonmises_calving,ocean_kill", ocean_kill_file=pism_dataname)
+                calving_params_dict = generate_calving("float_kill", ocean_kill_file=pism_dataname)
 
                 scalar_ts_dict = generate_scalar_ts(
                     outfile, tsstep, start=simulation_start_year, end=simulation_end_year, odir=dirs["scalar"]
@@ -445,7 +431,6 @@ for n, combination in enumerate(combinations):
                     grid_params_dict,
                     stress_balance_params_dict,
                     climate_params_dict,
-                    ocean_params_dict,
                     hydro_params_dict,
                     calving_params_dict,
                     scalar_ts_dict,
