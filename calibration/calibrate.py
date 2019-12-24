@@ -92,7 +92,7 @@ parser.add_argument(
     default="pleiades_broadwell",
 )
 parser.add_argument(
-    "-b", "--bed_type", dest="bed_type", choices=list_bed_types(), help="output size type", default="wc"
+    "-b", "--bed_type", dest="bed_type", choices=list_bed_types(), help="output size type", default="ctrl"
 )
 parser.add_argument(
     "--spatial_ts",
@@ -126,7 +126,7 @@ parser.add_argument(
     default="ssa+sia",
 )
 parser.add_argument(
-    "--dataset_version", dest="version", choices=["2", "3", "3a", "4"], help="input data set version", default="4"
+    "--dataset_version", dest="version", choices=["2", "3", "3a", "4"], help="input data set version", default="3a"
 )
 parser.add_argument(
     "--vertical_velocity_approximation",
