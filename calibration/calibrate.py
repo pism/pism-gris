@@ -322,7 +322,7 @@ for n, combination in enumerate(combinations):
     vversion = "v" + str(version)
 
     name_options = OrderedDict()
-    name_options["id"] = "{:03d}".format(m_id)
+    name_options["id"] = "{}".format(m_id)
 
     full_exp_name = "_".join([vversion, "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())])])
     full_outfile = "g{grid}m_{experiment}.nc".format(grid=grid, experiment=full_exp_name)
