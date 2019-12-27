@@ -8,6 +8,24 @@
 
 cd $SLURM_SUBMIT_DIR
 
+odir=2019_12_calib
+mkdir -p ${odir}/speed
+cd ${odir}/state/
+for file in *_0_100.nc; do
+    ncks -4 -L 3 -v velsurf_mag $file ../speed/velsurf_mag_${file}
+done
+
+grid=1800
+MAXSIZE=2500000000
+for file in ${odir}/state/*_0_100.nc  ${odir}/state/*_0_100_max*.nc; do
+    FILESIZE=$(stat -c%s "$file")
+    if (( $FILESIZE > $MAXSIZE)); then
+        echo "compressing $file"
+        ncks -O -4 -L 3 $file $file
+    fi
+done
+
+
 ## PLEIADES
 odir=2019_02_salt
 grid=1800
@@ -55,28 +73,6 @@ for file in $odir/scalar_pruned/ts_*.nc; do
 done
 
 
-# Extract DGMSL
-odir=2019_02_salt
-grid=1800
-mkdir -p $odir/dgmsl
-rprefix=ts_
-postfix=_0_100.nc
-cd $odir/scalar_clean
-for rcp in 45; do
-    for year in 2100; do
-        for file in ts_gris_g${grid}m_v3a_rcp_${rcp}_id_*_0_100.nc; do
-            nfile=${file##*/}
-            sfile=${nfile#"$prefix"}
-            pfile=${sfile%"$postfix"}
-            ofile=../dgmsl/dgmsl_${pfile}_${year}.nc
-            if [ ! -f "$ofile" ]; then
-            echo "Extracting DGMSL at year $year from $file and saving it to $ofile"
-            cdo -L setattribute,limnsw@units="cm" -setattribute,limnsw@long_mame="contribution to global mean sea level" -divc,365 -divc,-1e13 -selvar,limnsw -sub -selyear,$year $file -seltimestep,1 $file $ofile
-            fi
-        done
-    done
-done
-cd ../../
 
 odir=2019_02_salt
 grid=1800
