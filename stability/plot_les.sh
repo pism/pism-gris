@@ -6,6 +6,8 @@
 # LES
 ~/base/gris-analysis/plotting/plotting.py  -o les18 --time_bounds 2008 3000 --ctrl_file 2018_08_ctrl/scalar_clean/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/contrib_flux_percent/*_0_1000.nc 2018_08_ctrl/contrib_flux_absolute/*_0_1000.nc --plot les 2018_09_les/scalar_ensstat/ens*_0_1000.nc ../data_sets/climate_forcing/tas_cmip5_rcp*ensstd**anom*.nc ../data_sets/climate_forcing/tas_Amon_*_rcp*_r1i1p1_ym_anom_GRIS_0-5000.nc  2018_09_les/contrib_flux_percent/ens*_0_1000.nc 2018_09_les/contrib_flux_absolute/ens*_0_1000.nc
 
+~/base/gris-analysis/plotting/plotting.py  -o les18_2200 --time_bounds 2008 2200 --ctrl_file 2018_08_ctrl/scalar_clean/ts_gris_g900m_v3a_rcp_*_id_CTRL_0_1000.nc 2018_08_ctrl/contrib_flux_percent/*_0_1000.nc 2018_08_ctrl/contrib_flux_absolute/*_0_1000.nc --plot forcing_mass 2018_09_les/scalar_ensstat/ens*_0_1000.nc ../data_sets/climate_forcing/tas_cmip5_rcp*ensstd**anom*.nc ../data_sets/climate_forcing/tas_Amon_*_rcp*_r1i1p1_ym_anom_GRIS_0-5000.nc  2018_09_les/contrib_flux_percent/ens*_0_1000.nc 2018_09_les/contrib_flux_absolute/ens*_0_1000.nc
+
 # Profiles
 ~/base/gris-analysis/plotting/plotting.py -c ~/base/gris-analysis/plotting/bath_112.cpt --bounds 0 12000 --time_bounds 2015 2315  -o rcp45 --plot profile 2018_08_ctrl/profiles/profiles_100m_ex_gris_g900m_v3a_rcp_45_id_CTRL_0_1000.nc
 

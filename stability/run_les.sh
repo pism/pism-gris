@@ -117,10 +117,10 @@ rcp=26
 for id in {400..449}; do sbatch /import/c1/ICESHEET/aaschwanden/pism-gris/stability/2018_09_les_chi/run_scripts/lhs_g1800m_v3a_rcp_26_id_${id}_j.sh; done
 
 
-odir=2018_08_ctrl
-s=chinook
-q=t2standard
-n=360
+odir=2020_05_ctrl
+s=electra_broadwell
+q=long
+n=420
 grid=900
 
 PISM_PREFIX=~/pism-as19/bin ./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 150:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 1000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
@@ -140,6 +140,15 @@ n=360
 grid=900
 
 ./lhs_ensemble.py --spatial_ts none -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 160:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 5000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+odir=2018_08_ctrl
+s=chinook
+q=t2standard
+n=360
+grid=900
+
+./lhs_ensemble.py --spatial_ts none -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 160:00:00 -g ${grid} -s ${s} -q ${q} --step 1000 --duration 5000 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
 
 
 odir=2018_08_svs
