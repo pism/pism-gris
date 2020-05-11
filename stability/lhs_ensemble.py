@@ -358,9 +358,27 @@ for n, combination in enumerate(combinations):
         m_pdd = 0.0
         m_ohc = 0.0
         try:
-            run_id, gcm, fice, fsnow, prs, rfr, ocm_v, ocs_v, tct_v, vcm, ppq, sia_e, m_bd, m_tlr, m_firn, m_pdd, m_ohc, m_gcm, m_sb = (
-                combination
-            )
+            (
+                run_id,
+                gcm,
+                fice,
+                fsnow,
+                prs,
+                rfr,
+                ocm_v,
+                ocs_v,
+                tct_v,
+                vcm,
+                ppq,
+                sia_e,
+                m_bd,
+                m_tlr,
+                m_firn,
+                m_pdd,
+                m_ohc,
+                m_gcm,
+                m_sb,
+            ) = combination
             bed_deformation = bd_dict[m_bd]
             firn = firn_dict[m_firn]
             lapse_rate = m_tlr
@@ -616,9 +634,15 @@ for n, combination in enumerate(combinations):
 
                     f.write(cmd)
                     f.write("\n")
+                    f.write("\n")
+                    f.write("ncks -O -4 -L 3 {ofile} {ofile}\n".format(ofile=join(dirs["state"], outfile)))
+                    f.write("\n")
                     f.write(batch_system.get("footer", ""))
 
                     f_combined.write(cmd)
+                    f.write("\n")
+                    f.write("\n")
+                    f.write("ncks -O -4 -L 3 {ofile} {ofile}\n".format(ofile=join(dirs["state"], outfile)))
                     f_combined.write("\n\n")
 
                     regridfile = join(dirs["state"], outfile)
