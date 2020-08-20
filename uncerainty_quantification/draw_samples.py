@@ -18,7 +18,7 @@ from SALib.sample import saltelli
 parser = ArgumentParser()
 parser.description = "Draw samples using the Saltelli methods"
 parser.add_argument(
-    "-s", "--n_samples", dest="n_samples", type=int, help="""number of samples to draw. default=40.""", default=40
+    "-s", "--n_samples", dest="n_samples", type=int, help="""number of samples to draw. default=10.""", default=10
 )
 parser.add_argument("OUTFILE", nargs=1, help="Ouput file (CSV)", default="velocity_calibration_samples.csv")
 options = parser.parse_args()
@@ -27,7 +27,7 @@ outfile = options.OUTFILE[-1]
 
 distributions = {
     "SIAE": uniform(1.0, 3.0),
-    "SSAN": uniform(3.0, 3.5),
+    "SSAN": uniform(3.0, 0.5),
     "PPQ": truncnorm(-0.35 / 0.2, 0.35 / 0.2, loc=0.6, scale=0.2),
     "TEFO": uniform(0.005, 0.025),
     "PHIMIN": uniform(5.0, 15.0),

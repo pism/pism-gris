@@ -420,7 +420,7 @@ for n, combination in enumerate(combinations):
 
                 hydro_params_dict = generate_hydrology(hydrology)
 
-                calving_params_dict = generate_calving("float_kill", ocean_kill_file=pism_dataname)
+                calving_params_dict = generate_calving("vonmises_calving", ocean_kill_file=pism_dataname)
 
                 scalar_ts_dict = generate_scalar_ts(
                     outfile, tsstep, start=simulation_start_year, end=simulation_end_year, odir=dirs["scalar"]
