@@ -67,7 +67,7 @@ parser.add_argument(
     "-f",
     "--o_format",
     dest="oformat",
-    choices=["netcdf3", "netcdf4_parallel", "netcdf4_serial, "pnetcdf"],
+    choices=["netcdf3", "netcdf4_parallel", "netcdf4_serial", "pnetcdf"],
     help="output format",
     default="netcdf4_parallel",
 )
@@ -482,7 +482,6 @@ for n, combination in enumerate(combinations):
                         )
                     )
                     f_combined.write("\n")
-
 
                 regridfile = join(dirs["state"], outfile)
                 outfiles.append(outfile)
