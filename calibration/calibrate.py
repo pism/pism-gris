@@ -472,6 +472,18 @@ for n, combination in enumerate(combinations):
                 f_combined.write(cmd)
                 f_combined.write("\n\n")
 
+                f_combined.write("\n")
+                f_combined.write("ncks -O -4 -L 2 {ofile} {ofile}\n".format(ofile=join(dirs["state"], outfile)))
+                f_combined.write("\n")
+                if not spatial_ts == "none":
+                    f_combined.write(
+                        "ncks -O -4 -L 2 {tmpfile} {ofile}\n".format(
+                            tmpfile=spatial_ts_dict["extra_file"], ofile=join(dirs["spatial"], "ex_" + outfile)
+                        )
+                    )
+                    f_combined.write("\n")
+
+
                 regridfile = join(dirs["state"], outfile)
                 outfiles.append(outfile)
 
