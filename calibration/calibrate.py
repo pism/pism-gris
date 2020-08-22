@@ -67,7 +67,7 @@ parser.add_argument(
     "-f",
     "--o_format",
     dest="oformat",
-    choices=["netcdf3", "netcdf4_parallel", "pnetcdf"],
+    choices=["netcdf3", "netcdf4_parallel", "netcdf4_serial, "pnetcdf"],
     help="output format",
     default="netcdf4_parallel",
 )
@@ -142,6 +142,13 @@ parser.add_argument(
     help="File that has all combinations for ensemble study",
     default="../uncertainty_quantification/initialization.csv",
 )
+parser.add_argument(
+    "-L",
+    "--comp_level",
+    dest="compression_level",
+    help="Compression level for output file. Only works with netcdf4_serial.",
+    default=2,
+)
 
 parser.add_argument("--start_year", dest="start_year", type=int, help="Simulation start year", default=0)
 parser.add_argument("--duration", dest="duration", type=int, help="Years to simulate", default=50)
@@ -154,6 +161,7 @@ input_dir = abspath(options.input_dir)
 output_dir = abspath(options.output_dir)
 spatial_tmp_dir = abspath(options.output_dir + "_tmp")
 
+compression_level = options.compression_level
 oformat = options.oformat
 osize = options.osize
 queue = options.queue
@@ -378,6 +386,7 @@ for n, combination in enumerate(combinations):
                     "calendar": "365_day",
                     "o": join(dirs["state"], outfile),
                     "o_format": oformat,
+                    "output.compression_level": "compression_level",
                     "config_override": "$config",
                 }
 
