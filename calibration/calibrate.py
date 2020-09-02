@@ -269,25 +269,7 @@ done
 # ########################################################
 
 ssa_e = 1.0
-tefo = 0.020
-phi_min = 5.0
-phi_max = 40.0
-topg_min = -700
-topg_max = 700
-
-sia_e_values = [1.25]
-ssa_n_values = [3.0, 3.25]
-ppq_values = [0.5, 0.6, 0.7]
-tefo_values = [0.020]
-tlftw_values = [0]
-if hydrology not in ("null", "diffuse"):
-    tlftw_values = [0.1, 1000]
-
-phi_min_values = [5.0]
-phi_max_values = [40.0]
-topg_min_values = [-700]
-topg_max_values = [700]
-omega_frac_values = [0.01]
+tlftw = 0.1
 
 if system == "debug":
     combinations = np.genfromtxt(ensemble_file, dtype=None, encoding=None, delimiter=",", skip_header=1)
@@ -386,7 +368,7 @@ for n, combination in enumerate(combinations):
                     "calendar": "365_day",
                     "o": join(dirs["state"], outfile),
                     "o_format": oformat,
-                    "output.compression_level": "compression_level",
+                    "output.compression_level": compression_level,
                     "config_override": "$config",
                 }
 
@@ -417,6 +399,7 @@ for n, combination in enumerate(combinations):
                     "pseudo_plastic_q": ppq,
                     "till_effective_fraction_overburden": tefo,
                     "vertical_velocity_approximation": vertical_velocity_approximation,
+                    "basal_yield_stress.mohr_coulomb.till_log_factor_transportable_water": tlftw,
                 }
 
                 if start == simulation_start_year:
@@ -473,11 +456,10 @@ for n, combination in enumerate(combinations):
                 f_combined.write("\n\n")
 
                 f_combined.write("\n")
-                f_combined.write("ncks -O -4 -L 2 {ofile} {ofile}\n".format(ofile=join(dirs["state"], outfile)))
                 f_combined.write("\n")
                 if not spatial_ts == "none":
                     f_combined.write(
-                        "ncks -O -4 -L 2 {tmpfile} {ofile}\n".format(
+                        "mv {tmpfile} {ofile}\n".format(
                             tmpfile=spatial_ts_dict["extra_file"], ofile=join(dirs["spatial"], "ex_" + outfile)
                         )
                     )
