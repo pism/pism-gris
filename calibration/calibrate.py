@@ -69,7 +69,7 @@ parser.add_argument(
     dest="oformat",
     choices=["netcdf3", "netcdf4_parallel", "netcdf4_serial", "pnetcdf"],
     help="output format",
-    default="netcdf4_parallel",
+    default="netcdf4_serial",
 )
 parser.add_argument(
     "-g", "--grid", dest="grid", type=int, choices=grid_choices, help="horizontal grid resolution", default=1500
@@ -99,7 +99,7 @@ parser.add_argument(
     dest="spatial_ts",
     choices=["basic", "standard", "none", "hydro"],
     help="output size type",
-    default="hydro",
+    default="basic",
 )
 parser.add_argument(
     "--hydrology",

@@ -31,7 +31,7 @@ distributions = {
     "PPQ": truncnorm(-0.35 / 0.2, 0.35 / 0.2, loc=0.6, scale=0.2),
     "TEFO": uniform(0.005, 0.025),
     "PHIMIN": uniform(5.0, 15.0),
-    "PHIMAX": uniform(40.0, 45.0),
+    "PHIMAX": uniform(40.0, 5.0),
     "ZMIN": randint(-1000, 0),
     "ZMAX": randint(0, 1000),
 }
