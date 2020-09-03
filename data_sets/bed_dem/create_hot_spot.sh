@@ -37,6 +37,25 @@
 # Switch to EPSG:3413, use coordinates in EPSG:3413 projection
 # 207000 -1630000
 
+# # Updated 9/2020
+
+# import numpy as np
+# from pyproj import Transformer
+# # Transform from Bamber to EPSG grid
+# transformer = Transformer.from_crs("+proj=stere +ellps=WGS84 +datum=WGS84 +lon_0=-39 +lat_0=90 +lat_ts=71 +units=m", "EPSG:3413")
+# # Transform the two points
+# p1 = np.array(transformer.transform(-32000, -1751180))
+# p2 = np.array(transformer.transform(103000,-1544330))
+# # The center is at
+# p_c = 0.5 * (p1 + p2)
+# = (206921.79363337, -1630125.19206727)
+# a = np.sqrt( (p2[0] - p_c[0])**2 + (p2[1] - p_c[1])**2)
+# = 123133
+# b = 50e3**2 / a
+# = 20303
+
+
+
 set -e  -x # exit on error
 
 INFILE=foo.nc
@@ -52,15 +71,13 @@ fi
 cp $INFILE $OUTFILE
 
 # center:
-XSPOT=206500
+XSPOT=206000
+# negate sign because -(-1630000) does not work in bash
 NEGYSPOT=1630000
 
 # parameters for ellipse and rotation in m and heat to apply there
-# ASPOT=123500
-# BSPOT=20242
-
-ASPOT=150000
-BSPOT=50000
+ASPOT=123000
+BSPOT=20300
 
 COSTHETA=0.54655
 SINTHETA=0.83743
@@ -70,7 +87,7 @@ GHFSPOT=0.970   # from Fahnstock et al 2001; in W m-2
 ncrename -v bheatflx,bheatflxSR $OUTFILE  # keep Shapiro & Ritzwoller
 
 # do equivalent of Matlab's:  [xx,yy] = meshgrid(x,y)
-ncap2 -O -s 'zero=0.0*lat' $OUTFILE $OUTFILE # note lat=lat(x,y)
+ncap2 -O -s 'zero=0.0*bheatflxSR' $OUTFILE $OUTFILE
 ncap2 -O -s 'xx=zero+x' $OUTFILE $OUTFILE
 ncap2 -O -s 'yy=zero+y' $OUTFILE $OUTFILE
 XIROT="xi=${COSTHETA}*(xx-${XSPOT})+${SINTHETA}*(yy+${NEGYSPOT})"
