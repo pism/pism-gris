@@ -126,18 +126,11 @@ parser.add_argument(
     default="ssa+sia",
 )
 parser.add_argument(
-<<<<<<< Updated upstream
-    "--dataset_version", dest="version", choices=["2", "3", "3a", "4"], help="input data set version", default="3a"
-=======
-    "--topg_delta", dest="topg_delta_file", help="end of initialization detla=(topg-topg_initial) file", default=None
-)
-parser.add_argument(
     "--dataset_version",
     dest="version",
     choices=["2", "3", "3a", "4", "1980", "1980v3"],
     help="Input data set version",
     default="4",
->>>>>>> Stashed changes
 )
 parser.add_argument(
     "--vertical_velocity_approximation",
