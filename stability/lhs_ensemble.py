@@ -299,13 +299,6 @@ gcm_dict = {
     1.0: "GISS-E2-R",
     2.0: "IPSL-CM5A-LR",
     3.0: "MPI-ESM-LR",
-    10.0: "W0.7K",
-    11.0: "W1.2K",
-    12.0: "W1.5K",
-    13.0: "W2.0K",
-    20.0: "C0.2K",
-    21.0: "C0.7K",
-    22.0: "C1.2K",
 }
 pgcm_dict = {
     -2.0: "ENSMEAN-CAP6",
@@ -314,12 +307,6 @@ pgcm_dict = {
     1.0: "GISS-E2-R-CAP6",
     2.0: "IPSL-CM5A-LR-CAP6",
     3.0: "MPI-ESM-LR-CAP6",
-    10.0: "W0.7K",
-    11.0: "W1.2K",
-    12.0: "W1.5K",
-    13.0: "W2.0K",
-    21.0: "C0.7K",
-    22.0: "C1.2K",
 }
 
 tsstep = "yearly"
@@ -400,7 +387,6 @@ for n, combination in enumerate(combinations):
         vversion = "v" + str(version)
         full_exp_name = "_".join([vversion, "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())])])
         full_outfile = "g{grid}m_{experiment}.nc".format(grid=grid, experiment=full_exp_name)
-
         climate_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
             mgcm=gcm_dict[gcm], rcp=rcp
         )
