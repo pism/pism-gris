@@ -8,6 +8,7 @@
 #SBATCH --mail-type=FAIL
 #SBATCH --output=gp-loo.%j
 
+umask 007
 
 cd $SLURM_SUBMIT_DIR
 

@@ -126,7 +126,18 @@ parser.add_argument(
     default="ssa+sia",
 )
 parser.add_argument(
+<<<<<<< Updated upstream
     "--dataset_version", dest="version", choices=["2", "3", "3a", "4"], help="input data set version", default="3a"
+=======
+    "--topg_delta", dest="topg_delta_file", help="end of initialization detla=(topg-topg_initial) file", default=None
+)
+parser.add_argument(
+    "--dataset_version",
+    dest="version",
+    choices=["2", "3", "3a", "4", "1980", "1980v3"],
+    help="Input data set version",
+    default="4",
+>>>>>>> Stashed changes
 )
 parser.add_argument(
     "--vertical_velocity_approximation",
@@ -205,7 +216,8 @@ climate_file = "$input_dir/data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2
     grid
 )
 
-regridvars = "litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume,thk"
+# regridvars = "litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume,thk"
+regridvars = "litho_temp,enthalpy,age,tillwat,bmelt,ice_area_specific_volume"
 
 dirs = {"output": "$output_dir", "spatial_tmp": "$spatial_tmp_dir"}
 for d in ["performance", "state", "scalar", "spatial", "jobs", "basins"]:
