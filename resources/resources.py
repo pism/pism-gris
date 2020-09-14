@@ -84,6 +84,8 @@ spatial_ts_vars["divq"] = [
 
 spatial_ts_vars["hydro"] = [
     "basal_melt_rate_grounded",
+    "bheatflx",
+    "bmelt",
     "bwat",
     "bwp",
     "bwatvel",
