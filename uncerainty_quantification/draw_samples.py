@@ -26,14 +26,16 @@ n_samples = options.n_samples
 outfile = options.OUTFILE[-1]
 
 distributions = {
-    "SIAE": uniform(1.0, 3.0),
-    "SSAN": uniform(3.0, 0.5),
-    "PPQ": truncnorm(-0.35 / 0.2, 0.35 / 0.2, loc=0.6, scale=0.2),
-    "TEFO": uniform(0.005, 0.025),
-    "PHIMIN": uniform(5.0, 15.0),
-    "PHIMAX": uniform(40.0, 5.0),
-    "ZMIN": randint(-1000, 0),
-    "ZMAX": randint(0, 1000),
+    "SIAE": uniform(loc=1.0, scale=3.0),  # uniform between 1 and 4    AS16 best value: 1.25
+    "SSAN": uniform(loc=3.0, scale=0.5),  # uniform between 3 and 3.5  AS16 best value: 3.25
+    "PPQ": truncnorm(
+        -0.35 / 0.2, 0.35 / 0.2, loc=0.6, scale=0.2
+    ),  # truncated norm with center 0.6 (AS16 best value), Brinkerhoff 2020 has ~0.5, we could use a uniform distribution, or truncnorm centered aroun 0.5?
+    "TEFO": uniform(loc=0.005, scale=0.025),  # uniform between 0.005 and 0.03
+    "PHIMIN": uniform(loc=5.0, scale=15.0),  # uniform between  5 and 20
+    "PHIMAX": uniform(loc=40.0, scale=5.0),  # uniform between 40 and 45
+    "ZMIN": uniform(loc=-1000, scale=1000),  # uniform between -1000 and 0
+    "ZMAX": uniform(loc=0, scale=1000),  # uniform between 0 and 1000
 }
 
 
