@@ -126,18 +126,11 @@ parser.add_argument(
     default="ssa+sia",
 )
 parser.add_argument(
-<<<<<<< Updated upstream
-    "--dataset_version", dest="version", choices=["2", "3", "3a", "4"], help="input data set version", default="3a"
-=======
-    "--topg_delta", dest="topg_delta_file", help="end of initialization detla=(topg-topg_initial) file", default=None
-)
-parser.add_argument(
     "--dataset_version",
     dest="version",
     choices=["2", "3", "3a", "4", "1980", "1980v3"],
     help="Input data set version",
     default="4",
->>>>>>> Stashed changes
 )
 parser.add_argument(
     "--vertical_velocity_approximation",
@@ -388,7 +381,7 @@ for n, combination in enumerate(combinations):
                     general_params_dict["bootstrap"] = ""
                     general_params_dict["i"] = pism_dataname
                     general_params_dict[
-                        "energy.thermal_bedrock.file"
+                        "energy.bedrock_thermal.file"
                     ] = "$input_dir/data_sets/bed_dem/pism_Greenland_ext_1800m_bheatflx_hot.nc"
                     general_params_dict["regrid_file"] = input_file
                     general_params_dict["regrid_vars"] = regridvars
