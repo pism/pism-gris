@@ -380,9 +380,9 @@ for n, combination in enumerate(combinations):
                 if start == simulation_start_year:
                     general_params_dict["bootstrap"] = ""
                     general_params_dict["i"] = pism_dataname
-                    general_params_dict[
-                        "energy.bedrock_thermal.file"
-                    ] = "$input_dir/data_sets/bed_dem/pism_Greenland_ext_1800m_bheatflx_hot.nc"
+                    # general_params_dict[
+                    #    "energy.bedrock_thermal.file"
+                    # ] = "$input_dir/data_sets/bed_dem/pism_Greenland_ext_1800m_bheatflx_hot.nc"
                     general_params_dict["regrid_file"] = input_file
                     general_params_dict["regrid_vars"] = regridvars
                 else:
