@@ -128,7 +128,7 @@ parser.add_argument(
 parser.add_argument(
     "--dataset_version",
     dest="version",
-    choices=["2", "3", "3a", "4", "1980", "1980v3"],
+    choices=["2", "3", "3a", "4", "1980", "1980v3", "1_RAGIS"],
     help="Input data set version",
     default="4",
 )
@@ -268,6 +268,12 @@ done
     config=pism_config_nc,
     dirs=" ".join(list(dirs.values())),
 )
+
+if system != "debug":
+    cmd = "lfs setstripe -c -1 {}".format(dirs["output"])
+    sub.call(shlex.split(cmd))
+    cmd = "lfs setstripe -c -1 {}".format(dirs["spatial_tmp"])
+    sub.call(shlex.split(cmd))
 
 # ########################################################
 # set up parameters
