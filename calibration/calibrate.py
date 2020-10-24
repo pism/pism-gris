@@ -119,6 +119,13 @@ parser.add_argument(
     default=True,
 )
 parser.add_argument(
+    "--hot_spot",
+    dest="hot_spot",
+    action="store_false",
+    help="Use hotpsot",
+    default=True,
+)
+parser.add_argument(
     "--stress_balance",
     dest="stress_balance",
     choices=["sia", "ssa+sia", "ssa"],
@@ -186,6 +193,7 @@ stress_balance = options.stress_balance
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 ocean = "const"
+hot_spot = options.hot_spot
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -386,9 +394,10 @@ for n, combination in enumerate(combinations):
                 if start == simulation_start_year:
                     general_params_dict["bootstrap"] = ""
                     general_params_dict["i"] = pism_dataname
-                    # general_params_dict[
-                    #    "energy.bedrock_thermal.file"
-                    # ] = "$input_dir/data_sets/bed_dem/pism_Greenland_ext_1800m_bheatflx_hot.nc"
+                    if hot_spot:
+                        general_params_dict[
+                            "energy.bedrock_thermal.file"
+                        ] = "$input_dir/data_sets/bed_dem/pism_Greenland_ext_1800m_bheatflx_hot.nc"
                     general_params_dict["regrid_file"] = input_file
                     general_params_dict["regrid_vars"] = regridvars
                 else:
