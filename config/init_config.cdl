@@ -45,4 +45,6 @@ netcdf pism_overrides {
     pism_overrides:geometry.ice_free_thickness_standard = 10.0;
     pism_overrides:geometry.ice_free_thickness_standard_doc = "If ice is thinner than this standard then the mask is set to MASK_ICE_FREE_BEDROCK or MASK_ICE_FREE_OCEAN.";
 
+    pism_overrides:grid.recompute_longitude_and_latitude = "no";
+
 }

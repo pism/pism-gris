@@ -1,5 +1,13 @@
 #!/bin/bash
 
+odir=2020_11_les
+s=chinook
+q=t2standard
+n=120
+grid=1800
+
+PISM_PREFIX=~/pism-as19/bin ./lhs_ensemble.py -e ../latin_hypercube/lhs_samples_gcm.csv --spatial_ts basic --o_dir ${odir} --exstep 1 -n ${n} -w 1:00:00 -g ${grid} -s ${s} -q ${q} --step 12 --duration 12 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
 odir=2019_08_les
 s=pleiades_ivy
 q=long

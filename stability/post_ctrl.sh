@@ -196,6 +196,24 @@ done
 
 odir=2018_08_ctrl
 grid=900
+mkdir -p $odir/smb
+ncap2 -O  -v -s "tendency_of_ice_mass_due_to_surface_mass_flux=mask*0; where(mask==2) tendency_of_ice_mass_due_to_surface_mass_flux=1;" /Volumes/zachariae/pism-gris/data_sets/bed_dem/pism_Greenland_900m_mcb_jpl_v3_no_bath.nc $odir/smb/mask_g${grid}m.nc
+for rcp in 26 45 85; do
+    for year in 2100; do
+        for run in CTRL ; do
+            cdo -L  -selvar,tendency_of_ice_mass_due_to_surface_mass_flux -selyear,2008/$year $odir/spatial/ex_gris_g${grid}m_v3a_rcp_${rcp}_id_${run}_0_1000.nc $odir/smb/smb_g${grid}m_rcp_${rcp}_${run}_2008_${year}.nc
+            cdo -L timcumsum $odir/smb/smb_g${grid}m_rcp_${rcp}_${run}_2008_${year}.nc $odir/smb/sum_smb_g${grid}m_rcp_${rcp}_${run}_2008_${year}.nc
+            cdo -L timcumsum -ifthen $odir/smb/mask_g${grid}m.nc $odir/smb/smb_g${grid}m_rcp_${rcp}_${run}_2008_${year}.nc $odir/smb/sum_smb_masked_g${grid}m_rcp_${rcp}_${run}_2008_${year}.nc
+            cdo -L fldsum $odir/smb/sum_smb_g${grid}m_rcp_${rcp}_${run}_2008_${year}.nc $odir/smb/fldsum_smb_g${grid}m_rcp_${rcp}_${run}_2008_${year}.nc
+            cdo -L fldsum $odir/smb/sum_smb_masked_g${grid}m_rcp_${rcp}_${run}_2008_${year}.nc $odir/smb/fldsum_smb_masked_g${grid}m_rcp_${rcp}_${run}_2008_${year}.nc
+        done
+    done
+done
+
+
+
+odir=2018_08_ctrl
+grid=900
 mkdir -p $odir/final_states
 cd $odir/state
 for file in gris_g${grid}m*CTRL_500_1000.nc; do
