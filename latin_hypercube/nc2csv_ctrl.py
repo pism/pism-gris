@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-# Copyright (C) 2019 Andy Aschwanden
+# Copyright (C) 2019-21 Andy Aschwanden
 
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import numpy as np
 from netCDF4 import Dataset as NC
 import os
@@ -9,13 +8,7 @@ import re
 from glob import glob
 import pandas as pd
 
-# set up the option parser
-parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
-parser.description = "Generating scripts for warming experiments."
-parser.add_argument("-v", "--variable", dest="variable", help="Variable to read in. Default=limnsw", default="limnsw")
-
-options = parser.parse_args()
-infiles = glob(os.path.join("2018_09_les/scalar_clean", "ts_*.nc"))
+infiles = glob(os.path.join("2018_08_ctrl/scalar_clean", "ts_*.nc"))
 start_year = 2008
 
 dfs = []
@@ -23,7 +16,8 @@ for infile in infiles:
     print(f"Processing {infile}")
     if os.path.isfile(infile):
         nc = NC(infile)
-        m_id = int(re.search("id_(.+?)_", infile).group(1))
+        m_id = re.search("id_(.+?)_", infile).group(1)
+        m_dx = int(re.search("gris_g(.+?)m", infile).group(1))
         m_rcp = int(re.search("rcp_(.+?)_", infile).group(1))
         m_m = np.squeeze(nc.variables["limnsw"][:]) / 1e12
         m_m -= m_m[0]
@@ -45,6 +39,7 @@ for infile in infiles:
                         m_d.reshape(-1, 1),
                         np.repeat(m_id, n).reshape(-1, 1),
                         np.repeat(m_rcp, n).reshape(-1, 1),
+                        np.repeat(m_dx, n).reshape(-1, 1),
                     ]
                 ),
                 columns=[
@@ -55,10 +50,11 @@ for infile in infiles:
                     "D (Gt/yr)",
                     "Experiment",
                     "RCP",
+                    "Resolution (m)",
                 ],
             )
         )
 
         nc.close()
 df = pd.concat(dfs)
-df.to_csv("aschwanden_et_al_2019_les.gz", index=False)
+df.to_csv("aschwanden_et_al_2019_ctrl.gz", index=False)

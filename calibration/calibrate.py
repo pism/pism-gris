@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2016-18 Andy Aschwanden
+# Copyright (C) 2016-21 Andy Aschwanden
 
 import itertools
 from collections import OrderedDict
@@ -126,6 +126,13 @@ parser.add_argument(
     default=True,
 )
 parser.add_argument(
+    "--regularized_coulomb",
+    dest="regularized_coulomb",
+    action="store_false",
+    help="Use regularized Coulomb sliding",
+    default=False,
+)
+parser.add_argument(
     "--stress_balance",
     dest="stress_balance",
     choices=["sia", "ssa+sia", "ssa"],
@@ -194,6 +201,7 @@ vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 ocean = "const"
 hot_spot = options.hot_spot
+regularized_coulomb = options.reglarized_coulomb
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -427,6 +435,10 @@ for n, combination in enumerate(combinations):
 
                 if start == simulation_start_year:
                     sb_params_dict["topg_to_phi"] = ttphi
+                if regularized_coulomb:
+                    sb_params_dict["regularized_coulomb"] = ""
+                else:
+                    sb_params_dict["pseudo_plastic"] = ""
 
                 # If stress balance choice is made in file, overwrite command line option
                 stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
