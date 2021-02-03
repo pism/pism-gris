@@ -128,7 +128,7 @@ parser.add_argument(
 parser.add_argument(
     "--regularized_coulomb",
     dest="regularized_coulomb",
-    action="store_false",
+    action="store_true",
     help="Use regularized Coulomb sliding",
     default=False,
 )
@@ -201,7 +201,7 @@ vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 ocean = "const"
 hot_spot = options.hot_spot
-regularized_coulomb = options.reglarized_coulomb
+regularized_coulomb = options.regularized_coulomb
 
 domain = options.domain
 pism_exec = generate_domain(domain)
