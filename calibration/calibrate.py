@@ -405,7 +405,7 @@ for n, combination in enumerate(combinations):
                     if hot_spot:
                         general_params_dict[
                             "energy.bedrock_thermal.file"
-                        ] = "$input_dir/data_sets/bed_dem/pism_Greenland_ext_1800m_bheatflx_hot.nc"
+                        ] = "$input_dir/data_sets/bheatflux/Geothermal_Heat_Flux_Greenland_corrected_g{grid}m.nc"
                     general_params_dict["regrid_file"] = input_file
                     general_params_dict["regrid_vars"] = regridvars
                 else:

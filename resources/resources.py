@@ -63,7 +63,7 @@ def generate_domain(domain):
 
 spatial_ts_vars = {}
 
-spatial_ts_vars["basic"] = ["ice_mass", "mass_fluxes", "sftgif", "velsurf_mag", "mask", "usurf"]
+spatial_ts_vars["basic"] = ["ice_mass", "mass_fluxes", "sftgif", "velsurf_mag", "mask", "usurf", "tempicethk_basal"]
 
 spatial_ts_vars["svs"] = ["topg", "sftgif", "velsurf_mag", "mask", "usurf", "dHdt", "velsurf", "thk"]
 
