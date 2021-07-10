@@ -37,14 +37,12 @@ netcdf pism_overrides {
     pism_overrides:ocean.sub_shelf_heat_flux_into_ice = 50.0;
     pism_overrides:ocean.sub_shelf_heat_flux_into_ice_doc = "W m-2; = J m-2 s-1; naively chosen default value for heat from ocean; see comments in @ref pism::POConstant::shelf_base_mass_flux().";
 
-    pism_overrides:climate_forcing.buffer_size = 13;
-    pism_overrides:climate_forcing.buffer_size_doc = "; number of 2D climate forcing records to keep in memory; = 5 years of monthly records";
-
     pism_overrides:geometry.ice_free_thickness_standard_units = "meters";
     pism_overrides:geometry.ice_free_thickness_standard_type = "scalar";
     pism_overrides:geometry.ice_free_thickness_standard = 10.0;
     pism_overrides:geometry.ice_free_thickness_standard_doc = "If ice is thinner than this standard then the mask is set to MASK_ICE_FREE_BEDROCK or MASK_ICE_FREE_OCEAN.";
 
-    pism_overrides:grid.recompute_longitude_and_latitude = "no";
-
+    pism_overrides:grid.correct_cell_areas = "no";
+    pism_overrides:grid.correct_cell_areas_doc = "Compute corrected cell areas using WGS84 datum (for ice area and volume computations).";
+    pism_overrides:grid.correct_cell_areas_type = "boolean";
 }
