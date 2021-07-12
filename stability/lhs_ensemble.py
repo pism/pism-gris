@@ -513,6 +513,7 @@ for n, combination in enumerate(combinations):
                         "sia_e": sia_e,
                         "ssa_e": ssa_e,
                         "ssa_n": ssa_n,
+                        "pseudo_plastic": "",
                         "pseudo_plastic_q": ppq,
                         "till_effective_fraction_overburden": tefo,
                         "vertical_velocity_approximation": vertical_velocity_approximation,
