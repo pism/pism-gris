@@ -269,11 +269,11 @@ done
 
 ssa_n = 3.25
 ssa_e = 1.0
-tefo = 0.020
-phi_min = 5.0
-phi_max = 40.0
-topg_min = -700
-topg_max = 700
+# tefo = 0.020
+# phi_min = 5.0
+# phi_max = 40.0
+# topg_min = -700
+# topg_max = 700
 
 rcps = ["cc", "26", "45", "85"]
 std_dev = 4.23
@@ -370,7 +370,26 @@ for n, combination in enumerate(combinations):
             firn = firn_dict[m_firn]
             lapse_rate = m_tlr
         except:
-            run_id, gcm, fice, fsnow, prs, rfr, ocm_v, ocs_v, tct_v, vcm, ppq, sia_e = combination
+            (
+                run_id,
+                gcm,
+                fice,
+                fsnow,
+                prs,
+                rfr,
+                ocm_v,
+                ocs_v,
+                tct_v,
+                vcm,
+                sia_e,
+                ssa_n,
+                ppq,
+                tefo,
+                phi_min,
+                phi_max,
+                topg_min,
+                topg_max,
+            ) = combination
 
         ocm = ocm_dict[ocm_v]
         ocs = ocs_dict[ocs_v]
@@ -387,11 +406,15 @@ for n, combination in enumerate(combinations):
         vversion = "v" + str(version)
         full_exp_name = "_".join([vversion, "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())])])
         full_outfile = "g{grid}m_{experiment}.nc".format(grid=grid, experiment=full_exp_name)
-        climate_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
-            mgcm=gcm_dict[gcm], rcp=rcp
+        climate_modifier_file = (
+            "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
+                mgcm=gcm_dict[gcm], rcp=rcp
+            )
         )
-        precip_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
-            mgcm=pgcm_dict[gcm], rcp=rcp
+        precip_modifier_file = (
+            "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
+                mgcm=pgcm_dict[gcm], rcp=rcp
+            )
         )
 
         if m_ohc == 0:
