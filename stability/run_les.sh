@@ -263,6 +263,16 @@ grid=450
 ./lhs_ensemble.py -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 160:00:00 -g ${grid} -s ${s} -q ${q} --step 100 --duration 1000 ../calibration/2017_06_vc/state/gris_g600m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
 
 
+
+odir=2021_07_mc
+s=chinook
+q=t2standard
+n=72
+grid=1800
+
+PISM_PREFIX=~/pism-as19/bin ./lhs_ensemble.py -e ../uncertainty_qunatification/lhs_plus_mc_samples.csv --spatial_ts none --o_dir ${odir} --exstep 1 -n ${n} -w 8:00:00 -g ${grid} -s ${s} -q ${q} --step 100 --duration 100 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+
 ################################3
 # INITIALIZATION
 ################################3
@@ -278,3 +288,30 @@ grid=3600
 
 # Walltime
 4615660: rcp45_id_34??
+
+
+odir=2021_06_ctrl
+s=chinook
+q=t2standard
+n=120
+grid=900
+
+PISM_PREFIX=~/pism-as19/bin ./lhs_ensemble.py --spatial_ts divq -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 100:00:00 -g ${grid} -s ${s} -q ${q} --step 200 --duration 200 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+odir=2021_06_tauc
+s=chinook
+q=t2standard
+n=120
+grid=1500
+
+PISM_PREFIX=~/pism-as19/bin ./lhs_ensemble.py --spatial_ts divq -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 100:00:00 -g ${grid} -s ${s} -q ${q} --step 200 --duration 200 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc
+
+
+
+odir=2021_06_test
+s=chinook
+q=t2standard
+n=120
+grid=1500
+
+PISM_PREFIX=~/pism-as19/bin ./lhs_ensemble.py --spatial_ts divq -e ../latin_hypercube/lhs_control.csv --o_dir ${odir} --exstep 1 -n ${n} -w 100:00:00 -g ${grid} -s ${s} -q ${q} --step 50 --duration 200 ../calibration/2017_06_vc/state/gris_g${grid}m_flux_v3a_no_bath_sia_e_1.25_sia_n_3_ssa_n_3.25_ppq_0.6_tefo_0.02_calving_vonmises_calving_0_100.nc

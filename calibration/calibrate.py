@@ -121,21 +121,14 @@ parser.add_argument(
 parser.add_argument(
     "--hot_spot",
     dest="hot_spot",
-    action="store_false",
-    help="Use hotpsot",
-    default=True,
-)
-parser.add_argument(
-    "--regularized_coulomb",
-    dest="regularized_coulomb",
     action="store_true",
-    help="Use regularized Coulomb sliding",
+    help="Use hotpsot",
     default=False,
 )
 parser.add_argument(
     "--stress_balance",
     dest="stress_balance",
-    choices=["sia", "ssa+sia", "ssa"],
+    choices=["sia", "ssa+sia", "ssa", "blatter"],
     help="stress balance solver",
     default="ssa+sia",
 )
@@ -201,7 +194,6 @@ vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
 ocean = "const"
 hot_spot = options.hot_spot
-regularized_coulomb = options.regularized_coulomb
 
 domain = options.domain
 pism_exec = generate_domain(domain)
@@ -298,10 +290,7 @@ if system != "debug":
 ssa_e = 1.0
 tlftw = 0.1
 
-if system == "debug":
-    combinations = np.genfromtxt(ensemble_file, dtype=None, encoding=None, delimiter=",", skip_header=1)
-else:
-    combinations = np.genfromtxt(ensemble_file, dtype=None, delimiter=",", skip_header=1)
+combinations = np.genfromtxt(ensemble_file, dtype=None, encoding=None, delimiter=",", skip_header=1)
 
 sb_dict = {0.0: "ssa+sia", 1.0: "sia"}
 
@@ -332,7 +321,11 @@ batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
 
 for n, combination in enumerate(combinations):
 
-    m_id, sia_e, ssa_n, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
+    sliding_law = None
+    try:
+        m_id, sia_e, ssa_n, ppq, tefo, phi_min, phi_max, topg_min, topg_max, u_threshold, sliding_law = combination
+    except:
+        m_id, sia_e, ssa_n, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
 
     ttphi = "{},{},{},{}".format(phi_min, phi_max, topg_min, topg_max)
 
@@ -397,6 +390,7 @@ for n, combination in enumerate(combinations):
                     "o_format": oformat,
                     "output.compression_level": compression_level,
                     "config_override": "$config",
+                    #                    "energy.ch_warming.enabled": True,
                 }
 
                 if start == simulation_start_year:
@@ -405,7 +399,7 @@ for n, combination in enumerate(combinations):
                     if hot_spot:
                         general_params_dict[
                             "energy.bedrock_thermal.file"
-                        ] = "$input_dir/data_sets/bheatflux/Geothermal_Heat_Flux_Greenland_corrected_g{grid}m.nc"
+                        ] = f"$input_dir/data_sets/bheatflux/Geothermal_Heat_Flux_Greenland_corrected_g{grid}m.nc"
                     general_params_dict["regrid_file"] = input_file
                     general_params_dict["regrid_vars"] = regridvars
                 else:
@@ -431,14 +425,13 @@ for n, combination in enumerate(combinations):
                     "till_effective_fraction_overburden": tefo,
                     "vertical_velocity_approximation": vertical_velocity_approximation,
                     "basal_yield_stress.mohr_coulomb.till_log_factor_transportable_water": tlftw,
+                    #                    "basal_resistance.pseudo_plastic.u_threshold": u_threshold,
                 }
 
+                if sliding_law is not None:
+                    sb_params_dict["sliding_law"] = ""
                 if start == simulation_start_year:
                     sb_params_dict["topg_to_phi"] = ttphi
-                if regularized_coulomb:
-                    sb_params_dict["regularized_coulomb"] = ""
-                else:
-                    sb_params_dict["pseudo_plastic"] = ""
 
                 # If stress balance choice is made in file, overwrite command line option
                 stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
@@ -448,7 +441,6 @@ for n, combination in enumerate(combinations):
                 hydro_params_dict = generate_hydrology(hydrology)
 
                 calving_params_dict = generate_calving("vonmises_calving", front_retreat_file=pism_dataname)
-
                 scalar_ts_dict = generate_scalar_ts(
                     outfile, tsstep, start=simulation_start_year, end=simulation_end_year, odir=dirs["scalar"]
                 )

@@ -63,7 +63,17 @@ def generate_domain(domain):
 
 spatial_ts_vars = {}
 
-spatial_ts_vars["basic"] = ["ice_mass", "mass_fluxes", "sftgif", "velsurf_mag", "mask", "usurf", "tempicethk_basal"]
+spatial_ts_vars["basic"] = [
+    "ice_mass",
+    "mass_fluxes",
+    "sftgif",
+    "velsurf_mag",
+    "mask",
+    "usurf",
+    "tempicethk_basal",
+    "bmelt",
+    "velbase_mag",
+]
 
 spatial_ts_vars["svs"] = ["topg", "sftgif", "velsurf_mag", "mask", "usurf", "dHdt", "velsurf", "thk"]
 
@@ -78,7 +88,9 @@ spatial_ts_vars["divq"] = [
     "ice_mass",
     "flux_divergence",
     "mass_fluxes",
-    "pdd_rates",
+    "height_above_flotation",
+    "tauc",
+    "taub_mag",
 ]
 
 
@@ -722,7 +734,7 @@ systems["pleiades"][
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
-#PBS -W group_list=s1878
+#PBS -W group_list=s2457
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=ivy
 #PBS -j oe
@@ -741,7 +753,7 @@ systems["pleiades_broadwell"][
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
-#PBS -W group_list=s1878
+#PBS -W group_list=s2457
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=bro
 #PBS -j oe
@@ -760,7 +772,7 @@ systems["pleiades_sandy"][
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
-#PBS -W group_list=s1878
+#PBS -W group_list=s2457
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=san
 #PBS -j oe
@@ -779,7 +791,7 @@ systems["pleiades_haswell"][
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
-#PBS -W group_list=s1878
+#PBS -W group_list=s2457
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=has
 #PBS -j oe
@@ -798,7 +810,7 @@ systems["pleiades_ivy"][
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
-#PBS -W group_list=s1878
+#PBS -W group_list=s2457
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=ivy
 #PBS -j oe
@@ -817,7 +829,7 @@ systems["electra_skylake"][
 #PBS -N cfd
 #PBS -l walltime={walltime}
 #PBS -m e
-#PBS -W group_list=s1878
+#PBS -W group_list=s2457
 #PBS -q {queue}
 #PBS -lselect={nodes}:ncpus={ppn}:mpiprocs={ppn}:model=sky_ele
 #PBS -j oe

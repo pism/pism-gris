@@ -1,0 +1,6 @@
+id,SIAE,SSAN,PPQ,TEFO,PHIMIN,PHIMAX,ZMIN,ZMAX,UTHRESH,SLDL
+0,1.25,3.25,0.6,0.02,5,40,-700,700,100,pseudo_plastic
+1,1.25,3.25,0.5,0.02,5,40,-700,700,100,pseudo_plastic
+2,3.0,3.25,0.5,0.02,5,40,-700,700,100,pseudo_plastic
+3,2.0,3.25,0.5,0.015,5,40,-700,700,100,pseudo_plastic
+4,2.0,3.00,0.6,0.02,5,40,-700,700,100,pseudo_plastic

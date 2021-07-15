@@ -267,7 +267,7 @@ done
 # set up model initialization
 # ########################################################
 
-ssa_n = 3.25
+# ssa_n = 3.25
 ssa_e = 1.0
 # tefo = 0.020
 # phi_min = 5.0
@@ -281,10 +281,7 @@ firn = "ctrl"
 lapse_rate = 6
 bed_deformation = "ip"
 
-try:
-    combinations = np.loadtxt(ensemble_file, delimiter=",", skiprows=1)
-except:
-    combinations = np.genfromtxt(ensemble_file, dtype=None, delimiter=",", skip_header=1)
+combinations = np.genfromtxt(ensemble_file, dtype=None, encoding=None, delimiter=",", skip_header=1)
 
 firn_dict = {-1.0: "low", 0.0: "off", 1.0: "ctrl"}
 ocs_dict = {-2.0: "off", -1.0: "low", 0.0: "mid", 1.0: "high"}
@@ -339,7 +336,6 @@ post_header = make_batch_post_header(system)
 m_sb = None
 
 for n, combination in enumerate(combinations):
-
     for rcp in rcps:
         m_bd = None
         m_pdd = 0.0
@@ -517,6 +513,7 @@ for n, combination in enumerate(combinations):
                         "sia_e": sia_e,
                         "ssa_e": ssa_e,
                         "ssa_n": ssa_n,
+                        "pseudo_plastic": "",
                         "pseudo_plastic_q": ppq,
                         "till_effective_fraction_overburden": tefo,
                         "vertical_velocity_approximation": vertical_velocity_approximation,
