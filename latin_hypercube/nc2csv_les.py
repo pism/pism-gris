@@ -8,7 +8,7 @@ import re
 from glob import glob
 import pandas as pd
 
-infiles = glob(os.path.join("2018_09_les/scalar_clean", "ts_*.nc"))
+infiles = glob(os.path.join("2021_07_mc/scalar_clean", "ts_*.nc"))
 start_year = 2008
 norm_years = [2008, 2015]
 idx_norm_years = [0, 7]
@@ -61,4 +61,4 @@ for (norm_year, idx_norm_year) in zip(norm_years, idx_norm_years):
 
             nc.close()
     df = pd.concat(dfs)
-    df.to_csv(f"aschwanden_et_al_2019_les_{norm_year}_norm.csv.gz", index=False)
+    df.to_csv(f"aschwanden_et_al_2019_mc_{norm_year}_norm.csv.gz", index=False)

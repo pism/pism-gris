@@ -8,6 +8,9 @@
 
 cd $SLURM_SUBMIT_DIR
 
+
+
+
 ## PLEIADES
 odir=2018_09_les
 grid=1800
@@ -30,6 +33,7 @@ for file in ${odir}/scalar/ts_*.nc; do
         nccopy $file ${ofile}
     fi
 done
+
 
 
 ## CHINOOK
