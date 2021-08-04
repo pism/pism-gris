@@ -48,19 +48,18 @@ distributions = {
     "PHIMAX": uniform(loc=40.0, scale=5.0),  # uniform between 40 and 45
     "ZMIN": uniform(loc=-1000, scale=1000),  # uniform between -1000 and 0
     "ZMAX": uniform(loc=0, scale=1000),  # uniform between 0 and 1000
-    #    "UTHRESH": uniform(loc=40, scale=40),  # uniform between 40 and 80
 }
-distributions = {
-    "SIAE": uniform(loc=1.0, scale=3.0),  # uniform between 1 and 4    AS16 best value: 1.25
-    "SSAN": uniform(loc=3.0, scale=0.5),  # uniform between 3 and 3.5  AS16 best value: 3.25
-    "PPQ": uniform(loc=0.15, scale=0.5)   # uniform between 0.15 and 0.65
-    "TEFO": uniform(loc=0.015, scale=0.035),  # uniform between 0.015 and 0.040
-    "PHIMIN": uniform(loc=10.0, scale=20.0),  # uniform between  15 and 30
-    "PHIMAX": uniform(loc=40.0, scale=5.0),  # uniform between 40 and 45
-    "ZMIN": uniform(loc=-1000, scale=1000),  # uniform between -1000 and 0
-    "ZMAX": uniform(loc=0, scale=1000),  # uniform between 0 and 1000
-    "UTHRESH": uniform(loc=40, scale=40),  # uniform between 40 and 80
-}
+# distributions = {
+#     "SIAE": uniform(loc=1.0, scale=3.0),  # uniform between 1 and 4    AS16 best value: 1.25
+#     "SSAN": uniform(loc=3.0, scale=0.5),  # uniform between 3 and 3.5  AS16 best value: 3.25
+#     "PPQ": uniform(loc=0.15, scale=0.5)   # uniform between 0.15 and 0.65
+#     "TEFO": uniform(loc=0.015, scale=0.035),  # uniform between 0.015 and 0.040
+#     "PHIMIN": uniform(loc=10.0, scale=20.0),  # uniform between  15 and 30
+#     "PHIMAX": uniform(loc=40.0, scale=5.0),  # uniform between 40 and 45
+#     "ZMIN": uniform(loc=-1000, scale=1000),  # uniform between -1000 and 0
+#     "ZMAX": uniform(loc=0, scale=1000),  # uniform between 0 and 1000
+#     "UTHRESH": uniform(loc=40, scale=40),  # uniform between 40 and 80
+# }
 
 
 # Generate the Sobol sequence samples with uniform distributions
@@ -89,10 +88,6 @@ header = keys
 # Convert to Pandas dataframe, append column headers, output as csv
 df = pd.DataFrame(data=dist_sample, columns=header)
 
-<<<<<<< Updated upstream
-df["SLDL"] = "regularized_coulomb"
-=======
 # df["SLDL"] = "regularized_coulomb"
->>>>>>> Stashed changes
 
 df.to_csv(outfile, index=True, index_label="id")
