@@ -42,7 +42,7 @@ outfile = options.OUTFILE[-1]
 distributions = {
     "SIAE": uniform(loc=1.0, scale=3.0),  # uniform between 1 and 4    AS16 best value: 1.25
     "SSAN": uniform(loc=3.0, scale=0.5),  # uniform between 3 and 3.5  AS16 best value: 3.25
-    "PPQ": uniform(loc=0.15, scale=0.5),  # uniform between 0.15 and 0.65
+    "PPQ": uniform(loc=0.25, scale=0.7),  # uniform between 0.25 and 0.95
     "TEFO": uniform(loc=0.015, scale=0.035),  # uniform between 0.015 and 0.040
     "PHIMIN": uniform(loc=10.0, scale=20.0),  # uniform between  15 and 30
     "PHIMAX": uniform(loc=40.0, scale=5.0),  # uniform between 40 and 45

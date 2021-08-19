@@ -1,4 +1,0 @@
-id,SIAE,SSAN,PPQ,TEFO,PHIMIN,PHIMAX,ZMIN,ZMAX,UTHRESH,SLDL
-0,2.00,3.00,0.2,0.02,5,40,-700,700,40,regularized_coulomb
-0,2.00,3.00,0.2,0.02,5,40,-700,700,40,regularized_coulomb
-0,2.00,3.00,0.2,0.02,5,40,-700,700,40,regularized_coulomb
