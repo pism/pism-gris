@@ -43,7 +43,6 @@ distributions = {
     "PPQ": uniform(loc=0.25, scale=0.7),  # uniform between 0.25 and 0.95
     "TEFO": uniform(loc=0.015, scale=0.035),  # uniform between 0.015 and 0.040
     "PHIMIN": uniform(loc=10.0, scale=20.0),  # uniform between  15 and 30
-    "PHIMAX": uniform(loc=40.0, scale=5.0),  # uniform between 40 and 45
     "ZMIN": uniform(loc=-1000, scale=1000),  # uniform between -1000 and 0
     "ZMAX": uniform(loc=0, scale=1000),  # uniform between 0 and 1000
 }
@@ -76,5 +75,8 @@ header = keys
 # Convert to Pandas dataframe, append column headers, output as csv
 df = pd.DataFrame(data=dist_sample, columns=header)
 
-
 df.to_csv(outfile, index=True, index_label="id")
+
+df["PHIMAX"] = 45.0
+df = df[["SIAE", "SSAN", "PPQ", "TEFO", "PHIMIN", "PHIMAX", "ZMIN", "ZMAX"]]
+df.to_csv(f"ensemble_{outfile}", index=True, index_label="id")
