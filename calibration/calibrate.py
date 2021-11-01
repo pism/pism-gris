@@ -9,6 +9,7 @@ import os
 import sys
 import shlex
 from os.path import join, abspath, realpath, dirname
+import pandas as pd
 
 try:
     import subprocess32 as sub
@@ -290,9 +291,9 @@ if system != "debug":
 ssa_e = 1.0
 tlftw = 0.1
 
-combinations = np.genfromtxt(ensemble_file, dtype=None, encoding=None, delimiter=",", skip_header=1)
+uq_df = pd.read_csv(ensemble_file)
+uq_df.fillna(False, inplace=True)
 
-sb_dict = {0.0: "ssa+sia", 1.0: "sia"}
 
 tsstep = "yearly"
 
@@ -319,20 +320,18 @@ if restart_step > (simulation_end_year - simulation_start_year):
 
 batch_header, batch_system = make_batch_header(system, nn, walltime, queue)
 
-for n, combination in enumerate(combinations):
+for n, row in enumerate(uq_df.iterrows()):
+    combination = row[1]
+    print(combination)
 
-    sliding_law = None
-    try:
-        m_id, sia_e, ssa_n, ppq, tefo, phi_min, phi_max, topg_min, topg_max, u_threshold, sliding_law = combination
-    except:
-        m_id, sia_e, ssa_n, ppq, tefo, phi_min, phi_max, topg_min, topg_max = combination
-
-    ttphi = "{},{},{},{}".format(phi_min, phi_max, topg_min, topg_max)
+    ttphi = "{},{},{},{}".format(
+        combination["PHIMIN"], combination["PHIMAX"], combination["ZMIN"], combination["ZMAX"]
+    )
 
     vversion = "v" + str(version)
 
     name_options = OrderedDict()
-    name_options["id"] = "{}".format(m_id)
+    name_options["id"] = combination["id"]
 
     full_exp_name = "_".join([vversion, "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())])])
     full_outfile = "g{grid}m_{experiment}.nc".format(grid=grid, experiment=full_exp_name)
@@ -418,18 +417,16 @@ for n, combination in enumerate(combinations):
                     grid_params_dict = generate_grid_description(grid, domain, restart=True)
 
                 sb_params_dict = {
-                    "sia_e": sia_e,
-                    "ssa_e": ssa_e,
-                    "ssa_n": ssa_n,
-                    "pseudo_plastic_q": ppq,
-                    "till_effective_fraction_overburden": tefo,
+                    "sia_e": combination["SIAE"],
+                    "ssa_e": 1.0,
+                    "ssa_n": combination["SSAN"],
+                    "pseudo_plastic_q": combination["PPQ"],
+                    "till_effective_fraction_overburden": combination["TEFO"],
                     "vertical_velocity_approximation": vertical_velocity_approximation,
                     "basal_yield_stress.mohr_coulomb.till_log_factor_transportable_water": tlftw,
-                    #                    "basal_resistance.pseudo_plastic.u_threshold": u_threshold,
+                    "basal_resistance.pseudo_plastic.u_threshold": 100,
                 }
 
-                if sliding_law is not None:
-                    sb_params_dict["sliding_law"] = ""
                 if start == simulation_start_year:
                     sb_params_dict["topg_to_phi"] = ttphi
 
