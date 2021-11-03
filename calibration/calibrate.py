@@ -278,7 +278,7 @@ done
     dirs=" ".join(list(dirs.values())),
 )
 
-if system != "debug":
+if (system != "debug") or (system != "pleiades"):
     cmd = "lfs setstripe -c -1 {}".format(dirs["output"])
     sub.call(shlex.split(cmd))
     cmd = "lfs setstripe -c -1 {}".format(dirs["spatial_tmp"])
