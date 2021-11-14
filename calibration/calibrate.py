@@ -277,8 +277,7 @@ done
     config=pism_config_nc,
     dirs=" ".join(list(dirs.values())),
 )
-
-if (system != "debug") or (system != "pleiades"):
+if system not in ("debug", "pleiades"):
     cmd = "lfs setstripe -c -1 {}".format(dirs["output"])
     sub.call(shlex.split(cmd))
     cmd = "lfs setstripe -c -1 {}".format(dirs["spatial_tmp"])
