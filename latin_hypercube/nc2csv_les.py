@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # Copyright (C) 2019-21 Andy Aschwanden
 
+from argparse import ArgumentParser
 import numpy as np
 from netCDF4 import Dataset as NC
 import os
@@ -8,7 +9,11 @@ import re
 from glob import glob
 import pandas as pd
 
-infiles = glob(os.path.join("2021_07_mc/scalar_clean", "ts_*.nc"))
+parser = ArgumentParser()
+parser.add_argument("--indir", default="2021_11_mc/scalar_clean")
+args = parser.parse_args()
+
+infiles = sorted(glob(os.path.join(args.indir, "ts_*.nc")))
 start_year = 2008
 norm_years = [2008, 2015]
 idx_norm_years = [0, 7]
@@ -61,4 +66,4 @@ for (norm_year, idx_norm_year) in zip(norm_years, idx_norm_years):
 
             nc.close()
     df = pd.concat(dfs)
-    df.to_csv(f"aschwanden_et_al_2019_mc_{norm_year}_norm.csv.gz", index=False)
+    df.to_csv(f"aschwanden_et_al_2019_mc2_{norm_year}_norm.csv.gz", index=False)
