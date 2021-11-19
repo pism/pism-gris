@@ -9,6 +9,21 @@ mkdir -p ${data_dir}/${tmp_dir}
 
 for rcp in 26 45 85; do
     for gcm in GISS-E2-H GISS-E2-R IPSL-CM5A-LR MPI-ESM-LR; do
+        cdo -O mergetime ${data_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_*.nc ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_spatial_2006-23xx.nc
+        cdo -O -L remapbil,DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_4500m.nc -yearmean -selyear,2006/2300 ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_spatial_2006-23xx.nc ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_spatial_ym_GRIS_2006-2300.nc
+        cdo -O sub ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_spatial_ym_GRIS_2006-2300.nc -timmean -selyear,2006/2015 ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_spatial_ym_GRIS_2006-2300.nc ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2006-2300.nc
+        cdo -O -L selyear,2008/2300  ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2006-2300.nc ${var}_Amon_${gcm}_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc
+    done
+    cdo -O -P 4 ensmean ${var}_Amon_GISS-E2-H_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_GISS-E2-R_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_IPSL-CM5A-LR_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_MPI-ESM-LR_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_ENSMEAN_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc
+    cdo -O -P 4 ensmin ${var}_Amon_GISS-E2-H_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_GISS-E2-R_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_IPSL-CM5A-LR_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_MPI-ESM-LR_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_ENSMIN_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc
+    cdo -O -P 4 ensmax ${var}_Amon_GISS-E2-H_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_GISS-E2-R_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_IPSL-CM5A-LR_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_MPI-ESM-LR_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc ${var}_Amon_ENSMAX_rcp${rcp}_${ens}_spatial_ym_anom_GRIS_2008-2300.nc
+done
+
+
+exit
+
+for rcp in 26 45 85; do
+    for gcm in GISS-E2-H GISS-E2-R IPSL-CM5A-LR MPI-ESM-LR; do
         cdo -O mergetime ${data_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_*.nc ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_2006-23xx.nc
         cdo -O -L yearmean -selyear,2006/2300 -fldmean -sellonlatbox,$box ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_2006-23xx.nc ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_ym_GRIS_2006-2300.nc
         cdo -O sub ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_ym_GRIS_2006-2300.nc -timmean -selyear,2006/2015 ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_ym_GRIS_2006-2300.nc ${data_dir}/${tmp_dir}/${var}_Amon_${gcm}_rcp${rcp}_${ens}_ym_anom_GRIS_2006-2300.nc
@@ -26,3 +41,4 @@ for rcp in 26 45 85; do
     cdo -O -P 4 ensmin ${var}_Amon_GISS-E2-H_rcp${rcp}_${ens}_ym_anom_GRIS_0-500000.nc ${var}_Amon_GISS-E2-R_rcp${rcp}_${ens}_ym_anom_GRIS_0-500000.nc ${var}_Amon_IPSL-CM5A-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-500000.nc ${var}_Amon_MPI-ESM-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-5000.nc ${var}_Amon_ENSMIN_rcp${rcp}_${ens}_ym_anom_GRIS_0-500000.nc
     cdo -O -P 4 ensmax ${var}_Amon_GISS-E2-H_rcp${rcp}_${ens}_ym_anom_GRIS_0-500000.nc ${var}_Amon_GISS-E2-R_rcp${rcp}_${ens}_ym_anom_GRIS_0-500000.nc ${var}_Amon_IPSL-CM5A-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-500000.nc ${var}_Amon_MPI-ESM-LR_rcp${rcp}_${ens}_ym_anom_GRIS_0-500000.nc ${var}_Amon_ENSMAX_rcp${rcp}_${ens}_ym_anom_GRIS_0-500000.nc
 done
+
