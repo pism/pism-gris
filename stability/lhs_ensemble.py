@@ -138,6 +138,7 @@ parser.add_argument(
     help="How to approximate vertical velocities",
     default="upstream",
 )
+parser.add_argument("--spatial_anomalies", action="store_true", help="Use patial temperature anomalies", default=False)
 parser.add_argument("--start_year", dest="start_year", type=int, help="Simulation start year", default=0)
 parser.add_argument("--duration", dest="duration", type=int, help="Years to simulate", default=1000)
 parser.add_argument("--step", dest="step", type=int, help="Step in years for restarting", default=1000)
@@ -185,6 +186,7 @@ topg_delta_file = options.topg_delta_file
 test_climate_models = options.test_climate_models
 vertical_velocity_approximation = options.vertical_velocity_approximation
 version = options.version
+spatial_anomalies = options.spatial_anomalies
 
 ensemble_file = options.ensemble_file
 
@@ -402,16 +404,24 @@ for n, combination in enumerate(combinations):
         vversion = "v" + str(version)
         full_exp_name = "_".join([vversion, "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())])])
         full_outfile = "g{grid}m_{experiment}.nc".format(grid=grid, experiment=full_exp_name)
-        climate_modifier_file = (
-            "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
+        if spatial_anomalies:
+            climate_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_spatial_ym_anom_GRIS_2008-2300.nc".format(
                 mgcm=gcm_dict[gcm], rcp=rcp
             )
-        )
-        precip_modifier_file = (
-            "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
+            precip_modifier_file = "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_spatial_ym_anom_GRIS_2008-2300.nc".format(
                 mgcm=pgcm_dict[gcm], rcp=rcp
             )
-        )
+        else:
+            climate_modifier_file = (
+                "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
+                    mgcm=gcm_dict[gcm], rcp=rcp
+                )
+            )
+            precip_modifier_file = (
+                "$input_dir/data_sets/climate_forcing/tas_Amon_{mgcm}_rcp{rcp}_r1i1p1_ym_anom_GRIS_0-5000.nc".format(
+                    mgcm=pgcm_dict[gcm], rcp=rcp
+                )
+            )
 
         if m_ohc == 0:
             ocean_modifier_file = climate_modifier_file
