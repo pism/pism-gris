@@ -66,4 +66,4 @@ for (norm_year, idx_norm_year) in zip(norm_years, idx_norm_years):
 
             nc.close()
     df = pd.concat(dfs)
-    df.to_csv(f"aschwanden_et_al_2019_mc2_{norm_year}_norm.csv.gz", index=False)
+    df.to_csv(f"aschwanden_et_al_2019_mc_{norm_year}_norm.csv.gz", index=False)
