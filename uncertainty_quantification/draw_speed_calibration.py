@@ -17,7 +17,7 @@ from SALib.sample import saltelli
 from pyDOE import lhs
 
 parser = ArgumentParser()
-parser.description = "Draw samples using the Saltelli methods"
+parser.description = "Draw samples using LHS or Saltelli."
 parser.add_argument(
     "-s", "--n_samples", dest="n_samples", type=int, help="""number of samples to draw. default=10.""", default=10
 )
@@ -41,8 +41,9 @@ distributions = {
     "SIAE": uniform(loc=1.0, scale=3.0),  # uniform between 1 and 4    AS16 best value: 1.25
     "SSAN": uniform(loc=3.0, scale=0.5),  # uniform between 3 and 3.5  AS16 best value: 3.25
     "PPQ": uniform(loc=0.25, scale=0.7),  # uniform between 0.25 and 0.95
-    "TEFO": uniform(loc=0.015, scale=0.035),  # uniform between 0.015 and 0.040
-    "PHIMIN": uniform(loc=10.0, scale=20.0),  # uniform between  15 and 30
+    "TEFO": uniform(loc=0.005, scale=0.025),  # uniform between 0.015 and 0.030
+    "PHIMIN": uniform(loc=5.0, scale=15.0),  # uniform between  5 and 20
+    "PHIMAX": uniform(loc=40.0, scale=5.0),  # uniform between  40 and 45
     "ZMIN": uniform(loc=-1000, scale=1000),  # uniform between -1000 and 0
     "ZMAX": uniform(loc=0, scale=1000),  # uniform between 0 and 1000
 }
