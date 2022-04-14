@@ -94,7 +94,7 @@ parser.add_argument(
 parser.add_argument(
     "--spatial_ts",
     dest="spatial_ts",
-    choices=["basic", "standard", "none", "svs", "divq"],
+    choices=["basic", "standard", "none", "svs", "divq", "minimal", "hydro"],
     help="output size type",
     default="basic",
 )

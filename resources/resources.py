@@ -75,6 +75,13 @@ spatial_ts_vars["basic"] = [
     "velbase_mag",
 ]
 
+spatial_ts_vars["minimal"] = [
+    "ice_mass",
+    "velsurf_mag",
+    "mask",
+    "usurf",
+]
+
 spatial_ts_vars["svs"] = ["topg", "sftgif", "velsurf_mag", "mask", "usurf", "dHdt", "velsurf", "thk"]
 
 spatial_ts_vars["divq"] = [
