@@ -40,20 +40,50 @@ def map_dict(val, mdict):
         return val
 
 
-grid_choices = [18000, 9000, 6000, 4500, 3600, 3000, 2400, 1800, 1500, 1200, 900, 600, 450, 300, 150]
+grid_choices = [
+    18000,
+    9000,
+    6000,
+    4500,
+    3600,
+    3000,
+    2400,
+    1800,
+    1500,
+    1200,
+    900,
+    600,
+    450,
+    300,
+    150,
+]
 
 # set up the option parser
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.description = "Generating scripts for warming experiments."
 parser.add_argument("FILE", nargs=1, help="Input file to restart from", default=None)
 parser.add_argument(
-    "-n", "--n_procs", dest="n", type=int, help="""number of cores/processors. default=140.""", default=140
+    "-n",
+    "--n_procs",
+    dest="n",
+    type=int,
+    help="""number of cores/processors. default=140.""",
+    default=140,
 )
 parser.add_argument(
-    "-w", "--wall_time", dest="walltime", help="""walltime. default: 100:00:00.""", default="100:00:00"
+    "-w",
+    "--wall_time",
+    dest="walltime",
+    help="""walltime. default: 100:00:00.""",
+    default="100:00:00",
 )
 parser.add_argument(
-    "-q", "--queue", dest="queue", choices=list_queues(), help="""queue. default=long.""", default="long"
+    "-q",
+    "--queue",
+    dest="queue",
+    choices=list_queues(),
+    help="""queue. default=long.""",
+    default="long",
 )
 parser.add_argument(
     "-d",
@@ -63,7 +93,12 @@ parser.add_argument(
     help="sets the modeling domain",
     default="gris",
 )
-parser.add_argument("--exstep", dest="exstep", help="Writing interval for spatial time series", default=1)
+parser.add_argument(
+    "--exstep",
+    dest="exstep",
+    help="Writing interval for spatial time series",
+    default=1,
+)
 parser.add_argument(
     "-f",
     "--o_format",
@@ -73,10 +108,23 @@ parser.add_argument(
     default="netcdf4_serial",
 )
 parser.add_argument(
-    "-g", "--grid", dest="grid", type=int, choices=grid_choices, help="horizontal grid resolution", default=1500
+    "-g",
+    "--grid",
+    dest="grid",
+    type=int,
+    choices=grid_choices,
+    help="horizontal grid resolution",
+    default=1500,
 )
-parser.add_argument("--i_dir", dest="input_dir", help="input directory", default=abspath(join(script_directory, "..")))
-parser.add_argument("--o_dir", dest="output_dir", help="output directory", default="test_dir")
+parser.add_argument(
+    "--i_dir",
+    dest="input_dir",
+    help="input directory",
+    default=abspath(join(script_directory, "..")),
+)
+parser.add_argument(
+    "--o_dir", dest="output_dir", help="output directory", default="test_dir"
+)
 parser.add_argument(
     "--o_size",
     dest="osize",
@@ -93,7 +141,12 @@ parser.add_argument(
     default="pleiades_broadwell",
 )
 parser.add_argument(
-    "-b", "--bed_type", dest="bed_type", choices=list_bed_types(), help="output size type", default="ctrl"
+    "-b",
+    "--bed_type",
+    dest="bed_type",
+    choices=list_bed_types(),
+    help="output size type",
+    default="ctrl",
 )
 parser.add_argument(
     "--spatial_ts",
@@ -110,7 +163,11 @@ parser.add_argument(
     default="diffuse",
 )
 parser.add_argument(
-    "-p", "--params", dest="params_list", help="Comma-separated list with params for sensitivity", default=None
+    "-p",
+    "--params",
+    dest="params_list",
+    help="Comma-separated list with params for sensitivity",
+    default=None,
 )
 parser.add_argument(
     "--stable_gl",
@@ -162,9 +219,15 @@ parser.add_argument(
     default=2,
 )
 
-parser.add_argument("--start_year", dest="start_year", type=int, help="Simulation start year", default=0)
-parser.add_argument("--duration", dest="duration", type=int, help="Years to simulate", default=50)
-parser.add_argument("--step", dest="step", type=int, help="Step in years for restarting", default=50)
+parser.add_argument(
+    "--start_year", dest="start_year", type=int, help="Simulation start year", default=0
+)
+parser.add_argument(
+    "--duration", dest="duration", type=int, help="Years to simulate", default=50
+)
+parser.add_argument(
+    "--step", dest="step", type=int, help="Step in years for restarting", default=50
+)
 
 options = parser.parse_args()
 
@@ -208,11 +271,17 @@ else:
     input_file = options.FILE[0]
 
 if domain.lower() in ("greenland_ext", "gris_ext"):
-    pism_dataname = "$input_dir/data_sets/bed_dem/pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc".format(
-        grid, version, bed_type
+    pism_dataname = (
+        "$input_dir/data_sets/bed_dem/pism_Greenland_ext_{}m_mcb_jpl_v{}_{}.nc".format(
+            grid, version, bed_type
+        )
     )
 else:
-    pism_dataname = "$input_dir/data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc".format(grid, version, bed_type)
+    pism_dataname = (
+        "$input_dir/data_sets/bed_dem/pism_Greenland_{}m_mcb_jpl_v{}_{}.nc".format(
+            grid, version, bed_type
+        )
+    )
 
 climate_file = "$input_dir/data_sets/climate_forcing/DMI-HIRHAM5_GL2_ERAI_2001_2014_YDM_BIL_EPSG3413_{}m.nc".format(
     grid
@@ -324,16 +393,31 @@ for n, row in enumerate(uq_df.iterrows()):
     print(combination)
 
     ttphi = "{},{},{},{}".format(
-        combination["PHIMIN"], combination["PHIMAX"], combination["ZMIN"], combination["ZMAX"]
+        combination["PHIMIN"],
+        combination["PHIMAX"],
+        combination["ZMIN"],
+        combination["ZMAX"],
     )
 
     vversion = "v" + str(version)
 
     name_options = OrderedDict()
-    name_options["id"] = combination["id"]
+    m_id = combination["id"]
+    try:
+        m_id = int(m_id)
+    except:
+        pass
+    name_options["id"] = m_id
 
-    full_exp_name = "_".join([vversion, "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())])])
-    full_outfile = "g{grid}m_{experiment}.nc".format(grid=grid, experiment=full_exp_name)
+    full_exp_name = "_".join(
+        [
+            vversion,
+            "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())]),
+        ]
+    )
+    full_outfile = "g{grid}m_{experiment}.nc".format(
+        grid=grid, experiment=full_exp_name
+    )
 
     # All runs in one script file for coarse grids that fit into max walltime
     script_combined = join(scripts_dir, "cc_g{}m_{}_j.sh".format(grid, full_exp_name))
@@ -349,7 +433,9 @@ for n, row in enumerate(uq_df.iterrows()):
             experiment = "_".join(
                 [
                     vversion,
-                    "_".join(["_".join([k, str(v)]) for k, v in list(name_options.items())]),
+                    "_".join(
+                        ["_".join([k, str(v)]) for k, v in list(name_options.items())]
+                    ),
                     "{}".format(start),
                     "{}".format(end),
                 ]
@@ -380,7 +466,10 @@ for n, row in enumerate(uq_df.iterrows()):
                 pism = generate_prefix_str(pism_exec)
 
                 general_params_dict = {
-                    "profile": join(dirs["performance"], "profile_${job_id}.py".format(**batch_system)),
+                    "profile": join(
+                        dirs["performance"],
+                        "profile_${job_id}.py".format(**batch_system),
+                    ),
                     "ys": start,
                     "ye": end,
                     "calendar": "365_day",
@@ -389,7 +478,7 @@ for n, row in enumerate(uq_df.iterrows()):
                     "output.compression_level": compression_level,
                     "config_override": "$config",
                     #                    "energy.ch_warming.enabled": True,
-                                        "stress_balance.blatter.coarsening_factor": 4,
+                    "stress_balance.blatter.coarsening_factor": 4,
                     "blatter_Mz": 17,
                     "bp_ksp_type": "gmres",
                     "bp_pc_type": "mg",
@@ -399,11 +488,10 @@ for n, row in enumerate(uq_df.iterrows()):
                     "bp_mg_coarse_ksp_type": "gmres",
                     "bp_mg_coarse_pc_type": "bjacobi",
                     "bp_snes_monitor_ratio": "",
-                    "bp_ksp_monitor" : "",
-                    "bp_ksp_view_singularvalues": "", 
+                    "bp_ksp_monitor": "",
+                    "bp_ksp_view_singularvalues": "",
                     "bp_snes_ksp_ew": 1,
                     "bp_snes_ksp_ew_version": 3,
-
                 }
 
                 if start == simulation_start_year:
@@ -428,7 +516,9 @@ for n, row in enumerate(uq_df.iterrows()):
                 if start == simulation_start_year:
                     grid_params_dict = generate_grid_description(grid, domain)
                 else:
-                    grid_params_dict = generate_grid_description(grid, domain, restart=True)
+                    grid_params_dict = generate_grid_description(
+                        grid, domain, restart=True
+                    )
 
                 sb_params_dict = {
                     "sia_e": combination["SIAE"],
@@ -445,15 +535,25 @@ for n, row in enumerate(uq_df.iterrows()):
                     sb_params_dict["topg_to_phi"] = ttphi
 
                 # If stress balance choice is made in file, overwrite command line option
-                stress_balance_params_dict = generate_stress_balance(stress_balance, sb_params_dict)
+                stress_balance_params_dict = generate_stress_balance(
+                    stress_balance, sb_params_dict
+                )
 
-                climate_params_dict = generate_climate(climate, force_to_thickness_file=pism_dataname)
+                climate_params_dict = generate_climate(
+                    climate, force_to_thickness_file=pism_dataname
+                )
 
                 hydro_params_dict = generate_hydrology(hydrology)
 
-                calving_params_dict = generate_calving("vonmises_calving", front_retreat_file=pism_dataname)
+                calving_params_dict = generate_calving(
+                    "vonmises_calving", front_retreat_file=pism_dataname
+                )
                 scalar_ts_dict = generate_scalar_ts(
-                    outfile, tsstep, start=simulation_start_year, end=simulation_end_year, odir=dirs["scalar"]
+                    outfile,
+                    tsstep,
+                    start=simulation_start_year,
+                    end=simulation_end_year,
+                    odir=dirs["scalar"],
                 )
 
                 all_params_dict = merge_dicts(
@@ -477,7 +577,9 @@ for n, row in enumerate(uq_df.iterrows()):
                     del all_params_dict["skip"]
                     all_params_dict["time_stepping.adaptive_ratio"] = 25
 
-                all_params = " \\\n  ".join(["-{} {}".format(k, v) for k, v in list(all_params_dict.items())])
+                all_params = " \\\n  ".join(
+                    ["-{} {}".format(k, v) for k, v in list(all_params_dict.items())]
+                )
 
                 if system == "debug":
                     redirect = " 2>&1 | tee {jobs}/job_{job_no}.${job_id}"
@@ -486,7 +588,11 @@ for n, row in enumerate(uq_df.iterrows()):
 
                 template = "{mpido} {pism} {params}" + redirect
 
-                context = merge_dicts(batch_system, dirs, {"job_no": job_no, "pism": pism, "params": all_params})
+                context = merge_dicts(
+                    batch_system,
+                    dirs,
+                    {"job_no": job_no, "pism": pism, "params": all_params},
+                )
                 cmd = template.format(**context)
 
                 f.write(cmd)
@@ -501,7 +607,8 @@ for n, row in enumerate(uq_df.iterrows()):
                 if not spatial_ts == "none":
                     f_combined.write(
                         "mv {tmpfile} {ofile}\n".format(
-                            tmpfile=spatial_ts_dict["extra_file"], ofile=join(dirs["spatial"], "ex_" + outfile)
+                            tmpfile=spatial_ts_dict["extra_file"],
+                            ofile=join(dirs["spatial"], "ex_" + outfile),
                         )
                     )
                     f_combined.write("\n")
