@@ -19,9 +19,19 @@ from pyDOE import lhs
 parser = ArgumentParser()
 parser.description = "Draw samples using the Saltelli methods"
 parser.add_argument(
-    "-s", "--n_samples", dest="n_samples", type=int, help="""number of samples to draw. default=10.""", default=10
+    "-s",
+    "--n_samples",
+    dest="n_samples",
+    type=int,
+    help="""number of samples to draw. default=10.""",
+    default=10,
 )
-parser.add_argument("OUTFILE", nargs=1, help="Ouput file (CSV)", default="velocity_calibration_samples.csv")
+parser.add_argument(
+    "OUTFILE",
+    nargs=1,
+    help="Ouput file (CSV)",
+    default="velocity_calibration_samples.csv",
+)
 options = parser.parse_args()
 n_samples = options.n_samples
 outfile = options.OUTFILE[-1]
@@ -40,14 +50,29 @@ outfile = options.OUTFILE[-1]
 # }
 
 distributions = {
-    "SIAE": uniform(loc=1.0, scale=3.0),  # uniform between 1 and 4    AS16 best value: 1.25
-    "SSAN": uniform(loc=3.0, scale=0.5),  # uniform between 3 and 3.5  AS16 best value: 3.25
+    "SIAE": uniform(
+        loc=1.0, scale=3.0
+    ),  # uniform between 1 and 4    AS16 best value: 1.25
+    "SSAN": uniform(
+        loc=3.0, scale=0.5
+    ),  # uniform between 3 and 3.5  AS16 best value: 3.25
     "PPQ": uniform(loc=0.25, scale=0.7),  # uniform between 0.25 and 0.95
     "TEFO": uniform(loc=0.015, scale=0.035),  # uniform between 0.015 and 0.040
     "PHIMIN": uniform(loc=10.0, scale=20.0),  # uniform between  15 and 30
     "PHIMAX": uniform(loc=40.0, scale=5.0),  # uniform between 40 and 45
     "ZMIN": uniform(loc=-1000, scale=1000),  # uniform between -1000 and 0
     "ZMAX": uniform(loc=0, scale=1000),  # uniform between 0 and 1000
+}
+
+# Andrew Johnson's paper
+
+distributions = {
+    "SIAe": uniform(loc=0.25, scale=2.25),
+    "SSAe": uniform(loc=0.5, scale=1.0),
+    "TEFO": uniform(loc=0.03, scale=0.08),
+    "PPQ": uniform(loc=0.25, scale=0.75),
+    "topg_to_phi_base": uniform(loc=-1500, scale=2000),
+    "topg_to_phi_range": uniform(loc=500, scale=2000),
 }
 # distributions = {
 #     "SIAE": uniform(loc=1.0, scale=3.0),  # uniform between 1 and 4    AS16 best value: 1.25

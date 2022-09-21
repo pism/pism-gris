@@ -12,6 +12,8 @@ from argparse import ArgumentParser
 import numpy as np
 import pandas as pd
 from scipy.stats.distributions import truncnorm, gamma, uniform, randint
+import pylab as plt
+import seaborn as sns
 
 from SALib.sample import saltelli
 from pyDOE import lhs
@@ -87,6 +89,7 @@ header = keys
 df = pd.DataFrame(data=dist_sample, columns=header)
 
 df.to_csv(outfile, index=True, index_label="id")
+
 
 df["PHIMAX"] = 45.0
 df = df[["SIAE", "SSAN", "PPQ", "TEFO", "PHIMIN", "PHIMAX", "ZMIN", "ZMAX"]]

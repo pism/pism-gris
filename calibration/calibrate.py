@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2016-21 Andy Aschwanden
+# Copyright (C) 2016-22 Andy Aschwanden
 
 import itertools
 from collections import OrderedDict
@@ -193,9 +193,20 @@ parser.add_argument(
 parser.add_argument(
     "--dataset_version",
     dest="version",
-    choices=["2", "3", "3a", "4", "1980", "1980v3", "1_RAGIS"],
+    choices=[
+        "2",
+        "3",
+        "3a",
+        "4",
+        "1980",
+        "1980v3",
+        "1_RAGIS",
+        "5_RAGIS",
+        "2021",
+        "2022",
+    ],
     help="Input data set version",
-    default="4",
+    default="2022",
 )
 parser.add_argument(
     "--vertical_velocity_approximation",
@@ -215,7 +226,7 @@ parser.add_argument(
     "-L",
     "--comp_level",
     dest="compression_level",
-    help="Compression level for output file. Only works with netcdf4_serial.",
+    help="Compression level for output file.",
     default=2,
 )
 
